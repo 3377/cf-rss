@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="grid gap-6 p-6 w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-    :style="gridStyle"
-  >
+  <div class="grid gap-6 p-6 w-full" :style="gridStyle">
     <div
       v-for="feed in feeds"
       :key="feed.url"
@@ -30,7 +27,7 @@
           <div
             v-for="item in feed.items.slice(
               0,
-              config.value.display.itemsPerFeed
+              config.value?.display?.itemsPerFeed || 15
             )"
             :key="item.id"
             class="group"
@@ -103,19 +100,21 @@ const formatDate = (date) => {
 // 计算样式
 const gridStyle = computed(() => ({
   fontSize: `${fontSize.value}px`,
-  "--card-width": `${config.value.display.cardWidth}px`,
-  gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${config.value.display.cardWidth}px), 1fr))`,
+  "--card-width": `${config.value?.display?.cardWidth || 400}px`,
+  gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${
+    config.value?.display?.cardWidth || 400
+  }px), 1fr))`,
 }));
 
 const cardStyle = computed(() => ({
-  minHeight: `${config.value.display.cardHeight}px`,
-  maxWidth: `${config.value.display.cardWidth}px`,
+  minHeight: `${config.value?.display?.cardHeight || 800}px`,
+  maxWidth: `${config.value?.display?.cardWidth || 400}px`,
   margin: "0 auto",
   width: "100%",
 }));
 
 const fontSize = computed(() => {
-  const size = config.value.display.fontSize;
+  const size = config.value?.display?.fontSize;
   return typeof size === "number" ? size : 16;
 });
 </script>
@@ -150,9 +149,17 @@ const fontSize = computed(() => {
 }
 
 /* 响应式布局调整 */
+.grid {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, var(--card-width, 400px)), 1fr)
+  );
+}
+
+/* 移动端显示单列 */
 @media (max-width: 640px) {
   .grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
 }
 
