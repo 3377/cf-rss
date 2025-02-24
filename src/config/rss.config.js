@@ -16,8 +16,8 @@ export const RSS_CONFIG = {
   ],
   // 刷新配置
   refresh: {
-    interval: 60, // 刷新间隔(秒)
-    cache: 60, // 缓存时间(秒)
+    interval: 30, // 降低到30秒以提高响应性
+    cache: 0, // 禁用缓存
   },
   // 显示配置
   display: {

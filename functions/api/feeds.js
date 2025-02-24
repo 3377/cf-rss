@@ -5,17 +5,23 @@ export async function onRequest(context) {
     const feedResults = await Promise.all(
       RSS_CONFIG.feeds.map(async (source) => {
         try {
-          // 添加自定义请求头
+          // 修改 fetch 部分的代码
           const response = await fetch(source.url, {
             headers: {
-              "User-Agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-              Accept:
-                "application/rss+xml, application/xml, application/atom+xml, text/xml, */*",
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
               "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+              "Accept-Encoding": "gzip, deflate, br",
+              "Connection": "keep-alive",
               "Cache-Control": "no-cache",
-              Pragma: "no-cache",
-              Referer: new URL(source.url).origin,
+              "Pragma": "no-cache",
+              "Sec-Fetch-Dest": "document",
+              "Sec-Fetch-Mode": "navigate",
+              "Sec-Fetch-Site": "none",
+              "Sec-Fetch-User": "?1",
+              "Upgrade-Insecure-Requests": "1",
+              "DNT": "1",
+              "Referer": `https://${new URL(source.url).hostname}/`,
             },
           });
 
@@ -184,7 +190,14 @@ export async function onRequest(context) {
     return new Response(JSON.stringify(feedResults), {
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": `public, max-age=${RSS_CONFIG.refresh.cache}`,
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "Surrogate-Control": "no-store",
+        // 允许跨域访问
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Max-Age": "86400",
       },
     });
   } catch (error) {
@@ -194,4 +207,6 @@ export async function onRequest(context) {
       headers: { "Content-Type": "application/json" },
     });
   }
+}
+
 }

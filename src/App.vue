@@ -62,10 +62,18 @@ const fetchFeeds = async () => {
   try {
     loading.value = true;
     error.value = null;
-    const response = await fetch("/api/feeds");
+    const timestamp = new Date().getTime();
+    const response = await fetch(`/api/feeds?t=${timestamp}`, {
+      headers: {
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+      },
+    });
+
     if (!response.ok) {
-      throw new Error("Failed to fetch feeds");
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     feeds.value = await response.json();
     // 重置倒计时
     countdown.value = RSS_CONFIG.refresh.interval;
