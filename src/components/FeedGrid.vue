@@ -1,57 +1,45 @@
 <template>
-  <div class="h-screen px-8 py-4 w-full">
-    <div class="grid gap-8 h-[calc(100vh-4rem)]" :style="gridStyle">
-      <div
-        v-for="feed in feeds"
-        :key="feed.url"
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col"
-      >
+  <div class="feed-container">
+    <div class="feed-grid" :style="gridStyle">
+      <div v-for="feed in feeds" :key="feed.url" class="feed-card">
         <!-- 标题区域 -->
-        <div class="p-3 border-b dark:border-gray-700">
-          <h2
-            class="text-xl font-bold text-gray-800 dark:text-gray-200 text-center"
-          >
+        <div class="card-header">
+          <h2 class="card-title">
             {{ feed.title }}
           </h2>
         </div>
 
         <!-- 内容区域 -->
-        <div class="flex-1 overflow-y-auto">
-          <div v-if="feed.error" class="p-4 text-red-500">
+        <div class="card-content">
+          <div v-if="feed.error" class="error-message">
             {{ feed.error }}
           </div>
-          <div
-            v-else-if="!feed.items.length"
-            class="p-4 text-gray-500 dark:text-gray-400 text-center"
-          >
+          <div v-else-if="!feed.items.length" class="empty-message">
             暂无内容
           </div>
-          <div v-else class="divide-y divide-gray-100 dark:divide-gray-700">
+          <div v-else class="items-list">
             <div
               v-for="item in feed.items.slice(
                 0,
                 config.value?.display?.itemsPerFeed || 15
               )"
               :key="item.id"
-              class="group relative"
+              class="feed-item"
             >
               <a
                 :href="item.link"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700"
+                class="item-link"
               >
                 <h3
-                  class="text-gray-800 dark:text-gray-200 group-hover:text-blue-500 dark:group-hover:text-blue-400"
+                  class="item-title"
                   :style="{ fontSize: `${fontSize}px` }"
                   :title="item.title"
                 >
                   {{ item.title }}
                 </h3>
-                <!-- 悬浮时显示的时间 -->
-                <span
-                  class="hidden group-hover:block absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded shadow-sm"
-                >
+                <span class="item-date">
                   {{ formatDate(item.pubDate) }}
                 </span>
               </a>
@@ -107,13 +95,11 @@ const formatDate = (date) => {
 const gridStyle = computed(() => {
   const layout = config.value?.display?.layout || {};
   return {
-    fontSize: `${fontSize.value}px`,
     gridTemplateColumns: `repeat(${layout.gridColumns || 3}, 1fr)`,
-    gap: `${layout.cardGap || 32}px`,
-    margin: `0 ${layout.sideMargin || "3%"}`,
-    maxWidth: layout.containerWidth || "1920px",
-    padding: layout.containerPadding || "10px",
-    height: layout.maxHeight || "100vh",
+    gap: `${layout.cardGap || 24}px`,
+    maxWidth: layout.containerWidth || '1920px',
+    padding: layout.containerPadding || '16px',
+    margin: `0 ${layout.sideMargin || '2%'}`
   };
 });
 
@@ -124,58 +110,166 @@ const fontSize = computed(() => {
 </script>
 
 <style scoped>
-/* 自定义滚动条样式 */
-.overflow-y-auto {
+.feed-container {
+  padding: 1rem;
+  width: 100%;
+}
+
+.feed-grid {
+  display: grid;
+  margin: 0 auto;
+}
+
+.feed-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: calc(98vh - 8rem);
+  overflow: hidden;
+}
+
+.dark .feed-card {
+  background: #1f2937;
+}
+
+.card-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .card-header {
+  border-color: #374151;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1f2937;
+  text-align: center;
+}
+
+.dark .card-title {
+  color: #e5e7eb;
+}
+
+.card-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+.items-list {
+  border-top: 1px solid #e5e7eb;
+}
+
+.dark .items-list {
+  border-color: #374151;
+}
+
+.feed-item {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .feed-item {
+  border-color: #374151;
+}
+
+.item-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  position: relative;
+}
+
+.item-link:hover {
+  background: #f3f4f6;
+}
+
+.dark .item-link:hover {
+  background: #374151;
+}
+
+.item-title {
+  color: #1f2937;
+  margin-right: 6rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dark .item-title {
+  color: #e5e7eb;
+}
+
+.item-link:hover .item-title {
+  color: #3b82f6;
+}
+
+.item-date {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: #6b7280;
+  background: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .item-date {
+  background: #1f2937;
+  color: #9ca3af;
+}
+
+.error-message {
+  color: #ef4444;
+  padding: 1rem;
+}
+
+.empty-message {
+  color: #6b7280;
+  text-align: center;
+  padding: 1rem;
+}
+
+.dark .empty-message {
+  color: #9ca3af;
+}
+
+/* 自定义滚动条 */
+.card-content {
   scrollbar-width: thin;
   scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
 }
 
-.overflow-y-auto::-webkit-scrollbar {
+.card-content::-webkit-scrollbar {
   width: 4px;
 }
 
-.overflow-y-auto::-webkit-scrollbar-track {
+.card-content::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.overflow-y-auto::-webkit-scrollbar-thumb {
+.card-content::-webkit-scrollbar-thumb {
   background-color: rgba(156, 163, 175, 0.5);
   border-radius: 2px;
 }
 
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+.card-content::-webkit-scrollbar-thumb:hover {
   background-color: rgba(156, 163, 175, 0.7);
 }
 
-/* 响应式布局调整 */
+/* 响应式布局 */
 @media (max-width: 768px) {
-  .grid {
+  .feed-grid {
     grid-template-columns: 1fr !important;
   }
 
-  /* 在移动端减小内边距 */
-  .h-screen {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  .feed-card {
+    height: calc(98vh - 4rem);
   }
-}
-
-/* 调整卡片间距 */
-.gap-8 {
-  gap: 2rem;
-}
-
-/* 确保内容区域不会溢出 */
-.flex-1 {
-  min-height: 0;
-  height: 0;
-}
-
-/* 标题文本省略 */
-h3 {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding-right: 100px; /* 为时间预留空间 */
 }
 </style>
