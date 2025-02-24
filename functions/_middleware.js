@@ -3,32 +3,94 @@ import { getRSSConfig } from "../src/config/rss.config.js";
 // 添加获取 RSS 内容的函数
 async function fetchRSSFeed(url) {
   try {
-    const response = await fetch(url);
+    // 根据不同的 URL 设置不同的请求头
+    const headers = new Headers();
+
+    if (url.includes("v2ex.com")) {
+      // V2EX 需要设置 User-Agent
+      headers.set(
+        "User-Agent",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+      );
+    } else if (url.includes("nodeseek.com")) {
+      // NodeSeek 可能需要特定的请求头
+      headers.set(
+        "User-Agent",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+      );
+      headers.set("Accept", "application/xml, application/rss+xml, text/xml");
+      headers.set("Referer", "https://nodeseek.com");
+    }
+
+    const response = await fetch(url, { headers });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const text = await response.text();
 
-    // 使用简单的字符串处理来提取所需信息
+    // 使用更健壮的正则表达式来处理不同格式的 RSS
     const items = [];
-    const itemMatches = text.match(/<item[\s\S]*?<\/item>/g) || [];
+    let itemMatches = text.match(/<item[\s\S]*?<\/item>/g) || [];
+
+    // 如果没有找到 <item>，尝试查找 <entry>（某些 RSS 源使用 Atom 格式）
+    if (itemMatches.length === 0) {
+      itemMatches = text.match(/<entry[\s\S]*?<\/entry>/g) || [];
+    }
 
     itemMatches.forEach((itemStr, index) => {
-      const titleMatch = itemStr.match(/<title>(.*?)<\/title>/);
-      const linkMatch = itemStr.match(/<link>(.*?)<\/link>/);
-      const pubDateMatch = itemStr.match(/<pubDate>(.*?)<\/pubDate>/);
+      // 标题匹配（处理 CDATA）
+      const titleMatch = itemStr.match(
+        /<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/
+      );
+
+      // 链接匹配（处理不同格式）
+      let linkMatch = itemStr.match(
+        /<link>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/link>/
+      );
+      if (!linkMatch) {
+        // 尝试匹配 href 属性格式
+        const hrefMatch = itemStr.match(/<link[^>]*href="([^"]*)"[^>]*\/>/);
+        if (hrefMatch) {
+          linkMatch = hrefMatch;
+        }
+      }
+
+      // 日期匹配（处理多种日期标签）
+      let pubDateMatch = itemStr.match(
+        /<pubDate>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/pubDate>/
+      );
+      if (!pubDateMatch) {
+        pubDateMatch = itemStr.match(
+          /<published>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/published>/
+        );
+      }
+      if (!pubDateMatch) {
+        pubDateMatch = itemStr.match(
+          /<updated>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/updated>/
+        );
+      }
 
       items.push({
         id: index,
-        title: titleMatch ? titleMatch[1] : "",
-        link: linkMatch ? linkMatch[1] : "",
-        pubDate: pubDateMatch ? pubDateMatch[1] : new Date().toISOString(),
+        title: titleMatch ? titleMatch[1].trim() : "",
+        link: linkMatch ? linkMatch[1].trim() : "",
+        pubDate: pubDateMatch
+          ? pubDateMatch[1].trim()
+          : new Date().toISOString(),
       });
     });
 
+    // 如果没有找到任何内容，记录错误
+    if (items.length === 0) {
+      console.warn(
+        `No items found for ${url}. Response:`,
+        text.substring(0, 500)
+      );
+    }
+
     return {
       items,
-      error: null,
+      error: items.length === 0 ? "No items found in feed" : null,
     };
   } catch (error) {
     console.error(`Error fetching RSS feed ${url}:`, error);
