@@ -113,7 +113,8 @@ const fontSize = computed(() => {
 .feed-container {
   padding: 1rem;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .feed-grid {
@@ -122,6 +123,8 @@ const fontSize = computed(() => {
   gap: 10rem;
   padding: 1rem;
   width: 98%;
+  height: calc(100vh - 2rem);
+  overflow: hidden;
 }
 
 .feed-card {
@@ -130,7 +133,7 @@ const fontSize = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 600px;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -251,8 +254,13 @@ const fontSize = computed(() => {
 }
 
 /* 自定义滚动条 */
+.card-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
 .card-content::-webkit-scrollbar {
-  width: 3px;
+  width: 4px;
 }
 
 .card-content::-webkit-scrollbar-track {
@@ -260,12 +268,12 @@ const fontSize = computed(() => {
 }
 
 .card-content::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.3);
-  border-radius: 3px;
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 2px;
 }
 
 .card-content::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(156, 163, 175, 0.5);
+  background-color: rgba(156, 163, 175, 0.7);
 }
 
 /* 响应式布局 */
@@ -275,11 +283,11 @@ const fontSize = computed(() => {
     gap: 3rem;
     width: 100%;
     padding: 0.5rem;
+    height: calc(100vh - 1rem);
   }
 
   .feed-card {
-    height: 500px;
-    margin-bottom: 1rem;
+    height: 100%;
   }
 }
 </style>
