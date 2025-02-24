@@ -13,7 +13,13 @@
         </button>
       </div>
 
-      <FeedGrid :layout="layout" :feeds="feeds" />
+      <div v-if="loading" class="text-center text-gray-600 dark:text-gray-400">
+        Loading feeds...
+      </div>
+      <div v-else-if="error" class="text-center text-red-500">
+        {{ error }}
+      </div>
+      <FeedGrid v-else :layout="layout" :feeds="feeds" />
     </div>
   </div>
 </template>
@@ -25,11 +31,25 @@ import { RSS_CONFIG } from "./config/rss.config";
 
 const layout = ref(4);
 const feeds = ref([]);
+const loading = ref(true);
+const error = ref(null);
 let refreshTimer = null;
 
 const fetchFeeds = async () => {
-  const response = await fetch("/api/feeds");
-  feeds.value = await response.json();
+  try {
+    loading.value = true;
+    error.value = null;
+    const response = await fetch("/api/feeds");
+    if (!response.ok) {
+      throw new Error("Failed to fetch feeds");
+    }
+    feeds.value = await response.json();
+  } catch (err) {
+    console.error("Error fetching feeds:", err);
+    error.value = "Failed to load feeds. Please try again later.";
+  } finally {
+    loading.value = false;
+  }
 };
 
 const toggleLayout = () => {

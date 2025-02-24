@@ -10,7 +10,18 @@
     </div>
 
     <div class="space-y-2">
-      <div v-for="(item, index) in feed.items" :key="item.id" class="text-sm">
+      <div v-if="feed.error" class="text-red-500 text-sm">
+        Error: {{ feed.error }}
+      </div>
+      <div v-else-if="feed.items.length === 0" class="text-gray-500 text-sm">
+        No items available
+      </div>
+      <div
+        v-else
+        v-for="(item, index) in feed.items"
+        :key="item.id"
+        class="text-sm"
+      >
         <span class="text-gray-500 mr-2">{{ index + 1 }}.</span>
         <span class="text-gray-700 dark:text-gray-300">{{ item.title }}</span>
         <span class="text-xs text-gray-500 ml-2">
@@ -22,7 +33,7 @@
 </template>
 
 <script setup>
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 const props = defineProps({
   feed: {
@@ -31,7 +42,14 @@ const props = defineProps({
   },
 });
 
-const formatDate = (date) => {
-  return format(new Date(date), "yyyy-MM-dd HH:mm");
+const formatDate = (dateStr) => {
+  try {
+    if (!dateStr) return "Unknown date";
+    const date = parseISO(dateStr);
+    return format(date, "yyyy-MM-dd HH:mm");
+  } catch (error) {
+    console.error("Date formatting error:", error);
+    return "Invalid date";
+  }
 };
 </script>
