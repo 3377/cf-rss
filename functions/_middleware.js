@@ -1,5 +1,44 @@
 import { getRSSConfig } from "../src/config/rss.config.js";
 
+// 添加获取 RSS 内容的函数
+async function fetchRSSFeed(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const text = await response.text();
+
+    // 使用简单的字符串处理来提取所需信息
+    const items = [];
+    const itemMatches = text.match(/<item[\s\S]*?<\/item>/g) || [];
+
+    itemMatches.forEach((itemStr, index) => {
+      const titleMatch = itemStr.match(/<title>(.*?)<\/title>/);
+      const linkMatch = itemStr.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = itemStr.match(/<pubDate>(.*?)<\/pubDate>/);
+
+      items.push({
+        id: index,
+        title: titleMatch ? titleMatch[1] : "",
+        link: linkMatch ? linkMatch[1] : "",
+        pubDate: pubDateMatch ? pubDateMatch[1] : new Date().toISOString(),
+      });
+    });
+
+    return {
+      items,
+      error: null,
+    };
+  } catch (error) {
+    console.error(`Error fetching RSS feed ${url}:`, error);
+    return {
+      items: [],
+      error: error.message,
+    };
+  }
+}
+
 export async function onRequest(context) {
   try {
     // 打印环境变量，用于调试
@@ -17,15 +56,20 @@ export async function onRequest(context) {
 
     // 如果是 /api/feeds 路径，返回所有 feeds 数据
     if (url.pathname === "/api/feeds") {
-      // 为每个 feed 添加必要的初始属性
-      const feedsWithDefaults = config.feeds.map((feed) => ({
-        ...feed,
-        lastUpdate: new Date().toISOString(),
-        items: [], // 初始化空数组
-        error: null, // 初始化错误为 null
-      }));
+      // 获取所有 RSS 源的内容
+      const feedsWithContent = await Promise.all(
+        config.feeds.map(async (feed) => {
+          const { items, error } = await fetchRSSFeed(feed.url);
+          return {
+            ...feed,
+            lastUpdate: new Date().toISOString(),
+            items,
+            error,
+          };
+        })
+      );
 
-      return new Response(JSON.stringify(feedsWithDefaults), {
+      return new Response(JSON.stringify(feedsWithContent), {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",

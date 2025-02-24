@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "vue": "^3.3.0",
-    "date-fns": "^2.30.0"
+    "date-fns": "^2.30.0",
+    "@xmldom/xmldom": "^0.8.10"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.0",
