@@ -27,6 +27,11 @@ const defaultConfig = {
       cardGap: 48, // 增加卡片间距到48px使布局更加宽松
       sideMargin: "1%", // 减少两侧留白到1%以充分利用空间
       cardPadding: 20, // 保持原有的内边距
+      fixedLayout: true, // 固定布局，禁用布局切换
+      gridColumns: 3, // 固定3列布局
+      showLayoutToggle: false, // 隐藏布局切换按钮
+      containerWidth: "98vw", // 容器宽度
+      containerPadding: "10px", // 容器内边距
     },
   },
 };
