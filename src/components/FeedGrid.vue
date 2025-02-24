@@ -104,12 +104,18 @@ const formatDate = (date) => {
 };
 
 // 修改网格样式计算
-const gridStyle = computed(() => ({
-  fontSize: `${fontSize.value}px`,
-  gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))",
-  margin: "0 auto",
-  maxWidth: "1920px",
-}));
+const gridStyle = computed(() => {
+  const layout = config.value?.display?.layout || {};
+  return {
+    fontSize: `${fontSize.value}px`,
+    gridTemplateColumns: `repeat(${layout.gridColumns || 3}, 1fr)`,
+    gap: `${layout.cardGap || 32}px`,
+    margin: `0 ${layout.sideMargin || "3%"}`,
+    maxWidth: layout.containerWidth || "1920px",
+    padding: layout.containerPadding || "10px",
+    height: layout.maxHeight || "100vh",
+  };
+});
 
 const fontSize = computed(() => {
   const size = config.value?.display?.fontSize;

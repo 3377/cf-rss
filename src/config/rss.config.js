@@ -23,15 +23,15 @@ const defaultConfig = {
     dateFormat: "yyyy-MM-dd HH:mm",
     fontSize: 16,
     layout: {
-      maxHeight: "100vh", // 使用100vh确保完全填充视口高度
-      cardGap: 48, // 增加卡片间距到48px使布局更加宽松
-      sideMargin: "1%", // 减少两侧留白到1%以充分利用空间
-      cardPadding: 20, // 保持原有的内边距
-      fixedLayout: true, // 固定布局，禁用布局切换
-      gridColumns: 3, // 固定3列布局
-      showLayoutToggle: false, // 隐藏布局切换按钮
-      containerWidth: "98vw", // 容器宽度
-      containerPadding: "10px", // 容器内边距
+      maxHeight: "98vh", // 控制整体高度在视口范围内
+      cardGap: 24, // 调整卡片间距
+      sideMargin: "2%", // 两侧留白
+      cardPadding: 16, // 卡片内边距
+      fixedLayout: true, // 固定布局
+      gridColumns: 3, // 3列布局
+      showLayoutToggle: false, // 隐藏布局切换
+      containerWidth: "96vw", // 容器宽度
+      containerPadding: "16px", // 容器内边距
     },
   },
 };

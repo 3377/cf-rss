@@ -56,12 +56,6 @@
             <span v-if="loading">刷新中...</span>
             <span v-else>立即刷新</span>
           </button>
-          <button
-            @click="toggleLayout"
-            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-          >
-            {{ layout === 4 ? "8 格布局" : "4 格布局" }}
-          </button>
         </div>
       </div>
 
@@ -71,7 +65,7 @@
       <div v-else-if="error" class="text-center text-red-500">
         {{ error }}
       </div>
-      <FeedGrid v-else :layout="layout" :feeds="feeds" :isDark="isDark" />
+      <FeedGrid v-else :feeds="feeds" :isDark="isDark" />
     </div>
   </div>
 </template>
@@ -81,7 +75,6 @@ import { ref, onMounted, onUnmounted, computed } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
 import { RSS_CONFIG } from "./config/rss.config";
 
-const layout = ref(4);
 const feeds = ref([]);
 const loading = ref(true);
 const error = ref(null);
@@ -139,10 +132,6 @@ const fetchFeeds = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-const toggleLayout = () => {
-  layout.value = layout.value === 4 ? 8 : 4;
 };
 
 const updateCountdown = () => {
