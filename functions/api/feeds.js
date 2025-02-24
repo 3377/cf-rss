@@ -8,20 +8,22 @@ export async function onRequest(context) {
           // 修改 fetch 部分的代码
           const response = await fetch(source.url, {
             headers: {
-              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+              "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+              Accept:
+                "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
               "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
               "Accept-Encoding": "gzip, deflate, br",
-              "Connection": "keep-alive",
+              Connection: "keep-alive",
               "Cache-Control": "no-cache",
-              "Pragma": "no-cache",
+              Pragma: "no-cache",
               "Sec-Fetch-Dest": "document",
               "Sec-Fetch-Mode": "navigate",
               "Sec-Fetch-Site": "none",
               "Sec-Fetch-User": "?1",
               "Upgrade-Insecure-Requests": "1",
-              "DNT": "1",
-              "Referer": `https://${new URL(source.url).hostname}/`,
+              DNT: "1",
+              Referer: `https://${new URL(source.url).hostname}/`,
             },
           });
 
@@ -33,6 +35,7 @@ export async function onRequest(context) {
           // 调试日志
           console.log(`Fetching ${source.title}: ${source.url}`);
           console.log(`Response status: ${response.status}`);
+          console.log(`Content sample: ${text.substring(0, 200)}`); // 添加内容样本日志
 
           // 获取标签内容的通用方法
           const getTagContent = (xml, tags) => {
@@ -190,9 +193,10 @@ export async function onRequest(context) {
     return new Response(JSON.stringify(feedResults), {
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
+        "Cache-Control":
+          "no-store, no-cache, must-revalidate, proxy-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
         "Surrogate-Control": "no-store",
         // 允许跨域访问
         "Access-Control-Allow-Origin": "*",
@@ -207,6 +211,4 @@ export async function onRequest(context) {
       headers: { "Content-Type": "application/json" },
     });
   }
-}
-
 }
