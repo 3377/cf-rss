@@ -1,8 +1,6 @@
 <template>
-  <div
-    :class="['min-h-screen p-4', isDark ? 'dark bg-gray-900' : 'bg-gray-100']"
-  >
-    <div class="container mx-auto">
+  <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-100']">
+    <div class="header">
       <div class="flex justify-between items-center mb-6">
         <div class="flex items-center gap-4">
           <h1 class="text-2xl font-bold dark:text-gray-200">RSS Reader</h1>
@@ -65,8 +63,8 @@
       <div v-else-if="error" class="text-center text-red-500">
         {{ error }}
       </div>
-      <FeedGrid v-else :feeds="feeds" :isDark="isDark" />
     </div>
+    <FeedGrid v-else :feeds="feeds" :isDark="isDark" />
   </div>
 </template>
 
@@ -160,7 +158,33 @@ onUnmounted(() => {
 </script>
 
 <style>
+.app-container {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 1rem;
+  flex-shrink: 0;
+}
+
 .dark {
   @apply text-gray-100;
+}
+
+/* 移除全局滚动条 */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#app {
+  height: 100vh;
+  overflow: hidden;
 }
 </style>
