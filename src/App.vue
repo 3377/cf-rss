@@ -5,14 +5,15 @@
         <h1 class="text-3xl font-bold dark:text-gray-200">RSS Reader</h1>
       </div>
 
-      <div class="flex flex-col items-center">
+      <div class="flex justify-between items-center">
+        <div class="flex-1"></div>
         <div
-          class="flex justify-center gap-8 text-sm text-gray-600 dark:text-gray-400 mb-4"
+          class="flex justify-center flex-1 text-sm text-gray-600 dark:text-gray-400 gap-8"
         >
           <div>下次刷新: {{ formatCountdown }}</div>
           <div>最后更新: {{ formatLastUpdate }}</div>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 flex-1 justify-end">
           <button
             @click="toggleTheme"
             class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"

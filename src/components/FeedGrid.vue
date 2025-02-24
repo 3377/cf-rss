@@ -95,7 +95,7 @@ const formatDate = (date) => {
 const gridStyle = computed(() => {
   const layout = config.value?.display?.layout || {};
   return {
-    gridTemplateColumns: `repeat(${layout.gridColumns || 3}, 1fr)`,
+    gridTemplateColumns: `repeat(4, 1fr)`,
     gap: `${layout.cardGap || 24}px`,
     maxWidth: layout.containerWidth || "1920px",
     padding: layout.containerPadding || "16px",
@@ -215,34 +215,23 @@ const fontSize = computed(() => {
   color: #3b82f6;
   white-space: normal;
   overflow: visible;
-  position: absolute;
-  background: inherit;
-  z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 0.75rem 1rem;
-  border-radius: 0.375rem;
-  width: calc(100% - 2rem);
-  max-width: none;
-}
-
-.dark .item-link:hover .item-title {
-  background: #1f2937;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  padding-right: 0;
 }
 
 .item-date {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  position: relative;
+  display: inline-block;
   font-size: 0.75rem;
   color: #6b7280;
+  margin-left: 0.5rem;
   background: white;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   opacity: 0;
   transition: opacity 0.2s ease;
+  vertical-align: middle;
 }
 
 .item-link:hover .item-date {
