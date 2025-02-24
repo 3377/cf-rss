@@ -119,7 +119,8 @@ const fontSize = computed(() => {
 .feed-grid {
   display: grid;
   margin: 0 auto;
-  gap: 2rem;
+  gap: 3rem;
+  padding: 1rem;
 }
 
 .feed-card {
@@ -194,10 +195,11 @@ const fontSize = computed(() => {
 
 .item-title {
   color: #1f2937;
-  margin-right: 6rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding-right: 1rem;
+  transition: all 0.2s ease;
 }
 
 .dark .item-title {
@@ -219,6 +221,12 @@ const fontSize = computed(() => {
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.item-link:hover .item-date {
+  opacity: 1;
 }
 
 .dark .item-date {
@@ -268,6 +276,7 @@ const fontSize = computed(() => {
 @media (max-width: 768px) {
   .feed-grid {
     grid-template-columns: 1fr !important;
+    gap: 2rem;
   }
 
   .feed-card {
