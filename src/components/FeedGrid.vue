@@ -130,7 +130,7 @@ const fontSize = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 800px;
+  height: 850px;
   overflow: hidden;
 }
 
