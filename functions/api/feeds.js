@@ -5,7 +5,19 @@ export async function onRequest(context) {
     const feedResults = await Promise.all(
       RSS_CONFIG.feeds.map(async (source) => {
         try {
-          const response = await fetch(source.url);
+          // 添加自定义请求头
+          const response = await fetch(source.url, {
+            headers: {
+              "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+              Accept:
+                "application/rss+xml, application/xml, application/atom+xml, text/xml, */*",
+              "Accept-Language": "en-US,en;q=0.9",
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+            },
+          });
+
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -19,18 +31,19 @@ export async function onRequest(context) {
           // 获取标签内容的通用方法
           const getTagContent = (xml, tags) => {
             for (const tag of tags) {
-              // 支持自闭合标签和CDATA
-              const patterns = [
-                `<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`,
-                `<${tag}[^>]*?\/?>([^<]*)`,
-              ];
-
-              for (const pattern of patterns) {
-                const regex = new RegExp(pattern, "g");
-                const matches = [...xml.matchAll(regex)];
-                if (matches.length > 0) {
-                  return matches.map((match) => match[1].trim());
-                }
+              const pattern = `<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`;
+              const regex = new RegExp(pattern, "g");
+              const matches = [...xml.matchAll(regex)];
+              if (matches.length > 0) {
+                return matches.map((match) =>
+                  match[1]
+                    .trim()
+                    .replace(/&lt;/g, "<")
+                    .replace(/&gt;/g, ">")
+                    .replace(/&amp;/g, "&")
+                    .replace(/&quot;/g, '"')
+                    .replace(/&#39;/g, "'")
+                );
               }
             }
             return [];
@@ -38,15 +51,10 @@ export async function onRequest(context) {
 
           // 获取链接的通用方法
           const getLink = (itemContent) => {
-            // 扩展链接匹配模式
             const patterns = [
               /<link[^>]*>([^<]+)<\/link>/,
               /<link[^>]*href="([^"]+)"[^>]*\/>/,
-              /<link[^>]*href='([^']+)'[^>]*\/>/,
               /<guid[^>]*>([^<]+)<\/guid>/,
-              /<id[^>]*>([^<]+)<\/id>/,
-              /rel="alternate" href="([^"]+)"/,
-              /<link>([^<]+)<\/link>/,
             ];
 
             for (const pattern of patterns) {
@@ -55,102 +63,35 @@ export async function onRequest(context) {
                 return match[1].trim();
               }
             }
-
-            // 尝试直接从原始文本中提取URL
-            const urlMatch = itemContent.match(/(https?:\/\/[^\s<>"']+)/);
-            return urlMatch ? urlMatch[1] : "";
+            return "";
           };
 
           // 获取所有文章条目
-          let items = [];
+          const itemRegex = /<item[^>]*>[\s\S]*?<\/item>/g;
+          const items = [];
+          const matches = text.match(itemRegex) || [];
 
-          // 首先尝试标准的RSS和Atom格式
-          const itemPatterns = [
-            /<item[^>]*>[\s\S]*?<\/item>/g,
-            /<entry[^>]*>[\s\S]*?<\/entry>/g,
-            /<article[^>]*>[\s\S]*?<\/article>/g,
-          ];
+          for (const itemContent of matches) {
+            const title =
+              getTagContent(itemContent, ["title"])[0] || "No title";
+            const link = getLink(itemContent);
+            const pubDate = getTagContent(itemContent, ["pubDate"])[0] || "";
 
-          for (const pattern of itemPatterns) {
-            const matches = text.match(pattern) || [];
-            console.log(
-              `Found ${matches.length} items using pattern: ${pattern}`
-            );
-
-            for (const itemContent of matches) {
-              const title =
-                getTagContent(itemContent, ["title", "h1"])[0] || "No title";
-              const link = getLink(itemContent);
-              const pubDate =
-                getTagContent(itemContent, [
-                  "pubDate",
-                  "published",
-                  "updated",
-                  "date",
-                  "time",
-                  "created",
-                ])[0] || "";
-
-              let formattedDate;
-              try {
-                formattedDate = pubDate
-                  ? new Date(pubDate).toISOString()
-                  : new Date().toISOString();
-              } catch (e) {
-                formattedDate = new Date().toISOString();
-              }
-
-              items.push({
-                id: items.length,
-                title: title,
-                link: link,
-                pubDate: formattedDate,
-              });
-            }
-          }
-
-          // 如果没有找到条目，尝试备用解析方法
-          if (items.length === 0) {
-            console.log(`Trying alternative parsing for ${source.title}`);
-
-            // 尝试解析JSON格式
+            let formattedDate;
             try {
-              const jsonData = JSON.parse(text);
-              if (Array.isArray(jsonData)) {
-                items = jsonData.map((item, index) => ({
-                  id: index,
-                  title: item.title || item.name || "No title",
-                  link: item.link || item.url || "",
-                  pubDate: new Date(
-                    item.date || item.created || Date.now()
-                  ).toISOString(),
-                }));
-              }
+              formattedDate = pubDate
+                ? new Date(pubDate).toISOString()
+                : new Date().toISOString();
             } catch (e) {
-              console.log("Not JSON format, continuing with XML parsing");
+              formattedDate = new Date().toISOString();
             }
 
-            // 如果JSON解析失败，继续尝试XML解析
-            if (items.length === 0) {
-              const titles = getTagContent(text, ["title", "h1"]);
-              const links =
-                text
-                  .match(/<link[^>]*?(?:href="([^"]+)"[^>]*|>([^<]+))/g)
-                  ?.map((l) => {
-                    const match = /(?:href="([^"]+)"|>([^<]+))/.exec(l);
-                    return match ? match[1] || match[2] : "";
-                  }) || [];
-
-              // 跳过第一个（通常是feed标题）
-              for (let i = 1; i < titles.length; i++) {
-                items.push({
-                  id: i - 1,
-                  title: titles[i],
-                  link: links[i] || "",
-                  pubDate: new Date().toISOString(),
-                });
-              }
-            }
+            items.push({
+              id: items.length,
+              title: title,
+              link: link,
+              pubDate: formattedDate,
+            });
           }
 
           console.log(`Final items count for ${source.title}: ${items.length}`);
