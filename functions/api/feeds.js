@@ -5,24 +5,72 @@ export async function onRequest(context) {
     const feedResults = await Promise.all(
       RSS_CONFIG.feeds.map(async (source) => {
         try {
-          // 参考 rss2tg 的请求头配置
-          const response = await fetch(source.url, {
-            headers: {
-              "User-Agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-              Accept:
-                "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-              "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-              Connection: "keep-alive",
-              "Upgrade-Insecure-Requests": "1",
-              "Cache-Control": "max-age=0",
-            },
-          });
+          // 针对 Cloudflare 保护的站点优化请求头
+          const headers = {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept:
+              "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Accept-Encoding": "gzip, deflate, br",
+            Connection: "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
+            "sec-ch-ua":
+              '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
+            "Cache-Control": "max-age=0",
+          };
+
+          // 如果是 Cloudflare 站点，添加特定的请求头
+          const hostname = new URL(source.url).hostname;
+          if (hostname === "linux.do") {
+            headers["CF-IPCountry"] = "US"; // 模拟来自美国的请求
+            headers["CF-Connecting-IP"] =
+              context.request.headers.get("CF-Connecting-IP");
+            headers["CF-RAY"] = context.request.headers.get("CF-RAY");
+            headers["CF-Visitor"] = '{"scheme":"https"}';
+            headers["CDN-Loop"] = "cloudflare";
+          }
+
+          // 第一次尝试请求
+          let response = await fetch(source.url, { headers });
+          let text = "";
+
+          // 如果返回 403，等待短暂时间后重试
+          if (response.status === 403) {
+            console.log(
+              `First attempt failed for ${source.title}, retrying...`
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+
+            // 第二次尝试，添加更多的 Cloudflare 相关头
+            headers["X-Requested-With"] = "XMLHttpRequest";
+            headers["X-Forwarded-For"] =
+              context.request.headers.get("CF-Connecting-IP");
+            headers["X-Real-IP"] =
+              context.request.headers.get("CF-Connecting-IP");
+
+            response = await fetch(source.url, { headers });
+          }
 
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
-          const text = await response.text();
+
+          text = await response.text();
+
+          // 检查是否包含 Cloudflare 验证页面
+          if (
+            text.includes("Just a moment") ||
+            text.includes("DDoS protection by Cloudflare")
+          ) {
+            throw new Error("Blocked by Cloudflare protection");
+          }
 
           // 调试日志
           console.log(`Fetching ${source.title}: ${source.url}`);
@@ -140,12 +188,17 @@ export async function onRequest(context) {
           };
         } catch (error) {
           console.error(`Error processing ${source.url}:`, error);
+          // 如果是 Cloudflare 保护导致的错误，返回特定的错误信息
+          const errorMessage = error.message.includes("Cloudflare")
+            ? "Site protected by Cloudflare, please try again later"
+            : error.message;
+
           return {
             title: source.title,
             url: source.url,
             lastUpdate: new Date().toISOString(),
             items: [],
-            error: error.message,
+            error: errorMessage,
           };
         }
       })
