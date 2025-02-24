@@ -8,48 +8,66 @@ export async function onRequest(context) {
           const response = await fetch(source.url);
           const text = await response.text();
 
-          // 改进的标签内容获取方法
-          const getTagContent = (xml, tag) => {
-            // 支持 CDATA 和普通内容
-            const pattern = `<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`;
-            const regex = new RegExp(pattern, "g");
-            const matches = [...xml.matchAll(regex)];
-            return matches.map((match) => match[1].trim());
+          // 调试日志
+          console.log(`Fetching ${source.title}: ${source.url}`);
+
+          // 获取标签内容的通用方法
+          const getTagContent = (xml, tags) => {
+            for (const tag of tags) {
+              const pattern = `<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`;
+              const regex = new RegExp(pattern, "g");
+              const matches = [...xml.matchAll(regex)];
+              if (matches.length > 0) {
+                return matches.map((match) => match[1].trim());
+              }
+            }
+            return [];
           };
 
-          // 获取链接的方法
+          // 获取链接的通用方法
           const getLink = (itemContent) => {
-            // 尝试获取 link 标签内容
-            const linkMatch = /<link[^>]*>([^<]+)<\/link>/.exec(itemContent);
-            if (linkMatch) return linkMatch[1].trim();
+            // 尝试不同的链接格式
+            const patterns = [
+              /<link[^>]*>([^<]+)<\/link>/,
+              /<link[^>]*href="([^"]+)"[^>]*\/>/,
+              /<guid[^>]*>([^<]+)<\/guid>/,
+              /<id[^>]*>([^<]+)<\/id>/,
+            ];
 
-            // 尝试获取 link 标签的 href 属性
-            const hrefMatch = /<link[^>]*href="([^"]+)"[^>]*\/>/.exec(
-              itemContent
-            );
-            if (hrefMatch) return hrefMatch[1];
-
+            for (const pattern of patterns) {
+              const match = pattern.exec(itemContent);
+              if (match && match[1]) {
+                return match[1].trim();
+              }
+            }
             return "";
           };
 
           // 获取所有文章条目
-          const itemPattern =
-            /<item[^>]*>([\s\S]*?)<\/item>|<entry[^>]*>([\s\S]*?)<\/entry>/g;
           const items = [];
-          let match;
 
-          // 使用循环来处理每个匹配项
-          while ((match = itemPattern.exec(text)) !== null) {
-            const itemContent = match[1] || match[2];
-            if (!itemContent) continue;
+          // 尝试 RSS 格式 (<item>)
+          const rssItems = text.match(/<item[^>]*>[\s\S]*?<\/item>/g) || [];
 
-            const title = getTagContent(itemContent, "title")[0] || "No title";
+          // 尝试 Atom 格式 (<entry>)
+          const atomItems = text.match(/<entry[^>]*>[\s\S]*?<\/entry>/g) || [];
+
+          // 合并所有找到的条目
+          const allItems = [...rssItems, ...atomItems];
+
+          console.log(`Found ${allItems.length} items for ${source.title}`);
+
+          for (const itemContent of allItems) {
+            const title =
+              getTagContent(itemContent, ["title"])[0] || "No title";
             const link = getLink(itemContent);
             const pubDate =
-              getTagContent(itemContent, "pubDate")[0] ||
-              getTagContent(itemContent, "published")[0] ||
-              getTagContent(itemContent, "updated")[0] ||
-              "";
+              getTagContent(itemContent, [
+                "pubDate",
+                "published",
+                "updated",
+                "date",
+              ])[0] || "";
 
             let formattedDate;
             try {
@@ -68,20 +86,33 @@ export async function onRequest(context) {
             });
           }
 
-          // 如果没有找到条目，尝试其他格式
+          // 如果还是没有找到条目，尝试整个文档解析
           if (items.length === 0) {
-            const titles = getTagContent(text, "title");
-            const links =
-              text.match(/<link[^>]*href="([^"]+)"[^>]*>/g)?.map((l) => {
-                const match = /href="([^"]+)"/.exec(l);
-                return match ? match[1] : "";
-              }) || [];
-            const dates =
-              getTagContent(text, "updated") ||
-              getTagContent(text, "published");
+            console.log(
+              `No items found using standard parsing for ${source.title}, trying alternative method`
+            );
 
-            // 跳过第一个标题（通常是 feed 标题）
-            for (let i = 1; i < titles.length; i++) {
+            const titles = getTagContent(text, ["title"]);
+            const links =
+              text
+                .match(/<link[^>]*(?:href="([^"]+)"[^>]*|>([^<]+))<\/link>/g)
+                ?.map((l) => {
+                  const match = /(?:href="([^"]+)"|>([^<]+)<)/.exec(l);
+                  return match ? match[1] || match[2] : "";
+                }) || [];
+            const dates = getTagContent(text, [
+              "updated",
+              "published",
+              "pubDate",
+              "date",
+            ]);
+
+            // 跳过第一个（通常是 feed 标题）
+            for (
+              let i = 1;
+              i < Math.min(titles.length, RSS_CONFIG.display.itemsPerFeed + 1);
+              i++
+            ) {
               items.push({
                 id: i - 1,
                 title: titles[i],
@@ -93,6 +124,8 @@ export async function onRequest(context) {
             }
           }
 
+          console.log(`Final items count for ${source.title}: ${items.length}`);
+
           return {
             title: source.title,
             url: source.url,
@@ -100,7 +133,7 @@ export async function onRequest(context) {
             items: items.slice(0, RSS_CONFIG.display.itemsPerFeed),
           };
         } catch (error) {
-          console.error(`Error fetching ${source.url}:`, error);
+          console.error(`Error processing ${source.url}:`, error);
           return {
             title: source.title,
             url: source.url,
@@ -119,6 +152,7 @@ export async function onRequest(context) {
       },
     });
   } catch (error) {
+    console.error("Global error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
