@@ -130,8 +130,7 @@ const fontSize = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: auto;
-  max-height: calc(100vh - 8rem);
+  height: 600px;
   overflow: hidden;
 }
 
@@ -162,7 +161,7 @@ const fontSize = computed(() => {
 .card-content {
   flex: 1;
   padding: 0.5rem 0;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .items-list {
@@ -252,13 +251,8 @@ const fontSize = computed(() => {
 }
 
 /* 自定义滚动条 */
-.card-content {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
-}
-
 .card-content::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 
 .card-content::-webkit-scrollbar-track {
@@ -266,12 +260,12 @@ const fontSize = computed(() => {
 }
 
 .card-content::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5);
-  border-radius: 2px;
+  background-color: rgba(156, 163, 175, 0.3);
+  border-radius: 3px;
 }
 
 .card-content::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(156, 163, 175, 0.7);
+  background-color: rgba(156, 163, 175, 0.5);
 }
 
 /* 响应式布局 */
@@ -284,8 +278,7 @@ const fontSize = computed(() => {
   }
 
   .feed-card {
-    height: auto;
-    max-height: calc(100vh - 4rem);
+    height: 500px;
     margin-bottom: 1rem;
   }
 }
