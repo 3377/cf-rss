@@ -5,7 +5,7 @@ export async function onRequest(context) {
     const feedResults = await Promise.all(
       RSS_CONFIG.feeds.map(async (source) => {
         try {
-          // 基础请求头
+          // 针对 Cloudflare 保护的站点优化请求头
           const headers = {
             "User-Agent":
               "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -15,75 +15,47 @@ export async function onRequest(context) {
             "Accept-Encoding": "gzip, deflate, br",
             Connection: "keep-alive",
             "Upgrade-Insecure-Requests": "1",
+            "sec-ch-ua":
+              '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
             "Cache-Control": "max-age=0",
           };
 
-          // 获取原始请求的headers
-          const originalHeaders = Object.fromEntries(
-            context.request.headers.entries()
-          );
-
-          // 合并headers
-          const mergedHeaders = {
-            ...headers,
-            ...originalHeaders,
-          };
-
-          // 如果配置了cookie，添加到请求头中
-          if (source.cookie) {
-            mergedHeaders["Cookie"] = source.cookie;
-          }
-
+          // 如果是 Cloudflare 站点，添加特定的请求头
           const hostname = new URL(source.url).hostname;
-
-          // 特殊站点处理
           if (hostname === "linux.do") {
-            // 保持 Cookie
-            if (!mergedHeaders["Cookie"] && source.cookie) {
-              mergedHeaders["Cookie"] = source.cookie;
-            }
-
-            // 添加 Cloudflare 相关头
-            mergedHeaders["CF-IPCountry"] =
-              originalHeaders["cf-ipcountry"] || "US";
-            mergedHeaders["CF-Connecting-IP"] =
-              originalHeaders["cf-connecting-ip"];
-            mergedHeaders["CF-RAY"] = originalHeaders["cf-ray"];
-            mergedHeaders["CF-Visitor"] = '{"scheme":"https"}';
-            mergedHeaders["CDN-Loop"] = "cloudflare";
+            headers["CF-IPCountry"] = "US"; // 模拟来自美国的请求
+            headers["CF-Connecting-IP"] =
+              context.request.headers.get("CF-Connecting-IP");
+            headers["CF-RAY"] = context.request.headers.get("CF-RAY");
+            headers["CF-Visitor"] = '{"scheme":"https"}';
+            headers["CDN-Loop"] = "cloudflare";
           }
 
-          // 创建请求
-          const modifiedRequest = new Request(source.url, {
-            headers: mergedHeaders,
-            method: "GET",
-            redirect: "follow",
-          });
-
-          // 发送请求
-          let response = await fetch(modifiedRequest);
+          // 第一次尝试请求
+          let response = await fetch(source.url, { headers });
           let text = "";
 
-          // 如果返回 403，等待后重试
+          // 如果返回 403，等待短暂时间后重试
           if (response.status === 403) {
             console.log(
               `First attempt failed for ${source.title}, retrying...`
             );
             await new Promise((resolve) => setTimeout(resolve, 2000));
 
-            // 添加额外的请求头重试
-            mergedHeaders["X-Requested-With"] = "XMLHttpRequest";
-            mergedHeaders["X-Forwarded-For"] =
-              originalHeaders["cf-connecting-ip"];
-            mergedHeaders["X-Real-IP"] = originalHeaders["cf-connecting-ip"];
+            // 第二次尝试，添加更多的 Cloudflare 相关头
+            headers["X-Requested-With"] = "XMLHttpRequest";
+            headers["X-Forwarded-For"] =
+              context.request.headers.get("CF-Connecting-IP");
+            headers["X-Real-IP"] =
+              context.request.headers.get("CF-Connecting-IP");
 
-            response = await fetch(
-              new Request(source.url, {
-                headers: mergedHeaders,
-                method: "GET",
-                redirect: "follow",
-              })
-            );
+            response = await fetch(source.url, { headers });
           }
 
           if (!response.ok) {
@@ -103,7 +75,6 @@ export async function onRequest(context) {
           // 调试日志
           console.log(`Fetching ${source.title}: ${source.url}`);
           console.log(`Response status: ${response.status}`);
-          console.log(`Headers used:`, mergedHeaders);
 
           // 获取标签内容的通用方法
           const getTagContent = (xml, tag) => {

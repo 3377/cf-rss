@@ -1,40 +1,77 @@
 <template>
-  <div class="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+  <div
+    :class="['min-h-screen p-4', isDark ? 'dark bg-gray-900' : 'bg-gray-100']"
+  >
     <div class="container mx-auto">
       <div class="flex justify-between items-center mb-6">
         <div class="flex items-center gap-4">
-          <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">
-            RSS Reader
-          </h1>
+          <h1 class="text-2xl font-bold dark:text-gray-200">RSS Reader</h1>
           <div class="text-sm text-gray-600 dark:text-gray-400">
-            Next refresh in: {{ formatCountdown }}
+            下次刷新: {{ formatCountdown }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            最后更新: {{ formatLastUpdate }}
           </div>
         </div>
         <div class="flex items-center gap-4">
           <button
+            @click="toggleTheme"
+            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+            :title="isDark ? '切换到亮色模式' : '切换到暗色模式'"
+          >
+            <svg
+              v-if="isDark"
+              class="w-6 h-6 text-gray-200"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+            <svg
+              v-else
+              class="w-6 h-6 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+              />
+            </svg>
+          </button>
+          <button
             @click="fetchFeeds"
-            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
             :disabled="loading"
           >
-            <span v-if="loading">Refreshing...</span>
-            <span v-else>Refresh Now</span>
+            <span v-if="loading">刷新中...</span>
+            <span v-else>立即刷新</span>
           </button>
           <button
             @click="toggleLayout"
-            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
           >
-            {{ layout === 4 ? "8 Blocks" : "4 Blocks" }}
+            {{ layout === 4 ? "8 格布局" : "4 格布局" }}
           </button>
         </div>
       </div>
 
       <div v-if="loading" class="text-center text-gray-600 dark:text-gray-400">
-        Loading feeds...
+        加载中...
       </div>
       <div v-else-if="error" class="text-center text-red-500">
         {{ error }}
       </div>
-      <FeedGrid v-else :layout="layout" :feeds="feeds" />
+      <FeedGrid v-else :layout="layout" :feeds="feeds" :isDark="isDark" />
     </div>
   </div>
 </template>
@@ -49,14 +86,34 @@ const feeds = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const countdown = ref(RSS_CONFIG.refresh.interval);
+const isDark = ref(localStorage.getItem("theme") === "dark");
 let refreshTimer = null;
 let countdownTimer = null;
 
 const formatCountdown = computed(() => {
   const minutes = Math.floor(countdown.value / 60);
   const seconds = countdown.value % 60;
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  return `${minutes}分${seconds.toString().padStart(2, "0")}秒`;
 });
+
+const formatLastUpdate = computed(() => {
+  if (!feeds.value.length) return "暂无";
+  const date = new Date(feeds.value[0].lastUpdate);
+  return date.toLocaleString("zh-CN", {
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+});
+
+const toggleTheme = () => {
+  isDark.value = !isDark.value;
+  localStorage.setItem("theme", isDark.value ? "dark" : "light");
+};
 
 const fetchFeeds = async () => {
   try {
@@ -75,11 +132,10 @@ const fetchFeeds = async () => {
     }
 
     feeds.value = await response.json();
-    // 重置倒计时
     countdown.value = RSS_CONFIG.refresh.interval;
   } catch (err) {
     console.error("Error fetching feeds:", err);
-    error.value = "Failed to load feeds. Please try again later.";
+    error.value = "加载失败，请稍后重试";
   } finally {
     loading.value = false;
   }
@@ -113,3 +169,9 @@ onUnmounted(() => {
   }
 });
 </script>
+
+<style>
+.dark {
+  @apply text-gray-100;
+}
+</style>

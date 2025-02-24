@@ -1,27 +1,88 @@
 <template>
-  <div :class="gridClass">
-    <FeedBlock v-for="feed in feeds" :key="feed.url" :feed="feed" />
+  <div :class="['grid gap-4', layout === 4 ? 'grid-cols-2' : 'grid-cols-4']">
+    <div
+      v-for="feed in feeds"
+      :key="feed.url"
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+    >
+      <div class="p-4 border-b dark:border-gray-700">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+          {{ feed.title }}
+        </h2>
+      </div>
+      <div class="p-4">
+        <div v-if="feed.error" class="text-red-500">
+          {{ feed.error }}
+        </div>
+        <div
+          v-else-if="!feed.items.length"
+          class="text-gray-500 dark:text-gray-400"
+        >
+          暂无内容
+        </div>
+        <div v-else class="space-y-4">
+          <div
+            v-for="item in feed.items.slice(0, itemsToShow)"
+            :key="item.id"
+            class="group"
+          >
+            <a
+              :href="item.link"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block"
+            >
+              <div class="flex justify-between items-start gap-2">
+                <h3
+                  class="text-gray-800 dark:text-gray-200 group-hover:text-blue-500 dark:group-hover:text-blue-400 line-clamp-2"
+                >
+                  {{ item.title }}
+                </h3>
+                <span
+                  class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap"
+                >
+                  {{ formatDate(item.pubDate) }}
+                </span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from "vue";
-import FeedBlock from "./FeedBlock.vue";
+import { RSS_CONFIG } from "../config/rss.config";
 
 const props = defineProps({
-  layout: {
-    type: Number,
-    default: 4,
-  },
-  feeds: {
-    type: Array,
-    default: () => [],
-  },
+  feeds: Array,
+  layout: Number,
+  isDark: Boolean,
 });
 
-const gridClass = computed(() => ({
-  "grid gap-4": true,
-  "grid-cols-2 md:grid-cols-2": props.layout === 4,
-  "grid-cols-2 md:grid-cols-4": props.layout === 8,
-}));
+const itemsToShow = computed(() => {
+  return props.layout === 4
+    ? RSS_CONFIG.display.itemsPerFeedExpanded
+    : RSS_CONFIG.display.itemsPerFeedCompact;
+});
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleString("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 </script>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
