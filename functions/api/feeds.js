@@ -8,21 +8,22 @@ export async function onRequest(context) {
           const response = await fetch(source.url);
           const text = await response.text();
 
-          // XML 解析
-          const parser = new DOMParser();
-          const xml = parser.parseFromString(text, "text/xml");
+          // 使用简单的字符串解析方法
+          const getTagContent = (xml, tag) => {
+            const regex = new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, "gs");
+            const matches = [...xml.matchAll(regex)];
+            return matches.map((match) => match[1].trim());
+          };
 
-          // 处理不同类型的 RSS feed
-          const items = Array.from(xml.querySelectorAll("item, entry")).map(
-            (item, index) => {
-              // 尝试获取发布日期
-              const pubDate =
-                item.querySelector("pubDate, published")?.textContent;
+          const titles = getTagContent(text, "title");
+          const pubDates = getTagContent(text, "pubDate");
+
+          const items = titles
+            .map((title, index) => {
               let formattedDate;
-
               try {
-                formattedDate = pubDate
-                  ? new Date(pubDate).toISOString()
+                formattedDate = pubDates[index]
+                  ? new Date(pubDates[index]).toISOString()
                   : new Date().toISOString();
               } catch (e) {
                 formattedDate = new Date().toISOString();
@@ -30,13 +31,11 @@ export async function onRequest(context) {
 
               return {
                 id: index,
-                title:
-                  item.querySelector("title")?.textContent?.trim() ||
-                  "No title",
+                title: title || "No title",
                 pubDate: formattedDate,
               };
-            }
-          );
+            })
+            .slice(1); // 跳过第一个标题（通常是 feed 标题）
 
           return {
             title: source.title,

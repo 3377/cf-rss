@@ -7,17 +7,17 @@ export const RSS_CONFIG = {
     },
     {
       title: "NodeSeek",
-      url: "https://www.nodeseek.com/feed",
+      url: "https://rss.nodeseek.com",
     },
     {
       title: "Linux DO",
-      url: "https://linux.do/feed",
+      url: "https://linux.do/latest.rss",
     },
   ],
   // 刷新配置
   refresh: {
-    interval: 5 * 60, // 刷新间隔(秒)
-    cache: 300, // 缓存时间(秒)
+    interval: 60, // 刷新间隔(秒)
+    cache: 60, // 缓存时间(秒)
   },
   // 显示配置
   display: {
