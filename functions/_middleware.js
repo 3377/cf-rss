@@ -13,10 +13,11 @@ export async function onRequest(context) {
     const config = getRSSConfig(context.env);
     console.log("Generated config:", config);
 
+    const url = new URL(context.request.url);
+
     // 如果是 /api/feeds 路径，返回所有 feeds 数据
-    if (new URL(context.request.url).pathname === "/api/feeds") {
+    if (url.pathname === "/api/feeds") {
       return new Response(JSON.stringify(config), {
-        // 返回完整配置而不是只返回 feeds
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
@@ -24,8 +25,17 @@ export async function onRequest(context) {
       });
     }
 
-    // 处理 HTML 页面请求
+    // 获取原始响应
     const response = await context.next();
+
+    // 检查是否是 HTML 请求
+    const contentType = response.headers.get("Content-Type") || "";
+    if (!contentType.includes("text/html")) {
+      // 如果不是 HTML，直接返回原始响应
+      return response;
+    }
+
+    // 处理 HTML 页面
     const html = await response.text();
 
     // 注入配置到全局变量
@@ -36,11 +46,13 @@ export async function onRequest(context) {
       )};</script></head>`
     );
 
+    // 保持原始响应头，只修改 HTML 内容
+    const headers = new Headers(response.headers);
+    headers.set("Content-Type", "text/html;charset=UTF-8");
+
     return new Response(injectedHtml, {
-      headers: {
-        ...response.headers,
-        "Content-Type": "text/html;charset=UTF-8",
-      },
+      status: response.status,
+      headers: headers,
     });
   } catch (error) {
     console.error("Middleware error:", error);
