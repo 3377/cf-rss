@@ -19,8 +19,7 @@ const defaultConfig = {
     cache: 0,
   },
   display: {
-    itemsPerFeedCompact: 10,
-    itemsPerFeedExpanded: 15,
+    itemsPerFeed: 15, // 合并为单个配置
     dateFormat: "yyyy-MM-dd HH:mm",
     fontSize: 16,
   },
@@ -67,14 +66,6 @@ export function getRSSConfig(env) {
     }
 
     // 处理显示配置
-    if (env.ITEMS_PER_FEED_COMPACT) {
-      config.display.itemsPerFeedCompact = parseInt(env.ITEMS_PER_FEED_COMPACT);
-    }
-    if (env.ITEMS_PER_FEED_EXPANDED) {
-      config.display.itemsPerFeedExpanded = parseInt(
-        env.ITEMS_PER_FEED_EXPANDED
-      );
-    }
     if (env.DATE_FORMAT) {
       config.display.dateFormat = env.DATE_FORMAT;
     }

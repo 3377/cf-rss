@@ -1,49 +1,42 @@
 <template>
-  <div
-    :class="['grid gap-4', layout === 8 ? 'grid-cols-4' : 'grid-cols-2']"
-    :style="{ fontSize: `${fontSize}px` }"
-  >
+  <div class="grid gap-4 p-4 w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
     <div
       v-for="feed in feeds"
       :key="feed.url"
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-[calc(100vh-2rem)] sm:h-[600px]"
     >
       <div class="p-4 border-b dark:border-gray-700">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+        <h2
+          class="text-xl font-bold text-gray-800 dark:text-gray-200 text-center"
+        >
           {{ feed.title }}
         </h2>
       </div>
-      <div class="p-4">
+      <div class="p-4 flex-1 overflow-y-auto">
         <div v-if="feed.error" class="text-red-500">
           {{ feed.error }}
         </div>
         <div
           v-else-if="!feed.items.length"
-          class="text-gray-500 dark:text-gray-400"
+          class="text-gray-500 dark:text-gray-400 text-center"
         >
           暂无内容
         </div>
         <div v-else class="space-y-4">
-          <div
-            v-for="item in feed.items.slice(0, itemsToShow)"
-            :key="item.id"
-            class="group"
-          >
+          <div v-for="item in feed.items" :key="item.id" class="group">
             <a
               :href="item.link"
               target="_blank"
               rel="noopener noreferrer"
-              class="block"
+              class="block hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded"
             >
-              <div class="flex justify-between items-start gap-2">
+              <div class="flex flex-col gap-2">
                 <h3
-                  class="text-gray-800 dark:text-gray-200 group-hover:text-blue-500 dark:group-hover:text-blue-400 line-clamp-2"
+                  class="text-gray-800 dark:text-gray-200 group-hover:text-blue-500 dark:group-hover:text-blue-400 text-ellipsis overflow-hidden whitespace-nowrap"
                 >
                   {{ item.title }}
                 </h3>
-                <span
-                  class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap"
-                >
+                <span class="text-xs text-gray-500 dark:text-gray-400">
                   {{ formatDate(item.pubDate) }}
                 </span>
               </div>
@@ -62,9 +55,8 @@ import { getRSSConfig } from "../config/rss.config";
 const props = defineProps({
   feeds: {
     type: Array,
-    default: () => [], // 提供默认值
+    default: () => [],
     validator: (value) => {
-      // 确保每个 feed 都有必要的属性
       return value.every((feed) => {
         return (
           feed &&
@@ -75,26 +67,16 @@ const props = defineProps({
       });
     },
   },
-  layout: Number,
   isDark: Boolean,
 });
 
-// 获取配置
-const config = ref(getRSSConfig(null)); // 初始使用默认配置
+const config = ref(getRSSConfig(null));
 
 onMounted(() => {
-  // 在组件挂载后获取注入的配置
   if (typeof window !== "undefined" && window.__RSS_CONFIG__) {
     config.value = window.__RSS_CONFIG__;
     console.log("Using injected config:", config.value);
   }
-});
-
-// 修改显示数量逻辑
-const itemsToShow = computed(() => {
-  return props.layout === 8
-    ? config.value.display.itemsPerFeedCompact
-    : config.value.display.itemsPerFeedExpanded;
 });
 
 const formatDate = (date) => {
@@ -110,10 +92,26 @@ const fontSize = computed(() => config.value.display.fontSize);
 </script>
 
 <style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+/* 自定义滚动条样式 */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
 }
 </style>
