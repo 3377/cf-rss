@@ -56,15 +56,18 @@
           </button>
         </div>
       </div>
+    </div>
 
+    <!-- 内容区域 -->
+    <div class="content-area">
       <div v-if="loading" class="text-center text-gray-600 dark:text-gray-400">
         加载中...
       </div>
       <div v-else-if="error" class="text-center text-red-500">
         {{ error }}
       </div>
+      <FeedGrid v-else :feeds="feeds" :isDark="isDark" class="flex-1" />
     </div>
-    <FeedGrid v-else :feeds="feeds" :isDark="isDark" />
   </div>
 </template>
 
@@ -168,6 +171,13 @@ onUnmounted(() => {
 .header {
   padding: 1rem;
   flex-shrink: 0;
+}
+
+.content-area {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .dark {
