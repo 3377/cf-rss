@@ -22,8 +22,6 @@ const defaultConfig = {
     itemsPerFeed: 15, // 每个卡片显示的条目数
     dateFormat: "yyyy-MM-dd HH:mm",
     fontSize: 16,
-    cardHeight: 800, // 卡片高度(px)
-    cardWidth: 400, // 卡片宽度(px)
   },
 };
 
@@ -76,12 +74,6 @@ export function getRSSConfig(env) {
     }
     if (env.ITEMS_PER_FEED) {
       config.display.itemsPerFeed = parseInt(env.ITEMS_PER_FEED);
-    }
-    if (env.CARD_HEIGHT) {
-      config.display.cardHeight = parseInt(env.CARD_HEIGHT);
-    }
-    if (env.CARD_WIDTH) {
-      config.display.cardWidth = parseInt(env.CARD_WIDTH);
     }
   } catch (error) {
     console.error("Error in getRSSConfig:", error);

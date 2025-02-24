@@ -1,13 +1,13 @@
 <template>
-  <div class="h-screen p-4 w-full">
-    <div class="grid gap-4 h-[calc(100vh-2rem)]" :style="gridStyle">
+  <div class="h-screen px-8 py-4 w-full">
+    <div class="grid gap-8 h-[calc(100vh-4rem)]" :style="gridStyle">
       <div
         v-for="feed in feeds"
         :key="feed.url"
         class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col"
       >
         <!-- 标题区域 -->
-        <div class="p-4 border-b dark:border-gray-700">
+        <div class="p-3 border-b dark:border-gray-700">
           <h2
             class="text-xl font-bold text-gray-800 dark:text-gray-200 text-center"
           >
@@ -106,8 +106,9 @@ const formatDate = (date) => {
 // 修改网格样式计算
 const gridStyle = computed(() => ({
   fontSize: `${fontSize.value}px`,
-  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-  gap: "1rem",
+  gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))",
+  margin: "0 auto",
+  maxWidth: "1920px",
 }));
 
 const fontSize = computed(() => {
@@ -141,10 +142,27 @@ const fontSize = computed(() => {
 }
 
 /* 响应式布局调整 */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .grid {
     grid-template-columns: 1fr !important;
   }
+
+  /* 在移动端减小内边距 */
+  .h-screen {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* 调整卡片间距 */
+.gap-8 {
+  gap: 2rem;
+}
+
+/* 确保内容区域不会溢出 */
+.flex-1 {
+  min-height: 0;
+  height: 0;
 }
 
 /* 标题文本省略 */
@@ -153,10 +171,5 @@ h3 {
   text-overflow: ellipsis;
   white-space: nowrap;
   padding-right: 100px; /* 为时间预留空间 */
-}
-
-/* 确保卡片内容可以滚动 */
-.flex-1 {
-  min-height: 0;
 }
 </style>
