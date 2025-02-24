@@ -130,7 +130,8 @@ const fontSize = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 880px;
+  height: auto;
+  max-height: calc(100vh - 8rem);
   overflow: hidden;
 }
 
@@ -160,8 +161,8 @@ const fontSize = computed(() => {
 
 .card-content {
   flex: 1;
-  overflow-y: auto;
   padding: 0.5rem 0;
+  overflow: hidden;
 }
 
 .items-list {
@@ -283,7 +284,8 @@ const fontSize = computed(() => {
   }
 
   .feed-card {
-    height: 500px;
+    height: auto;
+    max-height: calc(100vh - 4rem);
     margin-bottom: 1rem;
   }
 }
