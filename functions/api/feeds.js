@@ -10,20 +10,13 @@ export async function onRequest(context) {
             headers: {
               "User-Agent":
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-              Accept:
-                "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-              "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
-              "Accept-Encoding": "gzip, deflate, br",
-              Connection: "keep-alive",
+              Accept: "application/rss+xml, application/xml, text/xml, */*",
+              "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
               "Cache-Control": "no-cache",
               Pragma: "no-cache",
-              "Sec-Fetch-Dest": "document",
-              "Sec-Fetch-Mode": "navigate",
-              "Sec-Fetch-Site": "none",
-              "Sec-Fetch-User": "?1",
-              "Upgrade-Insecure-Requests": "1",
-              DNT: "1",
+              Origin: `https://${new URL(source.url).hostname}`,
               Referer: `https://${new URL(source.url).hostname}/`,
+              Host: new URL(source.url).hostname,
             },
           });
 
@@ -40,11 +33,13 @@ export async function onRequest(context) {
           // 获取标签内容的通用方法
           const getTagContent = (xml, tags) => {
             for (const tag of tags) {
-              // 支持多种格式的标签内容
               const patterns = [
-                `<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`,
-                `<${tag}[^>]*>([^<]+)</${tag}>`,
-                `<${tag}[^>]*?\/?>([^<]*)`,
+                // 处理 CDATA 内容
+                `<${tag}[^>]*>\\s*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>\\s*</${tag}>`,
+                // 处理普通内容
+                `<${tag}[^>]*>([^<]*)</${tag}>`,
+                // 处理自闭合标签
+                `<${tag}[^>]*\\s*\\/?>(.*?)(?:<\\/${tag}>)?`,
               ];
 
               for (const pattern of patterns) {
@@ -75,47 +70,63 @@ export async function onRequest(context) {
           // 获取链接的通用方法
           const getLink = (itemContent) => {
             const patterns = [
+              // 处理 linux.do 特殊的链接格式
+              /https:\/\/linux\.do\/t\/topic\/\d+/,
               /<link[^>]*>([^<]+)<\/link>/,
               /<link[^>]*href="([^"]+)"[^>]*\/>/,
-              /<link[^>]*href='([^']+)'[^>]*\/>/,
               /<guid[^>]*>([^<]+)<\/guid>/,
               /<id[^>]*>([^<]+)<\/id>/,
-              /rel="alternate" href="([^"]+)"/,
-              /<link>([^<]+)<\/link>/,
             ];
 
             for (const pattern of patterns) {
-              const match = pattern.exec(itemContent);
-              if (match && match[1]) {
-                return match[1].trim();
+              const match =
+                typeof pattern === "string"
+                  ? new RegExp(pattern).exec(itemContent)
+                  : pattern.exec(itemContent);
+              if (match) {
+                return match[1] || match[0];
               }
             }
             return "";
           };
 
           let items = [];
-
-          // 尝试多种格式解析
           const itemPatterns = [
-            /<item[^>]*>[\s\S]*?<\/item>/g, // RSS 2.0
-            /<entry[^>]*>[\s\S]*?<\/entry>/g, // Atom
-            /<article[^>]*>[\s\S]*?<\/article>/g, // 其他可能的格式
+            // linux.do 特殊的条目格式
+            /阅读完整话题[\s\S]*?<\/topic>/g,
+            /<item[^>]*>[\s\S]*?<\/item>/g,
+            /<entry[^>]*>[\s\S]*?<\/entry>/g,
           ];
 
           for (const pattern of itemPatterns) {
             const matches = text.match(pattern) || [];
             if (matches.length > 0) {
               for (const itemContent of matches) {
-                const title =
-                  getTagContent(itemContent, ["title"])[0] || "No title";
+                // 尝试提取标题（针对 linux.do 的特殊格式）
+                let title = getTagContent(itemContent, ["title"])[0];
+                if (!title) {
+                  const titleMatch = itemContent.match(
+                    /([^\n]+)(?=\s+\d+\s+个帖子)/
+                  );
+                  title = titleMatch ? titleMatch[1].trim() : "No title";
+                }
+
+                // 提取链接
                 const link = getLink(itemContent);
-                const pubDate =
-                  getTagContent(itemContent, [
-                    "pubDate",
-                    "published",
-                    "updated",
-                    "date",
-                  ])[0] || new Date().toISOString();
+
+                // 提取日期
+                let pubDate = getTagContent(itemContent, [
+                  "pubDate",
+                  "published",
+                  "updated",
+                  "date",
+                ])[0];
+                if (!pubDate) {
+                  const dateMatch = itemContent.match(
+                    /\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/
+                  );
+                  pubDate = dateMatch ? dateMatch[0] : new Date().toISOString();
+                }
 
                 let formattedDate;
                 try {
@@ -124,14 +135,16 @@ export async function onRequest(context) {
                   formattedDate = new Date().toISOString();
                 }
 
-                items.push({
-                  id: items.length,
-                  title: title,
-                  link: link,
-                  pubDate: formattedDate,
-                });
+                if (title && link) {
+                  items.push({
+                    id: items.length,
+                    title: title,
+                    link: link,
+                    pubDate: formattedDate,
+                  });
+                }
               }
-              break; // 如果找到匹配的格式就停止尝试
+              if (items.length > 0) break;
             }
           }
 
