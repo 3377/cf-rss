@@ -68,6 +68,15 @@
       </div>
       <FeedGrid v-else :feeds="feeds" :isDark="isDark" class="flex-1" />
     </div>
+
+    <!-- 底部版权信息 -->
+    <footer class="footer">
+      <div class="text-center text-sm text-gray-500 dark:text-gray-400 py-2">
+        <span>© {{ new Date().getFullYear() }} RSS Reader. </span>
+        <span>Powered by Vue.js & TailwindCSS. </span>
+        <span>All rights reserved.</span>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -178,10 +187,18 @@ onUnmounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  margin-bottom: 1rem; /* 为footer留出空间 */
 }
 
-.dark {
-  @apply text-gray-100;
+.footer {
+  flex-shrink: 0;
+  border-top: 1px solid #e5e7eb;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.dark .footer {
+  border-color: #374151;
 }
 
 /* 移除全局滚动条 */
@@ -196,5 +213,9 @@ body {
 #app {
   height: 100vh;
   overflow: hidden;
+}
+
+.dark {
+  @apply text-gray-100;
 }
 </style>
