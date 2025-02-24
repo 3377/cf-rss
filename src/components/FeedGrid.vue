@@ -119,8 +119,8 @@ const fontSize = computed(() => {
 .feed-grid {
   display: grid;
   margin: 0 auto;
-  gap: 3rem;
-  padding: 1rem;
+  gap: 7rem;
+  padding: 2rem;
 }
 
 .feed-card {
@@ -129,7 +129,7 @@ const fontSize = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 600px;
+  height: 750px;
   overflow: hidden;
 }
 
@@ -276,7 +276,7 @@ const fontSize = computed(() => {
 @media (max-width: 768px) {
   .feed-grid {
     grid-template-columns: 1fr !important;
-    gap: 2rem;
+    gap: 3rem;
   }
 
   .feed-card {
