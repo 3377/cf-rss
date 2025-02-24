@@ -5,9 +5,9 @@
         <h1 class="text-3xl font-bold dark:text-gray-200">RSS Reader</h1>
       </div>
 
-      <div class="flex justify-between items-center">
+      <div class="flex flex-col items-center">
         <div
-          class="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400"
+          class="flex justify-center gap-8 text-sm text-gray-600 dark:text-gray-400 mb-4"
         >
           <div>下次刷新: {{ formatCountdown }}</div>
           <div>最后更新: {{ formatLastUpdate }}</div>

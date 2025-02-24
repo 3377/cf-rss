@@ -203,7 +203,8 @@ const fontSize = computed(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
   padding-right: 1rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .dark .item-title {
@@ -212,6 +213,21 @@ const fontSize = computed(() => {
 
 .item-link:hover .item-title {
   color: #3b82f6;
+  white-space: normal;
+  overflow: visible;
+  position: absolute;
+  background: inherit;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  width: calc(100% - 2rem);
+  max-width: none;
+}
+
+.dark .item-link:hover .item-title {
+  background: #1f2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .item-date {
