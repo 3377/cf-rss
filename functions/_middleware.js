@@ -17,7 +17,15 @@ export async function onRequest(context) {
 
     // 如果是 /api/feeds 路径，返回所有 feeds 数据
     if (url.pathname === "/api/feeds") {
-      return new Response(JSON.stringify(config), {
+      // 为每个 feed 添加必要的初始属性
+      const feedsWithDefaults = config.feeds.map((feed) => ({
+        ...feed,
+        lastUpdate: new Date().toISOString(),
+        items: [], // 初始化空数组
+        error: null, // 初始化错误为 null
+      }));
+
+      return new Response(JSON.stringify(feedsWithDefaults), {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
@@ -38,11 +46,21 @@ export async function onRequest(context) {
     // 处理 HTML 页面
     const html = await response.text();
 
-    // 注入配置到全局变量
+    // 注入配置到全局变量，同时确保 feeds 有正确的数据结构
+    const configWithDefaults = {
+      ...config,
+      feeds: config.feeds.map((feed) => ({
+        ...feed,
+        lastUpdate: new Date().toISOString(),
+        items: [],
+        error: null,
+      })),
+    };
+
     const injectedHtml = html.replace(
       "</head>",
       `<script>window.__RSS_CONFIG__ = ${JSON.stringify(
-        config
+        configWithDefaults
       )};</script></head>`
     );
 

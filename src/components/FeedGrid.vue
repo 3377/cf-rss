@@ -57,7 +57,21 @@ import { computed, ref, onMounted } from "vue";
 import { getRSSConfig } from "../config/rss.config";
 
 const props = defineProps({
-  feeds: Array,
+  feeds: {
+    type: Array,
+    default: () => [], // 提供默认值
+    validator: (value) => {
+      // 确保每个 feed 都有必要的属性
+      return value.every((feed) => {
+        return (
+          feed &&
+          typeof feed.title === "string" &&
+          typeof feed.url === "string" &&
+          Array.isArray(feed.items)
+        );
+      });
+    },
+  },
   layout: Number,
   isDark: Boolean,
 });
