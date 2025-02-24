@@ -81,6 +81,17 @@ export function getRSSConfig(env) {
     if (env.ITEMS_PER_FEED) {
       config.display.itemsPerFeed = parseInt(env.ITEMS_PER_FEED);
     }
+
+    // 处理布局配置
+    if (env.LAYOUT_SIDE_MARGIN) {
+      config.display.layout.sideMargin = env.LAYOUT_SIDE_MARGIN;
+    }
+    if (env.CARD_GAP) {
+      config.display.layout.cardGap = parseInt(env.CARD_GAP);
+    }
+    if (env.CARD_PADDING) {
+      config.display.layout.cardPadding = parseInt(env.CARD_PADDING);
+    }
   } catch (error) {
     console.error("Error in getRSSConfig:", error);
   }
