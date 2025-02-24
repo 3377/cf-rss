@@ -3,7 +3,7 @@ export const RSS_CONFIG = {
   feeds: [
     {
       title: "V2EX",
-      url: "https://www.v2ex.com/feed/tab/tech.xml",
+      url: "https://www.v2ex.com/index.xml",
     },
     {
       title: "NodeSeek",

@@ -20,10 +20,17 @@
         v-else
         v-for="(item, index) in feed.items"
         :key="item.id"
-        class="text-sm"
+        class="text-sm hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded"
       >
         <span class="text-gray-500 mr-2">{{ index + 1 }}.</span>
-        <span class="text-gray-700 dark:text-gray-300">{{ item.title }}</span>
+        <a
+          :href="item.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          {{ item.title }}
+        </a>
         <span class="text-xs text-gray-500 ml-2">
           {{ formatDate(item.pubDate) }}
         </span>
@@ -53,3 +60,9 @@ const formatDate = (dateStr) => {
   }
 };
 </script>
+
+<style scoped>
+.hover\:bg-gray-50:hover {
+  transition: background-color 0.2s;
+}
+</style>

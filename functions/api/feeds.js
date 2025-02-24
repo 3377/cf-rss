@@ -8,34 +8,48 @@ export async function onRequest(context) {
           const response = await fetch(source.url);
           const text = await response.text();
 
-          // 使用简单的字符串解析方法
-          const getTagContent = (xml, tag) => {
-            const regex = new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, "gs");
+          // 改进的标签内容获取方法
+          const getTagContent = (xml, tag, attribute = null) => {
+            const regex = attribute
+              ? new RegExp(
+                  `<${tag}[^>]*${attribute}="([^"]*)"[^>]*>(?:.*?)</${tag}>`,
+                  "gs"
+                )
+              : new RegExp(
+                  `<${tag}[^>]*>(?:<\\!\\[CDATA\\[)?(.*?)(?:\\]\\]>)?</${tag}>`,
+                  "gs"
+                );
+
             const matches = [...xml.matchAll(regex)];
-            return matches.map((match) => match[1].trim());
+            return matches.map((match) => {
+              return attribute ? match[1] : match[1].trim();
+            });
           };
 
-          const titles = getTagContent(text, "title");
-          const pubDates = getTagContent(text, "pubDate");
+          // 获取所有 item 标签
+          const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/g;
+          const items = [...text.matchAll(itemRegex)].map((match, index) => {
+            const itemContent = match[1];
+            const title = getTagContent(itemContent, "title")[0] || "No title";
+            const link = getTagContent(itemContent, "link")[0] || "";
+            const pubDate = getTagContent(itemContent, "pubDate")[0] || "";
 
-          const items = titles
-            .map((title, index) => {
-              let formattedDate;
-              try {
-                formattedDate = pubDates[index]
-                  ? new Date(pubDates[index]).toISOString()
-                  : new Date().toISOString();
-              } catch (e) {
-                formattedDate = new Date().toISOString();
-              }
+            let formattedDate;
+            try {
+              formattedDate = pubDate
+                ? new Date(pubDate).toISOString()
+                : new Date().toISOString();
+            } catch (e) {
+              formattedDate = new Date().toISOString();
+            }
 
-              return {
-                id: index,
-                title: title || "No title",
-                pubDate: formattedDate,
-              };
-            })
-            .slice(1); // 跳过第一个标题（通常是 feed 标题）
+            return {
+              id: index,
+              title: title,
+              link: link,
+              pubDate: formattedDate,
+            };
+          });
 
           return {
             title: source.title,
