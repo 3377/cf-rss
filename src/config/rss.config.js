@@ -23,10 +23,10 @@ const defaultConfig = {
     dateFormat: "yyyy-MM-dd HH:mm",
     fontSize: 16,
     layout: {
-      maxHeight: "100vh", // 限制最大高度为视口高度
-      cardGap: 24, // 卡片之间的间距（像素）
-      sideMargin: "5%", // 两侧留白比例
-      cardPadding: 16, // 卡片内边距
+      maxHeight: "100vh", // 使用100vh确保完全填充视口高度
+      cardGap: 48, // 增加卡片间距到48px使布局更加宽松
+      sideMargin: "1%", // 减少两侧留白到1%以充分利用空间
+      cardPadding: 20, // 保持原有的内边距
     },
   },
 };
