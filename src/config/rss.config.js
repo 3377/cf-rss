@@ -26,44 +26,62 @@ const defaultConfig = {
   },
 };
 
-// 导出用于 Pages 的配置函数
+// 导出配置获取函数
 export function getRSSConfig(env) {
-  return {
-    feeds: (() => {
-      try {
-        if (env?.RSS_FEEDS && env.RSS_FEEDS.trim() !== "") {
-          const parsedFeeds = JSON.parse(env.RSS_FEEDS);
-          if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
-            return parsedFeeds;
-          }
-        }
-      } catch (error) {
-        console.error("RSS_FEEDS parsing error:", error);
-      }
-      return defaultConfig.feeds;
-    })(),
-    refresh: {
-      interval: env?.REFRESH_INTERVAL
-        ? parseInt(env.REFRESH_INTERVAL)
-        : defaultConfig.refresh.interval,
-      cache: env?.CACHE_DURATION
-        ? parseInt(env.CACHE_DURATION)
-        : defaultConfig.refresh.cache,
-    },
-    display: {
-      itemsPerFeedCompact: env?.ITEMS_PER_FEED_COMPACT
-        ? parseInt(env.ITEMS_PER_FEED_COMPACT)
-        : defaultConfig.display.itemsPerFeedCompact,
-      itemsPerFeedExpanded: env?.ITEMS_PER_FEED_EXPANDED
-        ? parseInt(env.ITEMS_PER_FEED_EXPANDED)
-        : defaultConfig.display.itemsPerFeedExpanded,
-      dateFormat: env?.DATE_FORMAT || defaultConfig.display.dateFormat,
-      fontSize: env?.FONT_SIZE
-        ? parseInt(env.FONT_SIZE)
-        : defaultConfig.display.fontSize,
-    },
+  console.log("Getting RSS config with env:", env); // 调试日志
+
+  // 如果没有传入 env，返回默认配置
+  if (!env) {
+    console.log("No env provided, using default config");
+    return defaultConfig;
+  }
+
+  const config = {
+    feeds: defaultConfig.feeds,
+    refresh: { ...defaultConfig.refresh },
+    display: { ...defaultConfig.display },
   };
+
+  try {
+    // 处理 RSS feeds
+    if (env.RSS_FEEDS && env.RSS_FEEDS.trim()) {
+      const parsedFeeds = JSON.parse(env.RSS_FEEDS);
+      if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
+        config.feeds = parsedFeeds;
+        console.log("Using custom RSS feeds:", parsedFeeds);
+      }
+    }
+
+    // 处理刷新配置
+    if (env.REFRESH_INTERVAL) {
+      config.refresh.interval = parseInt(env.REFRESH_INTERVAL);
+    }
+    if (env.CACHE_DURATION) {
+      config.refresh.cache = parseInt(env.CACHE_DURATION);
+    }
+
+    // 处理显示配置
+    if (env.ITEMS_PER_FEED_COMPACT) {
+      config.display.itemsPerFeedCompact = parseInt(env.ITEMS_PER_FEED_COMPACT);
+    }
+    if (env.ITEMS_PER_FEED_EXPANDED) {
+      config.display.itemsPerFeedExpanded = parseInt(
+        env.ITEMS_PER_FEED_EXPANDED
+      );
+    }
+    if (env.DATE_FORMAT) {
+      config.display.dateFormat = env.DATE_FORMAT;
+    }
+    if (env.FONT_SIZE) {
+      config.display.fontSize = parseInt(env.FONT_SIZE);
+    }
+  } catch (error) {
+    console.error("Error parsing RSS config:", error);
+  }
+
+  console.log("Final config:", config); // 调试日志
+  return config;
 }
 
-// 导出默认配置用于组件
-export const RSS_CONFIG = defaultConfig;
+// 导出默认配置（仅用于开发环境）
+export const RSS_CONFIG = getRSSConfig(typeof ENV !== "undefined" ? ENV : null);
