@@ -1,15 +1,16 @@
 <template>
   <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-100']">
     <div class="header">
-      <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center gap-4">
-          <h1 class="text-2xl font-bold dark:text-gray-200">RSS Reader</h1>
-          <div class="text-sm text-gray-600 dark:text-gray-400">
-            下次刷新: {{ formatCountdown }}
-          </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">
-            最后更新: {{ formatLastUpdate }}
-          </div>
+      <div class="text-center mb-4">
+        <h1 class="text-3xl font-bold dark:text-gray-200">RSS Reader</h1>
+      </div>
+
+      <div class="flex justify-between items-center">
+        <div
+          class="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400"
+        >
+          <div>下次刷新: {{ formatCountdown }}</div>
+          <div>最后更新: {{ formatLastUpdate }}</div>
         </div>
         <div class="flex items-center gap-4">
           <button
@@ -72,7 +73,14 @@
     <!-- 底部版权信息 -->
     <footer class="footer">
       <div class="text-center text-sm text-gray-500 dark:text-gray-400 py-2">
-        <span>© {{ new Date().getFullYear() }} RSS Reader. </span>
+        <span>© {{ new Date().getFullYear() }} </span>
+        <a
+          href="https://github.com/3377/cf-rss"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
+          >RSS Reader</a
+        >.
         <span>Powered by Vue.js & TailwindCSS. </span>
         <span>All rights reserved.</span>
       </div>
@@ -178,8 +186,13 @@ onUnmounted(() => {
 }
 
 .header {
-  padding: 1rem;
+  padding: 1.5rem 1rem;
   flex-shrink: 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .header {
+  border-color: #374151;
 }
 
 .content-area {
@@ -187,7 +200,7 @@ onUnmounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem; /* 为footer留出空间 */
+  margin-bottom: 1rem;
 }
 
 .footer {
