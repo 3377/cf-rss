@@ -22,6 +22,12 @@ const defaultConfig = {
     itemsPerFeed: 15, // 每个卡片显示的条目数
     dateFormat: "yyyy-MM-dd HH:mm",
     fontSize: 16,
+    layout: {
+      maxHeight: "100vh", // 限制最大高度为视口高度
+      cardGap: 24, // 卡片之间的间距（像素）
+      sideMargin: "5%", // 两侧留白比例
+      cardPadding: 16, // 卡片内边距
+    },
   },
 };
 
