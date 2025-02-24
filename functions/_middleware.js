@@ -3,24 +3,12 @@ import { getRSSConfig } from "../src/config/rss.config.js";
 // 添加获取 RSS 内容的函数
 async function fetchRSSFeed(url) {
   try {
-    // 根据不同的 URL 设置不同的请求头
-    const headers = new Headers();
-
-    if (url.includes("v2ex.com")) {
-      // V2EX 需要设置 User-Agent
-      headers.set(
-        "User-Agent",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-      );
-    } else if (url.includes("nodeseek.com")) {
-      // NodeSeek 可能需要特定的请求头
-      headers.set(
-        "User-Agent",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-      );
-      headers.set("Accept", "application/xml, application/rss+xml, text/xml");
-      headers.set("Referer", "https://nodeseek.com");
-    }
+    // 通用的请求头
+    const headers = new Headers({
+      "User-Agent": "RSS Reader Bot/1.0",
+      Accept:
+        "application/rss+xml, application/xml, application/atom+xml, text/xml, */*",
+    });
 
     const response = await fetch(url, { headers });
     if (!response.ok) {
@@ -28,65 +16,42 @@ async function fetchRSSFeed(url) {
     }
     const text = await response.text();
 
-    // 使用更健壮的正则表达式来处理不同格式的 RSS
+    // 通用的 RSS/Atom 解析
     const items = [];
-    let itemMatches = text.match(/<item[\s\S]*?<\/item>/g) || [];
+    // 匹配所有可能的条目标签
+    const itemRegex = /<(item|entry)[\s\S]*?<\/\1>/g;
+    const matches = text.match(itemRegex) || [];
 
-    // 如果没有找到 <item>，尝试查找 <entry>（某些 RSS 源使用 Atom 格式）
-    if (itemMatches.length === 0) {
-      itemMatches = text.match(/<entry[\s\S]*?<\/entry>/g) || [];
-    }
-
-    itemMatches.forEach((itemStr, index) => {
-      // 标题匹配（处理 CDATA）
-      const titleMatch = itemStr.match(
-        /<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/
+    matches.forEach((itemStr, index) => {
+      // 通用标题匹配
+      const title = itemStr.match(
+        /<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/i
       );
 
-      // 链接匹配（处理不同格式）
-      let linkMatch = itemStr.match(
-        /<link>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/link>/
+      // 通用链接匹配
+      let link = itemStr.match(
+        /<link[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/link>/i
       );
-      if (!linkMatch) {
-        // 尝试匹配 href 属性格式
-        const hrefMatch = itemStr.match(/<link[^>]*href="([^"]*)"[^>]*\/>/);
+      if (!link) {
+        // 匹配自闭合的 link 标签
+        const hrefMatch = itemStr.match(/<link[^>]*href="([^"]*)"[^>]*\/?>/i);
         if (hrefMatch) {
-          linkMatch = hrefMatch;
+          link = hrefMatch;
         }
       }
 
-      // 日期匹配（处理多种日期标签）
-      let pubDateMatch = itemStr.match(
-        /<pubDate>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/pubDate>/
-      );
-      if (!pubDateMatch) {
-        pubDateMatch = itemStr.match(
-          /<published>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/published>/
-        );
-      }
-      if (!pubDateMatch) {
-        pubDateMatch = itemStr.match(
-          /<updated>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/updated>/
-        );
-      }
+      // 通用日期匹配
+      const dateRegex =
+        /<(pubDate|published|updated|date)[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/\1>/i;
+      const pubDate = itemStr.match(dateRegex);
 
       items.push({
         id: index,
-        title: titleMatch ? titleMatch[1].trim() : "",
-        link: linkMatch ? linkMatch[1].trim() : "",
-        pubDate: pubDateMatch
-          ? pubDateMatch[1].trim()
-          : new Date().toISOString(),
+        title: title ? title[1].trim() : "",
+        link: link ? link[1].trim() : "",
+        pubDate: pubDate ? pubDate[2].trim() : new Date().toISOString(),
       });
     });
-
-    // 如果没有找到任何内容，记录错误
-    if (items.length === 0) {
-      console.warn(
-        `No items found for ${url}. Response:`,
-        text.substring(0, 500)
-      );
-    }
 
     return {
       items,

@@ -1,5 +1,8 @@
 <template>
-  <div :class="['grid gap-4', layout === 4 ? 'grid-cols-2' : 'grid-cols-4']">
+  <div
+    :class="['grid gap-4', layout === 8 ? 'grid-cols-4' : 'grid-cols-2']"
+    :style="{ fontSize: `${fontSize}px` }"
+  >
     <div
       v-for="feed in feeds"
       :key="feed.url"
@@ -87,11 +90,11 @@ onMounted(() => {
   }
 });
 
-// 使用配置
+// 修改显示数量逻辑
 const itemsToShow = computed(() => {
-  return props.layout === 4
-    ? config.value.display.itemsPerFeedExpanded
-    : config.value.display.itemsPerFeedCompact;
+  return props.layout === 8
+    ? config.value.display.itemsPerFeedCompact
+    : config.value.display.itemsPerFeedExpanded;
 });
 
 const formatDate = (date) => {
@@ -103,7 +106,7 @@ const formatDate = (date) => {
   });
 };
 
-const fontSize = computed(() => `${config.value.display.fontSize}px`);
+const fontSize = computed(() => config.value.display.fontSize);
 </script>
 
 <style scoped>
