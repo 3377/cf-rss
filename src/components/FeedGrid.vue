@@ -202,7 +202,7 @@ const fontSize = computed(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-right: 1rem;
+  padding-right: 4rem;
   transition: all 0.3s ease;
   position: relative;
 }
@@ -215,27 +215,32 @@ const fontSize = computed(() => {
   color: #3b82f6;
   white-space: normal;
   overflow: visible;
-  position: relative;
   padding-right: 0;
 }
 
 .item-date {
-  position: relative;
-  display: inline-block;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 0.75rem;
   color: #6b7280;
-  margin-left: 0.5rem;
   background: white;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  vertical-align: middle;
+  opacity: 1;
+  transition: all 0.3s ease;
 }
 
 .item-link:hover .item-date {
-  opacity: 1;
+  position: relative;
+  display: inline-block;
+  right: auto;
+  top: auto;
+  transform: none;
+  margin-left: 0.5rem;
+  vertical-align: middle;
 }
 
 .dark .item-date {
