@@ -53,8 +53,8 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { RSS_CONFIG } from "../config/rss.config";
+import { computed, ref, onMounted } from "vue";
+import { getRSSConfig } from "../config/rss.config";
 
 const props = defineProps({
   feeds: Array,
@@ -62,10 +62,22 @@ const props = defineProps({
   isDark: Boolean,
 });
 
+// 获取配置
+const config = ref(getRSSConfig(null)); // 初始使用默认配置
+
+onMounted(() => {
+  // 在组件挂载后获取注入的配置
+  if (typeof window !== "undefined" && window.__RSS_CONFIG__) {
+    config.value = window.__RSS_CONFIG__;
+    console.log("Using injected config:", config.value);
+  }
+});
+
+// 使用配置
 const itemsToShow = computed(() => {
   return props.layout === 4
-    ? RSS_CONFIG.display.itemsPerFeedExpanded
-    : RSS_CONFIG.display.itemsPerFeedCompact;
+    ? config.value.display.itemsPerFeedExpanded
+    : config.value.display.itemsPerFeedCompact;
 });
 
 const formatDate = (date) => {
@@ -76,6 +88,8 @@ const formatDate = (date) => {
     minute: "2-digit",
   });
 };
+
+const fontSize = computed(() => `${config.value.display.fontSize}px`);
 </script>
 
 <style scoped>

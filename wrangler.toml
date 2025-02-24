@@ -7,9 +7,13 @@ bucket = "./dist"
 
 [build]
 command = "npm run build"
+directory = "dist"
 
 [build.upload]
 format = "service-worker"
 
 [env.production]
-pages_build_output_dir = "dist" 
+pages_build_output_dir = "dist"
+
+[functions]
+directory = "functions" 

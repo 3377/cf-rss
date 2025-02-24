@@ -30,25 +30,31 @@ const defaultConfig = {
 export function getRSSConfig(env) {
   console.log("Getting RSS config with env:", env); // 调试日志
 
-  // 如果没有传入 env，返回默认配置
-  if (!env) {
-    console.log("No env provided, using default config");
-    return defaultConfig;
-  }
-
-  const config = {
-    feeds: defaultConfig.feeds,
-    refresh: { ...defaultConfig.refresh },
-    display: { ...defaultConfig.display },
-  };
+  // 创建新的配置对象，避免修改默认配置
+  const config = JSON.parse(JSON.stringify(defaultConfig));
 
   try {
+    // 如果没有环境变量，直接返回默认配置
+    if (!env) {
+      console.log("No env provided, using default config");
+      return config;
+    }
+
     // 处理 RSS feeds
-    if (env.RSS_FEEDS && env.RSS_FEEDS.trim()) {
-      const parsedFeeds = JSON.parse(env.RSS_FEEDS);
-      if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
-        config.feeds = parsedFeeds;
-        console.log("Using custom RSS feeds:", parsedFeeds);
+    if (env.RSS_FEEDS) {
+      try {
+        const feedsStr = env.RSS_FEEDS.trim();
+        console.log("RSS_FEEDS string:", feedsStr);
+
+        const parsedFeeds = JSON.parse(feedsStr);
+        if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
+          config.feeds = parsedFeeds;
+          console.log("Successfully parsed RSS feeds:", parsedFeeds);
+        } else {
+          console.warn("Parsed RSS_FEEDS is not a valid array");
+        }
+      } catch (parseError) {
+        console.error("Error parsing RSS_FEEDS:", parseError);
       }
     }
 
@@ -76,12 +82,16 @@ export function getRSSConfig(env) {
       config.display.fontSize = parseInt(env.FONT_SIZE);
     }
   } catch (error) {
-    console.error("Error parsing RSS config:", error);
+    console.error("Error in getRSSConfig:", error);
   }
 
-  console.log("Final config:", config); // 调试日志
+  console.log("Final config:", config);
   return config;
 }
 
-// 导出默认配置（仅用于开发环境）
-export const RSS_CONFIG = getRSSConfig(typeof ENV !== "undefined" ? ENV : null);
+// 修改默认导出逻辑
+export const RSS_CONFIG = getRSSConfig(
+  typeof window !== "undefined" && window.__RSS_CONFIG__
+    ? window.__RSS_CONFIG__
+    : null
+);
