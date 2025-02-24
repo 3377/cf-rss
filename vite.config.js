@@ -16,8 +16,21 @@ export default defineConfig({
   ],
   build: {
     target: "es2015",
+    rollupOptions: {
+      external: ["http", "https", "timers"],
+    },
   },
   css: {
     postcss: "./postcss.config.cjs",
+  },
+  resolve: {
+    alias: {
+      http: "node:http",
+      https: "node:https",
+      timers: "node:timers",
+    },
+  },
+  optimizeDeps: {
+    include: ["rss-parser", "xml2js"],
   },
 });
