@@ -6,19 +6,31 @@ export async function onRequest(context) {
       RSS_CONFIG.feeds.map(async (source) => {
         try {
           const response = await fetch(source.url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
           const text = await response.text();
 
           // 调试日志
           console.log(`Fetching ${source.title}: ${source.url}`);
+          console.log(`Response status: ${response.status}`);
+          console.log(`Content sample: ${text.substring(0, 200)}`);
 
           // 获取标签内容的通用方法
           const getTagContent = (xml, tags) => {
             for (const tag of tags) {
-              const pattern = `<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`;
-              const regex = new RegExp(pattern, "g");
-              const matches = [...xml.matchAll(regex)];
-              if (matches.length > 0) {
-                return matches.map((match) => match[1].trim());
+              // 支持自闭合标签和CDATA
+              const patterns = [
+                `<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`,
+                `<${tag}[^>]*?\/?>([^<]*)`,
+              ];
+
+              for (const pattern of patterns) {
+                const regex = new RegExp(pattern, "g");
+                const matches = [...xml.matchAll(regex)];
+                if (matches.length > 0) {
+                  return matches.map((match) => match[1].trim());
+                }
               }
             }
             return [];
@@ -26,12 +38,15 @@ export async function onRequest(context) {
 
           // 获取链接的通用方法
           const getLink = (itemContent) => {
-            // 尝试不同的链接格式
+            // 扩展链接匹配模式
             const patterns = [
               /<link[^>]*>([^<]+)<\/link>/,
               /<link[^>]*href="([^"]+)"[^>]*\/>/,
+              /<link[^>]*href='([^']+)'[^>]*\/>/,
               /<guid[^>]*>([^<]+)<\/guid>/,
               /<id[^>]*>([^<]+)<\/id>/,
+              /rel="alternate" href="([^"]+)"/,
+              /<link>([^<]+)<\/link>/,
             ];
 
             for (const pattern of patterns) {
@@ -40,87 +55,101 @@ export async function onRequest(context) {
                 return match[1].trim();
               }
             }
-            return "";
+
+            // 尝试直接从原始文本中提取URL
+            const urlMatch = itemContent.match(/(https?:\/\/[^\s<>"']+)/);
+            return urlMatch ? urlMatch[1] : "";
           };
 
           // 获取所有文章条目
-          const items = [];
+          let items = [];
 
-          // 尝试 RSS 格式 (<item>)
-          const rssItems = text.match(/<item[^>]*>[\s\S]*?<\/item>/g) || [];
+          // 首先尝试标准的RSS和Atom格式
+          const itemPatterns = [
+            /<item[^>]*>[\s\S]*?<\/item>/g,
+            /<entry[^>]*>[\s\S]*?<\/entry>/g,
+            /<article[^>]*>[\s\S]*?<\/article>/g,
+          ];
 
-          // 尝试 Atom 格式 (<entry>)
-          const atomItems = text.match(/<entry[^>]*>[\s\S]*?<\/entry>/g) || [];
-
-          // 合并所有找到的条目
-          const allItems = [...rssItems, ...atomItems];
-
-          console.log(`Found ${allItems.length} items for ${source.title}`);
-
-          for (const itemContent of allItems) {
-            const title =
-              getTagContent(itemContent, ["title"])[0] || "No title";
-            const link = getLink(itemContent);
-            const pubDate =
-              getTagContent(itemContent, [
-                "pubDate",
-                "published",
-                "updated",
-                "date",
-              ])[0] || "";
-
-            let formattedDate;
-            try {
-              formattedDate = pubDate
-                ? new Date(pubDate).toISOString()
-                : new Date().toISOString();
-            } catch (e) {
-              formattedDate = new Date().toISOString();
-            }
-
-            items.push({
-              id: items.length,
-              title: title,
-              link: link,
-              pubDate: formattedDate,
-            });
-          }
-
-          // 如果还是没有找到条目，尝试整个文档解析
-          if (items.length === 0) {
+          for (const pattern of itemPatterns) {
+            const matches = text.match(pattern) || [];
             console.log(
-              `No items found using standard parsing for ${source.title}, trying alternative method`
+              `Found ${matches.length} items using pattern: ${pattern}`
             );
 
-            const titles = getTagContent(text, ["title"]);
-            const links =
-              text
-                .match(/<link[^>]*(?:href="([^"]+)"[^>]*|>([^<]+))<\/link>/g)
-                ?.map((l) => {
-                  const match = /(?:href="([^"]+)"|>([^<]+)<)/.exec(l);
-                  return match ? match[1] || match[2] : "";
-                }) || [];
-            const dates = getTagContent(text, [
-              "updated",
-              "published",
-              "pubDate",
-              "date",
-            ]);
+            for (const itemContent of matches) {
+              const title =
+                getTagContent(itemContent, ["title", "h1"])[0] || "No title";
+              const link = getLink(itemContent);
+              const pubDate =
+                getTagContent(itemContent, [
+                  "pubDate",
+                  "published",
+                  "updated",
+                  "date",
+                  "time",
+                  "created",
+                ])[0] || "";
 
-            // 跳过第一个（通常是 feed 标题）
-            for (
-              let i = 1;
-              i < Math.min(titles.length, RSS_CONFIG.display.itemsPerFeed + 1);
-              i++
-            ) {
+              let formattedDate;
+              try {
+                formattedDate = pubDate
+                  ? new Date(pubDate).toISOString()
+                  : new Date().toISOString();
+              } catch (e) {
+                formattedDate = new Date().toISOString();
+              }
+
               items.push({
-                id: i - 1,
-                title: titles[i],
-                link: links[i] || "",
-                pubDate: dates[i]
-                  ? new Date(dates[i]).toISOString()
-                  : new Date().toISOString(),
+                id: items.length,
+                title: title,
+                link: link,
+                pubDate: formattedDate,
               });
+            }
+          }
+
+          // 如果没有找到条目，尝试备用解析方法
+          if (items.length === 0) {
+            console.log(`Trying alternative parsing for ${source.title}`);
+
+            // 尝试解析JSON格式
+            try {
+              const jsonData = JSON.parse(text);
+              if (Array.isArray(jsonData)) {
+                items = jsonData.map((item, index) => ({
+                  id: index,
+                  title: item.title || item.name || "No title",
+                  link: item.link || item.url || "",
+                  pubDate: new Date(
+                    item.date || item.created || Date.now()
+                  ).toISOString(),
+                }));
+              }
+            } catch (e) {
+              console.log("Not JSON format, continuing with XML parsing");
+            }
+
+            // 如果JSON解析失败，继续尝试XML解析
+            if (items.length === 0) {
+              const titles = getTagContent(text, ["title", "h1"]);
+              const links =
+                text
+                  .match(/<link[^>]*?(?:href="([^"]+)"[^>]*|>([^<]+))/g)
+                  ?.map((l) => {
+                    const match = /(?:href="([^"]+)"|>([^<]+))/.exec(l);
+                    return match ? match[1] || match[2] : "";
+                  }) || [];
+
+              // 跳过第一个（通常是feed标题）
+              for (let i = 1; i < titles.length; i++) {
+                items.push({
+                  id: i - 1,
+                  title: titles[i],
+                  link: links[i] || "",
+                  pubDate: new Date().toISOString(),
+                });
+              }
             }
           }
 
@@ -134,6 +163,7 @@ export async function onRequest(context) {
           };
         } catch (error) {
           console.error(`Error processing ${source.url}:`, error);
+          console.error("Error details:", error.stack);
           return {
             title: source.title,
             url: source.url,
