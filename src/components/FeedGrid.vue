@@ -97,9 +97,9 @@ const gridStyle = computed(() => {
   return {
     gridTemplateColumns: `repeat(${layout.gridColumns || 3}, 1fr)`,
     gap: `${layout.cardGap || 24}px`,
-    maxWidth: layout.containerWidth || '1920px',
-    padding: layout.containerPadding || '16px',
-    margin: `0 ${layout.sideMargin || '2%'}`
+    maxWidth: layout.containerWidth || "1920px",
+    padding: layout.containerPadding || "16px",
+    margin: `0 ${layout.sideMargin || "2%"}`,
   };
 });
 
@@ -113,11 +113,13 @@ const fontSize = computed(() => {
 .feed-container {
   padding: 1rem;
   width: 100%;
+  min-height: 100vh;
 }
 
 .feed-grid {
   display: grid;
   margin: 0 auto;
+  gap: 2rem;
 }
 
 .feed-card {
@@ -126,7 +128,7 @@ const fontSize = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: calc(98vh - 8rem);
+  height: 600px;
   overflow: hidden;
 }
 
@@ -269,7 +271,8 @@ const fontSize = computed(() => {
   }
 
   .feed-card {
-    height: calc(98vh - 4rem);
+    height: 500px;
+    margin-bottom: 1rem;
   }
 }
 </style>
