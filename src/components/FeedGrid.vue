@@ -190,10 +190,10 @@ const fontSize = computed(() => {
   border-radius: 0.75rem;
 }
 
-:not(.dark) .feed-card {
-  background: rgba(245, 247, 250, 0.75);
-  border: 1px solid rgba(230, 235, 242, 0.8);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07);
+html body .app-container:not(.dark) .feed-card {
+  background: rgba(245, 247, 250, 0.75) !important;
+  border: 1px solid rgba(230, 235, 242, 0.8) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
 }
 
 .dark .feed-card {
@@ -206,9 +206,9 @@ const fontSize = computed(() => {
   border-bottom: 1px solid #e5e7eb;
 }
 
-:not(.dark) .card-header {
-  background-color: rgba(240, 242, 247, 0.9);
-  border-bottom: 1px solid rgba(230, 235, 242, 0.9);
+html body .app-container:not(.dark) .card-header {
+  background-color: rgba(240, 242, 247, 0.9) !important;
+  border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
 }
 
 .dark .card-header {
@@ -222,8 +222,8 @@ const fontSize = computed(() => {
   text-align: center;
 }
 
-:not(.dark) .card-title {
-  color: #2d3748;
+html body .app-container:not(.dark) .card-title {
+  color: #2d3748 !important;
 }
 
 .dark .card-title {
@@ -236,8 +236,8 @@ const fontSize = computed(() => {
   overflow-y: auto;
 }
 
-:not(.dark) .card-content {
-  background-color: rgba(240, 242, 247, 0.5);
+html body .app-container:not(.dark) .card-content {
+  background-color: rgba(240, 242, 247, 0.5) !important;
 }
 
 .dark .card-content {
@@ -266,8 +266,8 @@ const fontSize = computed(() => {
   position: relative;
 }
 
-:not(.dark) .item-link:hover {
-  background: rgba(240, 242, 247, 0.8);
+html body .app-container:not(.dark) .item-link:hover {
+  background: rgba(240, 242, 247, 0.8) !important;
 }
 
 .dark .item-link:hover {
@@ -284,16 +284,16 @@ const fontSize = computed(() => {
   max-width: 100%;
 }
 
-:not(.dark) .item-title {
-  color: #2d3748;
+html body .app-container:not(.dark) .item-title {
+  color: #2d3748 !important;
 }
 
 .dark .item-title {
   color: #f3f4f6;
 }
 
-:not(.dark) .item-link:hover .item-title {
-  color: #3182ce;
+html body .app-container:not(.dark) .item-link:hover .item-title {
+  color: #3182ce !important;
 }
 
 .dark .item-link:hover .item-title {
@@ -314,13 +314,13 @@ const fontSize = computed(() => {
   white-space: nowrap;
 }
 
-:not(.dark) .item-date {
-  color: #5a6171;
-  background: rgba(240, 244, 248, 0.9);
+html body .app-container:not(.dark) .item-date {
+  color: #5a6171 !important;
+  background: rgba(240, 244, 248, 0.9) !important;
 }
 
-:not(.dark) .item-link:hover .item-date {
-  background: rgba(236, 240, 244, 0.95);
+html body .app-container:not(.dark) .item-link:hover .item-date {
+  background: rgba(236, 240, 244, 0.95) !important;
 }
 
 .dark .item-date {
@@ -342,8 +342,8 @@ const fontSize = computed(() => {
   padding: 1rem;
 }
 
-:not(.dark) .empty-message {
-  color: #5a6171;
+html body .app-container:not(.dark) .empty-message {
+  color: #5a6171 !important;
 }
 
 .dark .empty-message {
@@ -366,10 +366,10 @@ const fontSize = computed(() => {
   text-align: left;
 }
 
-:not(.dark) .title-tooltip {
-  background: rgba(245, 247, 250, 0.95);
-  color: #2d3748;
-  border: 1px solid rgba(230, 235, 242, 0.8);
+html body .app-container:not(.dark) .title-tooltip {
+  background: rgba(245, 247, 250, 0.95) !important;
+  color: #2d3748 !important;
+  border: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
 .dark .title-tooltip {

@@ -195,14 +195,15 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-.bg-gray-50 {
-  background-color: #f5f7fa;
+/* 亮色模式样式 - 更高优先级 */
+html body .app-container.bg-gray-50 {
+  background-color: #f5f7fa !important;
   background-image: linear-gradient(
       to bottom,
       rgba(245, 247, 250, 0.8),
       rgba(245, 247, 250, 0.8)
     ),
-    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
+    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
 }
 
 .header {
@@ -213,10 +214,10 @@ onUnmounted(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.bg-gray-50 .header {
-  background-color: rgba(240, 242, 247, 0.9);
-  backdrop-filter: blur(5px);
-  border-bottom: 1px solid rgba(230, 235, 242, 0.8);
+html body .app-container.bg-gray-50 .header {
+  background-color: rgba(240, 242, 247, 0.9) !important;
+  backdrop-filter: blur(5px) !important;
+  border-bottom: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
 .dark .header {
@@ -224,24 +225,24 @@ onUnmounted(() => {
   background-color: rgba(17, 24, 39, 0.6);
 }
 
-.bg-gray-50 .header-title {
-  color: #2d3748;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+html body .app-container.bg-gray-50 .header-title {
+  color: #2d3748 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
-.bg-gray-50 button:not(.bg-green-500) {
-  background-color: rgba(240, 242, 247, 0.6);
-  border: 1px solid rgba(230, 235, 242, 0.8);
+html body .app-container.bg-gray-50 button:not(.bg-green-500) {
+  background-color: rgba(240, 242, 247, 0.6) !important;
+  border: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
-.bg-gray-50 button.bg-green-500 {
-  background-color: #4caf50;
-  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+html body .app-container.bg-gray-50 button.bg-green-500 {
+  background-color: #4caf50 !important;
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
 }
 
-.bg-gray-50 button.bg-green-500:hover {
-  background-color: #43a047;
-  box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3);
+html body .app-container.bg-gray-50 button.bg-green-500:hover {
+  background-color: #43a047 !important;
+  box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3) !important;
 }
 
 .content-area {
@@ -253,9 +254,9 @@ onUnmounted(() => {
   margin-bottom: 0.75rem;
 }
 
-.bg-gray-50 .content-area {
-  background-color: rgba(240, 242, 247, 0.4);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+html body .app-container.bg-gray-50 .content-area {
+  background-color: rgba(240, 242, 247, 0.4) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
 
 .dark .content-area {
@@ -270,9 +271,9 @@ onUnmounted(() => {
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
 }
 
-.bg-gray-50 .footer {
-  background-color: rgba(240, 242, 247, 0.85);
-  border-top: 1px solid rgba(230, 235, 242, 0.8);
+html body .app-container.bg-gray-50 .footer {
+  background-color: rgba(240, 242, 247, 0.85) !important;
+  border-top: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
 .dark .footer {
@@ -324,12 +325,12 @@ body {
   color: #4b5563;
 }
 
-.bg-gray-50 .text-gray-600 {
-  color: #4a5568;
+html body .app-container.bg-gray-50 .text-gray-600 {
+  color: #4a5568 !important;
 }
 
-.bg-gray-50 .text-gray-500 {
-  color: #5a6986;
+html body .app-container.bg-gray-50 .text-gray-500 {
+  color: #5a6986 !important;
 }
 
 button {
