@@ -34,7 +34,10 @@
               >
                 <h3
                   class="item-title"
-                  :style="{ fontSize: `${fontSize}px` }"
+                  :style="{
+                    fontSize: `${fontSize}px`,
+                    paddingRight: showItemDate ? '4rem' : '0.5rem',
+                  }"
                   :title="item.title"
                 >
                   {{ item.title }}
@@ -192,10 +195,13 @@ const fontSize = computed(() => {
   display: block;
   padding: 0.75rem 1rem;
   position: relative;
+  overflow: hidden;
 }
 
 .item-link:hover {
   background: #f3f4f6;
+  overflow: visible;
+  z-index: 10;
 }
 
 .dark .item-link:hover {
@@ -207,9 +213,10 @@ const fontSize = computed(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-right: 4rem;
   transition: all 0.3s ease;
   position: relative;
+  width: 100%;
+  max-width: 100%;
 }
 
 .dark .item-title {
@@ -236,6 +243,7 @@ const fontSize = computed(() => {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   opacity: 1;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .item-link:hover .item-date {
@@ -310,7 +318,7 @@ const fontSize = computed(() => {
   }
 
   .item-title {
-    padding-right: 3.5rem; /* 移动端日期显示更紧凑 */
+    /* 这里的内联样式已经通过:style绑定了，不需要在CSS中重复设置 */
   }
 }
 
