@@ -196,15 +196,19 @@ onUnmounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* 亮色模式背景样式 */
+  background-image: linear-gradient(to bottom right, rgba(240, 245, 252, 0.8), rgba(248, 250, 252, 0.8));
+  background-attachment: fixed;
 }
 
 .header {
   padding: 0.75rem 1rem 0.25rem;
   flex-shrink: 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e2e8f0;
   margin-bottom: 0;
-  background-color: rgba(249, 250, 251, 0.85);
+  background-color: rgba(241, 245, 249, 0.85);
   backdrop-filter: blur(5px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .dark .header {
@@ -219,7 +223,7 @@ onUnmounted(() => {
   flex-direction: column;
   margin-top: 0;
   margin-bottom: 0.75rem;
-  background-color: rgba(249, 250, 251, 0.6);
+  background-color: transparent;
 }
 
 .dark .content-area {
@@ -228,10 +232,11 @@ onUnmounted(() => {
 
 .footer {
   flex-shrink: 0;
-  border-top: 1px solid #e5e7eb;
-  background-color: rgba(249, 250, 251, 0.85);
+  border-top: 1px solid #e2e8f0;
+  background-color: rgba(241, 245, 249, 0.85);
   backdrop-filter: blur(8px);
   padding-top: 0.25rem;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .dark .footer {
@@ -246,7 +251,8 @@ body {
   padding: 0;
   overflow: hidden;
   height: 100vh;
-  background-color: #f9fafb;
+  background-color: #edf2f7;
+  color: #334155;
 }
 
 .dark body, 
@@ -263,12 +269,26 @@ body {
   color: #f3f4f6;
 }
 
+.header-title {
+  color: #334155 !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
 .dark .header-title {
   color: #f3f4f6 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.status-text {
+  color: #475569 !important;
 }
 
 .dark .status-text {
   color: #f3f4f6 !important;
+}
+
+.footer-text {
+  color: #475569 !important;
 }
 
 .dark .footer-text {
@@ -276,7 +296,7 @@ body {
 }
 
 .bg-gray-50 {
-  background-color: #f9fafb !important;
+  background-color: #edf2f7 !important;
 }
 
 .bg-gray-900 {
@@ -284,10 +304,40 @@ body {
 }
 
 .text-gray-700 {
-  color: #374151 !important;
+  color: #334155 !important;
 }
 
 button {
   transition: all 0.2s ease-in-out;
+}
+
+/* 自定义按钮样式 */
+button.px-3 {
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+button.px-3:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* 添加轻微的背景纹理 */
+.app-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a0aec0' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.4;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.dark .app-container::before {
+  opacity: 0.15;
 }
 </style>
