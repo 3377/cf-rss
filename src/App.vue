@@ -1,482 +1,530 @@
 <template>
   <div
-    :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']"
-    :style="
-      !isDark
-        ? {
-            '--card-bg': 'rgba(230, 240, 250, 0.95)',
-            '--card-header-bg': 'rgba(220, 235, 248, 0.95)',
-            '--card-content-bg': 'rgba(230, 240, 250, 0.75)',
-            '--card-border': 'rgba(200, 215, 235, 0.75)',
-            '--text-primary': '#3a5075',
-            '--text-secondary': '#566a8c',
-          }
-        : {}
-    "
+    class="app-container"
+    :class="{ dark: isDark, 'bg-gray-50': !isDark }"
+    :style="!isDark ? { backgroundColor: '#f2f4f8', color: '#3a5075' } : {}"
   >
-    <div class="header">
-      <div class="text-center mb-4">
-        <h1 class="text-3xl font-bold text-gray-700 header-title">
-          {{ appTitle }}
-        </h1>
-      </div>
-
-      <div class="flex justify-between items-center">
-        <div class="flex-1"></div>
-        <div
-          class="flex justify-center flex-1 text-base text-gray-600 status-text gap-8"
+    <div
+      class="app-header"
+      :style="
+        !isDark ? { borderBottom: '1px solid rgba(180, 205, 240, 0.9)' } : {}
+      "
+    >
+      <h1 class="text-2xl font-bold">CF RSS</h1>
+      <div class="header-controls">
+        <div class="search-box" v-if="config.features.search">
+          <input
+            v-model="searchTerm"
+            type="text"
+            placeholder="搜索内容..."
+            class="search-input"
+            :style="
+              !isDark
+                ? {
+                    backgroundColor: 'rgba(210, 230, 250, 0.9)',
+                    border: '1px solid rgba(180, 205, 240, 0.7)',
+                  }
+                : {}
+            "
+          />
+        </div>
+        <button
+          @click="toggleTheme"
+          class="theme-toggle"
+          :title="isDark ? '切换为亮色模式' : '切换为暗色模式'"
+          :style="
+            !isDark
+              ? {
+                  backgroundColor: 'rgba(210, 230, 250, 0.9)',
+                  border: '1px solid rgba(180, 205, 240, 0.7)',
+                }
+              : {}
+          "
         >
-          <div v-if="loading" class="text-gray-600 font-medium status-text">
-            加载中...
-          </div>
-          <template v-else>
-            <div>下次刷新: {{ formatCountdown }}</div>
-            <div>最后更新: {{ formatLastUpdate }}</div>
-          </template>
-        </div>
-        <div class="flex items-center gap-4 flex-1 justify-end">
+          {{ isDark ? "🌞" : "🌙" }}
+        </button>
+        <button
+          v-if="config.features.configEditable"
+          @click="toggleConfigModal"
+          class="config-button"
+          :style="
+            !isDark
+              ? {
+                  backgroundColor: 'rgba(210, 230, 250, 0.9)',
+                  border: '1px solid rgba(180, 205, 240, 0.7)',
+                }
+              : {}
+          "
+        >
+          ⚙️
+        </button>
+      </div>
+    </div>
+
+    <div class="app-content">
+      <FeedGrid :feeds="filteredFeeds" :isDark="isDark" />
+    </div>
+
+    <div
+      class="app-footer"
+      :style="
+        !isDark ? { borderTop: '1px solid rgba(180, 205, 240, 0.9)' } : {}
+      "
+    >
+      <span>CF RSS 阅读器</span>
+      <span>已加载 {{ feeds.length }} 个RSS源</span>
+    </div>
+
+    <div v-if="showConfigModal" class="modal-overlay">
+      <div
+        class="modal-content"
+        :style="
+          !isDark
+            ? {
+                backgroundColor: 'rgba(210, 230, 250, 0.95)',
+                border: '1px solid rgba(180, 205, 240, 0.9)',
+              }
+            : {}
+        "
+      >
+        <h2 class="modal-title">配置设置</h2>
+        <textarea
+          v-model="configJson"
+          class="config-textarea"
+          :style="
+            !isDark
+              ? {
+                  backgroundColor: 'rgba(210, 230, 250, 0.9)',
+                  border: '1px solid rgba(180, 205, 240, 0.7)',
+                  color: '#3a5075',
+                }
+              : {}
+          "
+        ></textarea>
+        <div class="modal-buttons">
           <button
-            @click="toggleTheme"
-            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
-            :title="isDark ? '切换到亮色模式' : '切换到暗色模式'"
+            @click="saveConfig"
+            class="save-button"
+            :style="
+              !isDark
+                ? {
+                    backgroundColor: 'rgba(49, 130, 206, 0.9)',
+                    border: '1px solid rgba(49, 130, 206, 0.7)',
+                  }
+                : {}
+            "
           >
-            <svg
-              v-if="isDark"
-              class="w-6 h-6 text-gray-200"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-            <svg
-              v-else
-              class="w-6 h-6 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-              />
-            </svg>
+            保存
           </button>
           <button
-            @click="fetchFeeds"
-            class="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
-            :disabled="loading"
+            @click="closeConfigModal"
+            class="cancel-button"
+            :style="
+              !isDark
+                ? {
+                    backgroundColor: 'rgba(210, 230, 250, 0.9)',
+                    border: '1px solid rgba(180, 205, 240, 0.7)',
+                  }
+                : {}
+            "
           >
-            <span v-if="loading">刷新中...</span>
-            <span v-else>立即刷新</span>
+            取消
           </button>
         </div>
       </div>
     </div>
-
-    <!-- 内容区域 -->
-    <div class="content-area">
-      <div v-if="error" class="text-center text-red-500">
-        {{ error }}
-      </div>
-      <FeedGrid v-else :feeds="feeds" :isDark="isDark" class="flex-1" />
-    </div>
-
-    <!-- 底部版权信息 -->
-    <footer class="footer">
-      <div class="text-center text-sm text-gray-500 footer-text py-2">
-        <span>© {{ new Date().getFullYear() }} </span>
-        <a
-          href="https://github.com/3377/cf-rss"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
-          >RSS Reader</a
-        >.
-        <span>Powered by Drfy & hstz.com. </span>
-        <span>All rights reserved.</span>
-      </div>
-    </footer>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
-import { RSS_CONFIG } from "./config/rss.config";
+import { getRSSConfig, parseRSSFeeds } from "./config/rss.config";
 
+// 获取存储的主题和配置
+const storedTheme = localStorage.getItem("theme");
+const isDark = ref(storedTheme === "dark");
+const config = ref(getRSSConfig(null));
 const feeds = ref([]);
-const loading = ref(true);
-const error = ref(null);
-const countdown = ref(RSS_CONFIG.refresh.interval);
-const isDark = ref(
-  localStorage.getItem("theme") === null
-    ? RSS_CONFIG.display.defaultDarkMode
-    : localStorage.getItem("theme") === "dark"
-);
-const appTitle = ref(RSS_CONFIG.display.appTitle);
-let refreshTimer = null;
-let countdownTimer = null;
+const searchTerm = ref("");
+const showConfigModal = ref(false);
+const configJson = ref("");
 
-const formatCountdown = computed(() => {
-  const minutes = Math.floor(countdown.value / 60);
-  const seconds = countdown.value % 60;
-  return `${minutes}分${seconds.toString().padStart(2, "0")}秒`;
-});
-
-const formatLastUpdate = computed(() => {
-  if (!feeds.value.length) return "暂无";
-  const date = new Date(feeds.value[0].lastUpdate);
-  return date.toLocaleString("zh-CN", {
-    hour12: false,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+// 计算过滤后的 RSS 源
+const filteredFeeds = computed(() => {
+  if (!searchTerm.value || !config.value.features.search) return feeds.value;
+  return feeds.value.filter((feed) => {
+    const searchLower = searchTerm.value.toLowerCase();
+    // 搜索标题
+    if (feed.title.toLowerCase().includes(searchLower)) return true;
+    // 搜索项目标题
+    return feed.items.some((item) =>
+      item.title.toLowerCase().includes(searchLower)
+    );
   });
 });
 
+// 切换主题
 const toggleTheme = () => {
   isDark.value = !isDark.value;
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
 };
 
-const fetchFeeds = async () => {
+// 配置模态框控制
+const toggleConfigModal = () => {
+  if (showConfigModal.value) {
+    closeConfigModal();
+  } else {
+    configJson.value = JSON.stringify(config.value, null, 2);
+    showConfigModal.value = true;
+  }
+};
+
+const closeConfigModal = () => {
+  showConfigModal.value = false;
+};
+
+// 保存配置
+const saveConfig = () => {
   try {
-    loading.value = true;
-    error.value = null;
-    const timestamp = new Date().getTime();
-    const response = await fetch(`/api/feeds?t=${timestamp}`, {
-      headers: {
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    feeds.value = await response.json();
-    countdown.value = RSS_CONFIG.refresh.interval;
-  } catch (err) {
-    console.error("Error fetching feeds:", err);
-    error.value = "加载失败，请稍后重试";
-  } finally {
-    loading.value = false;
+    const newConfig = JSON.parse(configJson.value);
+    config.value = newConfig;
+    localStorage.setItem("rssConfig", configJson.value);
+    closeConfigModal();
+    // 刷新RSS源
+    loadRSSFeeds();
+  } catch (e) {
+    alert("配置格式错误: " + e.message);
   }
 };
 
-const updateCountdown = () => {
-  countdown.value--;
-  if (countdown.value <= 0) {
-    countdown.value = RSS_CONFIG.refresh.interval;
+// 加载 RSS 源
+const loadRSSFeeds = async () => {
+  try {
+    feeds.value = await parseRSSFeeds(config.value);
+  } catch (error) {
+    console.error("加载RSS源失败:", error);
   }
 };
 
+// 组件挂载时初始化
 onMounted(async () => {
-  await fetchFeeds();
-  // 设置定时刷新
-  refreshTimer = setInterval(fetchFeeds, RSS_CONFIG.refresh.interval * 1000);
-  // 设置倒计时更新
-  countdownTimer = setInterval(updateCountdown, 1000);
+  // 从localStorage或者默认配置加载
+  const storedConfig = localStorage.getItem("rssConfig");
+  if (storedConfig) {
+    try {
+      config.value = JSON.parse(storedConfig);
+    } catch (e) {
+      console.error("解析存储的配置失败:", e);
+    }
+  }
+
+  // 如果浏览器支持媒体查询，并且用户未设置过主题偏好，则自动检测系统主题
+  if (
+    localStorage.getItem("theme") === null &&
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  ) {
+    isDark.value = true;
+    localStorage.setItem("theme", "dark");
+  }
+
+  // 注入配置到window对象，以便其他组件访问
+  window.__RSS_CONFIG__ = config.value;
+
+  // 加载RSS源
+  await loadRSSFeeds();
 });
 
-onUnmounted(() => {
-  if (refreshTimer) {
-    clearInterval(refreshTimer);
-  }
-  if (countdownTimer) {
-    clearInterval(countdownTimer);
-  }
+// 监听主题变化
+watch(isDark, () => {
+  document.body.classList.toggle("dark", isDark.value);
 });
 </script>
 
 <style>
-.app-container {
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 亮色模式样式 - 更高优先级 */
-html body .app-container.bg-gray-50 {
-  background-color: #f2f4f8 !important;
-  background-image: linear-gradient(
-      to bottom,
-      rgba(242, 244, 248, 0.8),
-      rgba(242, 244, 248, 0.85)
-    ),
-    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjE1Ii8+CiAgICA8L3BhdHRlcm4+KICA8L2RlZnM+CiAgP
-HJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
-}
-
-.header {
-  padding: 0.75rem 1rem 0.25rem;
-  flex-shrink: 0;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-html body .app-container.bg-gray-50 .header {
-  background-color: rgba(242, 244, 248, 0.8) !important;
-  backdrop-filter: blur(8px) !important;
-  border-bottom: 1px solid rgba(230, 235, 242, 0.5) !important;
-}
-
-.dark .header {
-  border-color: #374151;
-  background-color: rgba(17, 24, 39, 0.6);
-}
-
-html body .app-container.bg-gray-50 .header-title {
-  color: #3a5075 !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-}
-
-html body .app-container.bg-gray-50 button:not(.bg-green-500) {
-  background-color: rgba(230, 240, 250, 0.5) !important;
-  border: 1px solid rgba(200, 215, 235, 0.5) !important;
-}
-
-html body .app-container.bg-gray-50 button.bg-green-500 {
-  background-color: #5cbc7d !important;
-  box-shadow: 0 2px 4px rgba(92, 188, 125, 0.12) !important;
-}
-
-html body .app-container.bg-gray-50 button.bg-green-500:hover {
-  background-color: #52a871 !important;
-  box-shadow: 0 3px 6px rgba(92, 188, 125, 0.15) !important;
-}
-
-.content-area {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  margin-top: 0;
-  margin-bottom: 0.75rem;
-}
-
-html body .app-container.bg-gray-50 .content-area {
-  background-color: rgba(242, 244, 248, 0.35) !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.01) !important;
-}
-
-.dark .content-area {
-  background-color: rgba(17, 24, 39, 0.3);
-}
-
-.footer {
-  flex-shrink: 0;
-  border-top: 1px solid #e5e7eb;
-  backdrop-filter: blur(8px);
-  padding-top: 0.25rem;
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
-}
-
-html body .app-container.bg-gray-50 .footer {
-  background-color: rgba(242, 244, 248, 0.75) !important;
-  border-top: 1px solid rgba(230, 235, 242, 0.5) !important;
-}
-
-.dark .footer {
-  border-color: #374151;
-  background-color: rgba(17, 24, 39, 0.6);
-}
-
-/* 移除全局滚动条 */
-html,
+/* 全局样式 */
 body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  font-family: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  line-height: 1.5;
   height: 100vh;
+  overflow: hidden;
 }
 
-body {
-  background-color: #f2f4f8;
-  color: #445163;
+/* 亮色模式基础样式 */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-height: 100vh;
+  transition: all 0.3s ease;
 }
 
-.dark body,
-.dark html {
+/* 暗色模式基础样式 */
+.dark {
   background-color: #111827;
   color: #f3f4f6;
 }
 
-#app {
-  height: 100vh;
+/* 标题栏样式 */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  height: 3rem;
+}
+
+.dark .app-header {
+  border-color: #374151;
+  background-color: rgba(17, 24, 39, 0.8);
+}
+
+/* 标题栏控件容器 */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* 搜索框样式 */
+.search-box {
+  position: relative;
+}
+
+.search-input {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  width: 250px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.dark .search-input {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #f3f4f6;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.dark .search-input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+}
+
+/* 主题切换按钮 */
+.theme-toggle,
+.config-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dark .theme-toggle,
+.dark .config-button {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #f3f4f6;
+}
+
+.theme-toggle:hover,
+.config-button:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.dark .theme-toggle:hover,
+.dark .config-button:hover {
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+/* 主内容区域 */
+.app-content {
+  flex: 1;
   overflow: hidden;
+  height: calc(100vh - 7rem);
 }
 
-.dark {
+/* 页脚样式 */
+.app-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+  color: #6b7280;
+  height: 3rem;
+}
+
+.dark .app-footer {
+  border-color: #374151;
+  color: #9ca3af;
+  background-color: rgba(17, 24, 39, 0.8);
+}
+
+/* 模态框样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-height: 80vh;
+  overflow: auto;
+}
+
+.dark .modal-content {
+  background-color: #1f2937;
+  border: 1px solid #374151;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.config-textarea {
+  width: 100%;
+  height: 300px;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem;
+  font-family: monospace;
+  resize: vertical;
+  margin-bottom: 1rem;
+}
+
+.dark .config-textarea {
+  background-color: #111827;
+  border-color: #374151;
   color: #f3f4f6;
 }
 
-.dark .header-title {
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.save-button,
+.cancel-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-button {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.dark .save-button {
+  background-color: #2563eb;
+}
+
+.save-button:hover {
+  background-color: #2563eb;
+}
+
+.dark .save-button:hover {
+  background-color: #1d4ed8;
+}
+
+.cancel-button {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  color: #1f2937;
+}
+
+.dark .cancel-button {
+  background-color: #374151;
+  border-color: #4b5563;
   color: #f3f4f6;
 }
 
-.dark .status-text {
-  color: #f3f4f6;
+.cancel-button:hover {
+  background-color: #e5e7eb;
 }
 
-.dark .footer-text {
-  color: #f3f4f6;
+.dark .cancel-button:hover {
+  background-color: #4b5563;
 }
 
-.text-gray-700 {
-  color: #4b5563;
-}
-
-html body .app-container.bg-gray-50 .text-gray-600 {
-  color: #566a8c !important;
-}
-
-html body .app-container.bg-gray-50 .text-gray-500 {
-  color: #6b7f9e !important;
-}
-
-button {
-  transition: all 0.2s ease-in-out;
-}
-
-/* 应用CSS变量到卡片 */
-.app-container:not(.dark) .feed-card {
-  background: var(--card-bg, rgba(230, 240, 250, 0.95)) !important;
-  border: 1px solid var(--card-border, rgba(200, 215, 235, 0.75)) !important;
-}
-
-.app-container:not(.dark) .card-header {
-  background: var(--card-header-bg, rgba(220, 235, 248, 0.95)) !important;
-  border-bottom: 1px solid var(--card-border, rgba(200, 215, 235, 0.75)) !important;
-}
-
-.app-container:not(.dark) .card-content {
-  background: var(--card-content-bg, rgba(230, 240, 250, 0.75)) !important;
-}
-
-.app-container:not(.dark) .card-title {
-  color: var(--text-primary, #3a5075) !important;
-}
-
-.app-container:not(.dark) .item-title {
-  color: var(--text-primary, #3a5075) !important;
-}
-
-.app-container:not(.dark) .item-date {
-  color: var(--text-secondary, #566a8c) !important;
-  background: var(--card-bg, rgba(230, 240, 250, 0.95)) !important;
-}
-
-/* 移动端优化样式 */
+/* 移动端适配 */
 @media (max-width: 768px) {
-  .header {
-    padding: 0.5rem 0.75rem 0.25rem;
+  .app-header {
+    padding: 0.5rem 1rem;
   }
 
-  .header-title {
-    font-size: 1.5rem !important;
-    margin-bottom: 0.5rem;
+  .search-input {
+    width: 150px;
   }
 
-  .status-text {
-    font-size: 0.8rem;
-    gap: 0.5rem !important;
+  .app-content {
+    height: calc(100vh - 7rem);
   }
 
-  .footer {
-    padding: 0.25rem 0;
+  .modal-content {
+    width: 95%;
+    padding: 1rem;
   }
 
-  .footer-text {
-    font-size: 0.75rem;
-  }
-
-  button.bg-green-500 {
-    padding: 0.35rem 0.75rem !important;
-    font-size: 0.8rem !important;
-  }
-
-  button:not(.bg-green-500) {
-    padding: 0.35rem !important;
-  }
-
-  button svg {
-    width: 1.25rem;
-    height: 1.25rem;
+  .config-textarea {
+    height: 250px;
   }
 }
 
-/* 小型移动设备优化 */
 @media (max-width: 480px) {
-  .app-container {
-    overflow-x: hidden;
+  .search-input {
+    width: 120px;
   }
 
-  .header {
-    padding: 0.4rem 0.5rem 0.2rem;
-  }
-
-  .header-title {
-    font-size: 1.25rem !important;
-    margin-bottom: 0.4rem;
-  }
-
-  .status-text {
-    font-size: 0.75rem;
-    flex-direction: column;
-    gap: 0.1rem !important;
-    line-height: 1.3;
-  }
-
-  /* 移动端状态显示优化 */
-  .flex.justify-between.items-center {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .flex.justify-between.items-center > div {
-    width: 100%;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .flex.items-center.gap-4.flex-1.justify-end {
-    justify-content: center;
-    margin-top: 0.2rem;
-  }
-
-  .footer-text {
-    font-size: 0.7rem;
-    padding: 0.25rem 0;
-    display: flex;
-    flex-direction: column;
-    line-height: 1.4;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color-scheme: light;
-    --app-background: #f2f4f8;
-    --card-background: rgba(230, 240, 250, 0.95);
-    --card-border: rgba(200, 215, 235, 0.75);
-    --card-header: rgba(220, 235, 248, 0.95);
-    --text-primary: #3a5075;
-    --text-secondary: #566a8c;
+  .theme-toggle,
+  .config-button {
+    width: 2.25rem;
+    height: 2.25rem;
   }
 }
 </style>

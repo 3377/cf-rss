@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* 全局亮色模式样式覆盖 */
 html body .app-container.bg-gray-50 {
     background-color: #f2f4f8 !important;

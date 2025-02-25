@@ -9,8 +9,8 @@
           isDark
             ? {}
             : {
-                background: 'rgba(230, 240, 250, 0.95)',
-                border: '1px solid rgba(200, 215, 235, 0.75)',
+                background: 'rgba(220, 235, 250, 0.98)',
+                border: '1px solid rgba(200, 215, 235, 0.85)',
                 boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
               }
         "
@@ -22,7 +22,7 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(220, 235, 248, 0.95)',
+                  backgroundColor: 'rgba(210, 230, 248, 0.98)',
                   borderBottom: '1px solid rgba(200, 215, 235, 0.8)',
                 }
           "
@@ -39,7 +39,7 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(230, 240, 250, 0.75)',
+                  backgroundColor: 'rgba(220, 235, 250, 0.98)',
                 }
           "
         >
@@ -57,6 +57,13 @@
               )"
               :key="item.id"
               class="feed-item"
+              :style="
+                isDark
+                  ? {}
+                  : {
+                      borderBottom: '1px solid rgba(200, 215, 235, 0.5)',
+                    }
+              "
             >
               <a
                 :href="item.link"
@@ -66,7 +73,7 @@
                 :style="
                   isDark
                     ? {}
-                    : { hover: { background: 'rgba(225, 235, 250, 0.85)' } }
+                    : { hover: { background: 'rgba(210, 230, 245, 0.95)' } }
                 "
                 @mouseenter="showTooltip($event, item.title, item.pubDate)"
                 @mouseleave="hideTooltip"
@@ -89,7 +96,7 @@
                       ? {}
                       : {
                           color: '#566a8c',
-                          background: 'rgba(225, 235, 250, 0.9)',
+                          background: 'rgba(210, 230, 245, 0.9)',
                         }
                   "
                 >
@@ -111,7 +118,7 @@
         left: tooltipPosition.left + 'px',
         backgroundColor: isDark
           ? 'rgba(31, 41, 55, 0.95)'
-          : 'rgba(220, 235, 250, 0.95)',
+          : 'rgba(210, 230, 245, 0.98)',
         color: isDark ? '#f3f4f6' : '#3a5075',
         border: isDark
           ? '1px solid rgba(55, 65, 81, 0.8)'
@@ -247,8 +254,8 @@ const fontSize = computed(() => {
 }
 
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(230, 240, 250, 0.95) !important;
-  border: 1px solid rgba(200, 215, 235, 0.75) !important;
+  background: rgba(220, 235, 250, 0.98) !important;
+  border: 1px solid rgba(200, 215, 235, 0.85) !important;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
 }
 
@@ -264,7 +271,7 @@ html body .app-container:not(.dark) .feed-card {
 }
 
 html body .app-container:not(.dark) .card-header {
-  background-color: rgba(220, 235, 248, 0.95) !important;
+  background-color: rgba(210, 230, 248, 0.98) !important;
   border-bottom: 1px solid rgba(200, 215, 235, 0.8) !important;
 }
 
@@ -280,7 +287,7 @@ html body .app-container:not(.dark) .card-header {
 }
 
 html body .app-container:not(.dark) .card-title {
-  color: #445163 !important;
+  color: #3a5075 !important;
 }
 
 .dark .card-title {
@@ -294,7 +301,7 @@ html body .app-container:not(.dark) .card-title {
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(230, 240, 250, 0.75) !important;
+  background-color: rgba(220, 235, 250, 0.98) !important;
 }
 
 .dark .card-content {
@@ -313,6 +320,10 @@ html body .app-container:not(.dark) .card-content {
   border-bottom: 1px solid rgba(226, 232, 240, 0.6);
 }
 
+html body .app-container:not(.dark) .feed-item {
+  border-bottom: 1px solid rgba(200, 215, 235, 0.5) !important;
+}
+
 .dark .feed-item {
   border-color: #374151;
 }
@@ -324,7 +335,7 @@ html body .app-container:not(.dark) .card-content {
 }
 
 html body .app-container:not(.dark) .item-link:hover {
-  background: rgba(240, 242, 247, 0.8) !important;
+  background: rgba(210, 230, 245, 0.95) !important;
 }
 
 .dark .item-link:hover {
@@ -342,7 +353,7 @@ html body .app-container:not(.dark) .item-link:hover {
 }
 
 html body .app-container:not(.dark) .item-title {
-  color: #445163 !important;
+  color: #3a5075 !important;
 }
 
 .dark .item-title {
@@ -350,7 +361,7 @@ html body .app-container:not(.dark) .item-title {
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-title {
-  color: #5f91c7 !important;
+  color: #2563eb !important;
 }
 
 .dark .item-link:hover .item-title {
@@ -372,17 +383,17 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
 }
 
 html body .app-container:not(.dark) .item-date {
-  color: #778299 !important;
-  background: rgba(242, 244, 248, 0.9) !important;
-}
-
-html body .app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(238, 242, 247, 0.95) !important;
+  color: #566a8c !important;
+  background: rgba(210, 230, 245, 0.9) !important;
 }
 
 .dark .item-date {
   background: #1f2937;
   color: #9ca3af;
+}
+
+html body .app-container:not(.dark) .item-link:hover .item-date {
+  background: rgba(200, 225, 245, 0.95) !important;
 }
 
 .dark .item-link:hover .item-date {
@@ -400,7 +411,7 @@ html body .app-container:not(.dark) .item-link:hover .item-date {
 }
 
 html body .app-container:not(.dark) .empty-message {
-  color: #778299 !important;
+  color: #566a8c !important;
 }
 
 .dark .empty-message {
@@ -424,9 +435,9 @@ html body .app-container:not(.dark) .empty-message {
 }
 
 html body .app-container:not(.dark) .title-tooltip {
-  background: rgba(242, 244, 248, 0.95) !important;
-  color: #445163 !important;
-  border: 1px solid rgba(230, 235, 242, 0.5) !important;
+  background: rgba(210, 230, 245, 0.98) !important;
+  color: #3a5075 !important;
+  border: 1px solid rgba(200, 215, 235, 0.8) !important;
 }
 
 .dark .title-tooltip {
