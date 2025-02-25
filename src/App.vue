@@ -102,11 +102,7 @@ const feeds = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const countdown = ref(RSS_CONFIG.refresh.interval);
-const isDark = ref(
-  localStorage.getItem("theme") === null
-    ? RSS_CONFIG.display.defaultDarkMode
-    : localStorage.getItem("theme") === "dark"
-);
+const isDark = ref(false);
 const appTitle = ref(RSS_CONFIG.display.appTitle);
 let refreshTimer = null;
 let countdownTimer = null;
@@ -195,9 +191,12 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-/* 亮色模式样式 - 更高优先级 */
-html body .app-container.bg-gray-50 {
+html body #app div.app-container:not(.dark) {
   background-color: #f5f7fa !important;
+  color: #2d3748 !important;
+}
+
+html body #app div.app-container:not(.dark) {
   background-image: linear-gradient(
       to bottom,
       rgba(245, 247, 250, 0.8),
@@ -214,7 +213,7 @@ html body .app-container.bg-gray-50 {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-html body .app-container.bg-gray-50 .header {
+html body #app div.app-container:not(.dark) .header {
   background-color: rgba(240, 242, 247, 0.9) !important;
   backdrop-filter: blur(5px) !important;
   border-bottom: 1px solid rgba(230, 235, 242, 0.8) !important;
@@ -225,22 +224,22 @@ html body .app-container.bg-gray-50 .header {
   background-color: rgba(17, 24, 39, 0.6);
 }
 
-html body .app-container.bg-gray-50 .header-title {
+html body #app div.app-container:not(.dark) .header-title {
   color: #2d3748 !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
-html body .app-container.bg-gray-50 button:not(.bg-green-500) {
+html body #app div.app-container:not(.dark) button:not(.bg-green-500) {
   background-color: rgba(240, 242, 247, 0.6) !important;
   border: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
-html body .app-container.bg-gray-50 button.bg-green-500 {
+html body #app div.app-container:not(.dark) button.bg-green-500 {
   background-color: #4caf50 !important;
   box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
 }
 
-html body .app-container.bg-gray-50 button.bg-green-500:hover {
+html body #app div.app-container:not(.dark) button.bg-green-500:hover {
   background-color: #43a047 !important;
   box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3) !important;
 }
@@ -254,7 +253,7 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
   margin-bottom: 0.75rem;
 }
 
-html body .app-container.bg-gray-50 .content-area {
+html body #app div.app-container:not(.dark) .content-area {
   background-color: rgba(240, 242, 247, 0.4) !important;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
@@ -271,7 +270,7 @@ html body .app-container.bg-gray-50 .content-area {
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
 }
 
-html body .app-container.bg-gray-50 .footer {
+html body #app div.app-container:not(.dark) .footer {
   background-color: rgba(240, 242, 247, 0.85) !important;
   border-top: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
@@ -279,6 +278,57 @@ html body .app-container.bg-gray-50 .footer {
 .dark .footer {
   border-color: #374151;
   background-color: rgba(17, 24, 39, 0.6);
+}
+
+/* 全局卡片样式覆盖 */
+html body #app div.app-container:not(.dark) .feed-card {
+  background: rgba(245, 247, 250, 0.75) !important;
+  border: 1px solid rgba(230, 235, 242, 0.8) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
+}
+
+html body #app div.app-container:not(.dark) .card-header {
+  background-color: rgba(240, 242, 247, 0.9) !important;
+  border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
+}
+
+html body #app div.app-container:not(.dark) .card-title {
+  color: #2d3748 !important;
+}
+
+html body #app div.app-container:not(.dark) .card-content {
+  background-color: rgba(240, 242, 247, 0.5) !important;
+}
+
+html body #app div.app-container:not(.dark) .item-link:hover {
+  background: rgba(240, 242, 247, 0.8) !important;
+}
+
+html body #app div.app-container:not(.dark) .item-title {
+  color: #2d3748 !important;
+}
+
+html body #app div.app-container:not(.dark) .item-link:hover .item-title {
+  color: #3182ce !important;
+}
+
+html body #app div.app-container:not(.dark) .item-date {
+  color: #5a6171 !important;
+  background: rgba(240, 244, 248, 0.9) !important;
+}
+
+html body #app div.app-container:not(.dark) .item-link:hover .item-date {
+  background: rgba(236, 240, 244, 0.95) !important;
+}
+
+html body #app div.app-container:not(.dark) .empty-message {
+  color: #5a6171 !important;
+}
+
+html body #app div.app-container:not(.dark) .title-tooltip {
+  background: rgba(245, 247, 250, 0.95) !important;
+  color: #2d3748 !important;
+  border: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
 /* 移除全局滚动条 */
@@ -321,15 +371,17 @@ body {
   color: #f3f4f6;
 }
 
-.text-gray-700 {
-  color: #4b5563;
+html body #app div.app-container:not(.dark) .text-gray-700 {
+  color: #2d3748 !important;
 }
 
-html body .app-container.bg-gray-50 .text-gray-600 {
+html body #app div.app-container:not(.dark) .text-gray-600,
+html body #app div.app-container:not(.dark) .status-text {
   color: #4a5568 !important;
 }
 
-html body .app-container.bg-gray-50 .text-gray-500 {
+html body #app div.app-container:not(.dark) .text-gray-500,
+html body #app div.app-container:not(.dark) .footer-text {
   color: #5a6986 !important;
 }
 

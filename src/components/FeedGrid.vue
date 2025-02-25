@@ -190,7 +190,8 @@ const fontSize = computed(() => {
   border-radius: 0.75rem;
 }
 
-html body .app-container:not(.dark) .feed-card {
+/* 高优先级选择器 - 针对非暗色模式 */
+html body #app div:not(.dark) .feed-card {
   background: rgba(245, 247, 250, 0.75) !important;
   border: 1px solid rgba(230, 235, 242, 0.8) !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
@@ -206,7 +207,7 @@ html body .app-container:not(.dark) .feed-card {
   border-bottom: 1px solid #e5e7eb;
 }
 
-html body .app-container:not(.dark) .card-header {
+html body #app div:not(.dark) .card-header {
   background-color: rgba(240, 242, 247, 0.9) !important;
   border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
 }
@@ -222,7 +223,7 @@ html body .app-container:not(.dark) .card-header {
   text-align: center;
 }
 
-html body .app-container:not(.dark) .card-title {
+html body #app div:not(.dark) .card-title {
   color: #2d3748 !important;
 }
 
@@ -236,7 +237,7 @@ html body .app-container:not(.dark) .card-title {
   overflow-y: auto;
 }
 
-html body .app-container:not(.dark) .card-content {
+html body #app div:not(.dark) .card-content {
   background-color: rgba(240, 242, 247, 0.5) !important;
 }
 
@@ -266,7 +267,7 @@ html body .app-container:not(.dark) .card-content {
   position: relative;
 }
 
-html body .app-container:not(.dark) .item-link:hover {
+html body #app div:not(.dark) .item-link:hover {
   background: rgba(240, 242, 247, 0.8) !important;
 }
 
@@ -284,7 +285,7 @@ html body .app-container:not(.dark) .item-link:hover {
   max-width: 100%;
 }
 
-html body .app-container:not(.dark) .item-title {
+html body #app div:not(.dark) .item-title {
   color: #2d3748 !important;
 }
 
@@ -292,7 +293,7 @@ html body .app-container:not(.dark) .item-title {
   color: #f3f4f6;
 }
 
-html body .app-container:not(.dark) .item-link:hover .item-title {
+html body #app div:not(.dark) .item-link:hover .item-title {
   color: #3182ce !important;
 }
 
@@ -314,12 +315,12 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
   white-space: nowrap;
 }
 
-html body .app-container:not(.dark) .item-date {
+html body #app div:not(.dark) .item-date {
   color: #5a6171 !important;
   background: rgba(240, 244, 248, 0.9) !important;
 }
 
-html body .app-container:not(.dark) .item-link:hover .item-date {
+html body #app div:not(.dark) .item-link:hover .item-date {
   background: rgba(236, 240, 244, 0.95) !important;
 }
 
@@ -342,7 +343,7 @@ html body .app-container:not(.dark) .item-link:hover .item-date {
   padding: 1rem;
 }
 
-html body .app-container:not(.dark) .empty-message {
+html body #app div:not(.dark) .empty-message {
   color: #5a6171 !important;
 }
 
@@ -366,7 +367,7 @@ html body .app-container:not(.dark) .empty-message {
   text-align: left;
 }
 
-html body .app-container:not(.dark) .title-tooltip {
+html body #app div:not(.dark) .title-tooltip {
   background: rgba(245, 247, 250, 0.95) !important;
   color: #2d3748 !important;
   border: 1px solid rgba(230, 235, 242, 0.8) !important;
