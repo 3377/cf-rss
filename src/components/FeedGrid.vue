@@ -57,7 +57,9 @@
       :style="tooltipStyle"
       v-show="showTooltipText"
     >
-      <div v-if="tooltipDate" class="tooltip-date">{{ tooltipDate }}</div>
+      <div v-if="tooltipDate" class="tooltip-date">
+        发帖时间：{{ tooltipDate }}
+      </div>
       <div class="tooltip-content">{{ tooltipText }}</div>
     </div>
   </div>
@@ -97,13 +99,13 @@ const gridStyle = computed(() => {
   };
 });
 
-// 处理日期格式化
+// 处理日期格式化，确保返回易读的日期格式
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
 
   try {
     const date = parseISO(dateStr);
-    return format(date, dateFormat.value);
+    return format(date, "yyyy-MM-dd HH:mm:ss");
   } catch (error) {
     console.error("日期格式化错误:", error);
     return "";
@@ -319,14 +321,15 @@ onMounted(() => {
   text-align: center;
 }
 
-/* 添加提示框日期样式 */
+/* 修改提示框日期样式 */
 .tooltip-date {
   font-weight: 500;
-  font-size: 0.8rem;
-  opacity: 0.9;
+  font-size: 0.85rem;
+  opacity: 0.95;
   margin-bottom: 0.3rem;
   padding-bottom: 0.3rem;
   border-bottom: 1px dashed rgba(160, 190, 230, 0.5);
+  text-align: center;
 }
 
 /* 亮色模式下的提示框日期样式 */

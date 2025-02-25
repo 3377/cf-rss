@@ -35,22 +35,6 @@
           </template>
         </div>
         <div class="flex items-center gap-4 flex-1 justify-end">
-          <!-- 字体选择下拉菜单 -->
-          <div class="font-selector">
-            <select
-              v-model="selectedFont"
-              @change="changeFont"
-              class="px-2 py-1.5 text-sm rounded border focus:outline-none"
-              :class="
-                isDark
-                  ? 'bg-gray-700 text-gray-200 border-gray-600'
-                  : 'bg-white text-gray-700 border-gray-300'
-              "
-            >
-              <option value="DingTalk JinBuTi">钉钉进步体</option>
-              <option value="Yozai">悠哉字体</option>
-            </select>
-          </div>
           <button
             @click="toggleTheme"
             class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -85,6 +69,24 @@
               />
             </svg>
           </button>
+
+          <!-- 字体选择下拉菜单 -->
+          <div class="font-selector">
+            <select
+              v-model="selectedFont"
+              @change="changeFont"
+              class="px-2 py-1.5 text-sm rounded border focus:outline-none"
+              :class="
+                isDark
+                  ? 'bg-gray-700 text-gray-200 border-gray-600'
+                  : 'bg-white text-gray-700 border-gray-300'
+              "
+            >
+              <option value="DingTalk JinBuTi">钉钉进步体</option>
+              <option value="Yozai">悠哉字体</option>
+            </select>
+          </div>
+
           <button
             @click="fetchFeeds"
             class="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
@@ -150,7 +152,7 @@ const fontLoaded = ref({
   Yozai: false,
 });
 
-// 加载字体
+// 修改加载字体的函数，确保悠哉字体正确加载
 const loadFont = (fontName) => {
   if (fontLoaded.value[fontName]) return;
 
@@ -164,15 +166,21 @@ const loadFont = (fontName) => {
     link.href = "https://cdn.jsdelivr.net/npm/cn-fontsource-yozai/font.css";
   }
 
+  // 确保字体加载完成后才应用
+  link.onload = () => {
+    console.log(`${fontName} 字体加载完成`);
+    fontLoaded.value[fontName] = true;
+    document.documentElement.style.fontFamily = `Roboto, "${fontName}", sans-serif`;
+  };
+
   document.head.appendChild(link);
-  fontLoaded.value[fontName] = true;
 };
 
 // 切换字体
 const changeFont = () => {
+  console.log(`正在切换到: ${selectedFont.value}`);
   loadFont(selectedFont.value);
   localStorage.setItem("selectedFont", selectedFont.value);
-  document.documentElement.style.fontFamily = `Roboto, "${selectedFont.value}", sans-serif`;
 };
 
 // 监视字体变化
@@ -643,9 +651,10 @@ button {
   text-align: center !important;
 }
 
-/* 字体选择器样式 */
+/* 字体选择器样式 - 调整间距 */
 .font-selector {
   margin-right: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .font-selector select {
@@ -682,9 +691,9 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
 
 /* 针对移动设备优化字体选择器 */
 @media (max-width: 768px) {
-  .font-selector select {
-    padding: 0.35rem 0.5rem !important;
-    font-size: 0.8rem !important;
+  .font-selector {
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
   }
 }
 </style>

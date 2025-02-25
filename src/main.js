@@ -21,11 +21,14 @@ const preloadFont = () => {
     link.href = "https://cdn.jsdelivr.net/npm/cn-fontsource-yozai/font.css";
   }
 
+  // 确保字体加载完成后才应用
+  link.onload = () => {
+    console.log(`初始化字体 ${selectedFont} 加载完成`);
+    document.documentElement.style.fontFamily = `Roboto, "${selectedFont}", sans-serif`;
+  };
+
   // 添加到头部
   document.head.appendChild(link);
-
-  // 设置字体
-  document.documentElement.style.fontFamily = `Roboto, "${selectedFont}", sans-serif`;
 };
 
 // 启动时预加载字体
