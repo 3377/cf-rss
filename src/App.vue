@@ -532,4 +532,36 @@ button {
     height: 20px;
   }
 }
+
+/* 提示框样式 */
+.title-tooltip {
+  text-align: center !important;
+  min-width: 180px;
+  padding: 0.75rem 1rem !important;
+}
+
+/* 提示框日期样式 */
+.tooltip-date {
+  font-weight: 500 !important;
+  margin-bottom: 0.3rem !important;
+  padding-bottom: 0.3rem !important;
+  text-align: center !important;
+}
+
+/* 亮色模式下的提示框样式 */
+.app-container:not(.dark) .tooltip-date {
+  color: #2563eb !important;
+  border-bottom: 1px dashed rgba(160, 190, 230, 0.5) !important;
+}
+
+/* 暗色模式下的提示框样式 */
+.dark .tooltip-date {
+  color: #3b82f6 !important;
+  border-bottom: 1px dashed rgba(75, 85, 105, 0.5) !important;
+}
+
+/* 提示框内容居中 */
+.tooltip-content {
+  text-align: center !important;
+}
 </style>

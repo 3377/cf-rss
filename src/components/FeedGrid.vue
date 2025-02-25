@@ -33,7 +33,7 @@
                   target="_blank"
                   rel="noopener noreferrer"
                   class="item-link"
-                  @mouseover="showTooltip($event, item.title)"
+                  @mouseover="showTooltip($event, item.title, item.pubDate)"
                   @mouseleave="hideTooltip"
                 >
                   <div class="item-title">{{ item.title }}</div>
@@ -57,7 +57,8 @@
       :style="tooltipStyle"
       v-show="showTooltipText"
     >
-      {{ tooltipText }}
+      <div v-if="tooltipDate" class="tooltip-date">{{ tooltipDate }}</div>
+      <div class="tooltip-content">{{ tooltipText }}</div>
     </div>
   </div>
 </template>
@@ -112,6 +113,7 @@ const formatDate = (dateStr) => {
 // 标题提示功能
 const tooltip = ref(null);
 const tooltipText = ref("");
+const tooltipDate = ref("");
 const tooltipStyle = ref({
   opacity: 0,
   top: "0px",
@@ -119,10 +121,12 @@ const tooltipStyle = ref({
 });
 const showTooltipText = ref(false);
 
-const showTooltip = (event, text) => {
+const showTooltip = (event, text, date) => {
   if (!text) return;
 
   tooltipText.value = text;
+  // 格式化并设置日期
+  tooltipDate.value = date ? formatDate(date) : "";
   showTooltipText.value = true;
 
   // 延迟计算位置，确保DOM已更新
@@ -312,7 +316,32 @@ onMounted(() => {
   pointer-events: none;
   backdrop-filter: blur(5px);
   transition: opacity 0.2s ease;
-  text-align: left;
+  text-align: center;
+}
+
+/* 添加提示框日期样式 */
+.tooltip-date {
+  font-weight: 500;
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-bottom: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px dashed rgba(160, 190, 230, 0.5);
+}
+
+/* 亮色模式下的提示框日期样式 */
+html body .app-container:not(.dark) .tooltip-date {
+  color: #2563eb !important;
+}
+
+/* 暗色模式下的提示框日期样式 */
+.dark .tooltip-date {
+  color: #3b82f6 !important;
+  border-bottom-color: rgba(75, 85, 105, 0.5);
+}
+
+.tooltip-content {
+  text-align: center;
 }
 
 /* 移动设备适配 */
