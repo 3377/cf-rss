@@ -196,17 +196,13 @@ onUnmounted(() => {
 }
 
 .bg-gray-50 {
-  background-color: #f0f2f5 !important;
+  background-color: #f5f7fa;
   background-image: linear-gradient(
       to bottom,
-      rgba(240, 242, 245, 0.8),
-      rgba(240, 242, 245, 0.8)
+      rgba(245, 247, 250, 0.8),
+      rgba(245, 247, 250, 0.8)
     ),
-    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAg
-ICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDA
-gMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2
-U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZ
-mlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
+    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
 }
 
 .header {
@@ -218,9 +214,9 @@ mlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
 }
 
 .bg-gray-50 .header {
-  background-color: rgba(235, 238, 242, 0.85) !important;
+  background-color: rgba(240, 242, 247, 0.9);
   backdrop-filter: blur(5px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  border-bottom: 1px solid rgba(230, 235, 242, 0.8);
 }
 
 .dark .header {
@@ -229,22 +225,22 @@ mlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
 }
 
 .bg-gray-50 .header-title {
-  color: #3e4555 !important;
+  color: #2d3748;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .bg-gray-50 button:not(.bg-green-500) {
-  background-color: rgba(235, 238, 242, 0.5) !important;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  background-color: rgba(240, 242, 247, 0.6);
+  border: 1px solid rgba(230, 235, 242, 0.8);
 }
 
 .bg-gray-50 button.bg-green-500 {
-  background-color: #4caf50 !important;
+  background-color: #4caf50;
   box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
 }
 
 .bg-gray-50 button.bg-green-500:hover {
-  background-color: #43a047 !important;
+  background-color: #43a047;
   box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3);
 }
 
@@ -258,7 +254,8 @@ mlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
 }
 
 .bg-gray-50 .content-area {
-  background-color: rgba(235, 238, 242, 0.4);
+  background-color: rgba(240, 242, 247, 0.4);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .dark .content-area {
@@ -274,7 +271,8 @@ mlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
 }
 
 .bg-gray-50 .footer {
-  background-color: rgba(235, 238, 242, 0.85);
+  background-color: rgba(240, 242, 247, 0.85);
+  border-top: 1px solid rgba(230, 235, 242, 0.8);
 }
 
 .dark .footer {
@@ -292,8 +290,8 @@ body {
 }
 
 body {
-  background-color: #f0f2f5 !important;
-  color: #4b5563;
+  background-color: #f5f7fa;
+  color: #2d3748;
 }
 
 .dark body,
@@ -311,27 +309,27 @@ body {
 }
 
 .dark .header-title {
-  color: #f3f4f6 !important;
+  color: #f3f4f6;
 }
 
 .dark .status-text {
-  color: #f3f4f6 !important;
+  color: #f3f4f6;
 }
 
 .dark .footer-text {
-  color: #f3f4f6 !important;
+  color: #f3f4f6;
 }
 
 .text-gray-700 {
-  color: #4b5563 !important;
+  color: #4b5563;
 }
 
 .bg-gray-50 .text-gray-600 {
-  color: #5a6171 !important;
+  color: #4a5568;
 }
 
 .bg-gray-50 .text-gray-500 {
-  color: #666f7f !important;
+  color: #5a6986;
 }
 
 button {
@@ -341,12 +339,12 @@ button {
 @media (prefers-color-scheme: light) {
   :root {
     color-scheme: light;
-    --app-background: #f0f2f5;
-    --card-background: rgba(240, 244, 248, 0.75);
-    --card-border: rgba(226, 232, 240, 0.8);
-    --card-header: rgba(236, 240, 244, 0.9);
-    --text-primary: #3e4555;
-    --text-secondary: #5a6171;
+    --app-background: #f5f7fa;
+    --card-background: rgba(245, 247, 250, 0.75);
+    --card-border: rgba(230, 235, 242, 0.8);
+    --card-header: rgba(240, 242, 247, 0.9);
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
   }
 }
 </style>

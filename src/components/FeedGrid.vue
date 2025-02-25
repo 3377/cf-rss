@@ -191,9 +191,9 @@ const fontSize = computed(() => {
 }
 
 :not(.dark) .feed-card {
-  background: rgba(240, 244, 248, 0.75) !important;
-  border: 1px solid rgba(226, 232, 240, 0.8) !important;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
+  background: rgba(245, 247, 250, 0.75);
+  border: 1px solid rgba(230, 235, 242, 0.8);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07);
 }
 
 .dark .feed-card {
@@ -207,8 +207,8 @@ const fontSize = computed(() => {
 }
 
 :not(.dark) .card-header {
-  background-color: rgba(236, 240, 244, 0.9) !important;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+  background-color: rgba(240, 242, 247, 0.9);
+  border-bottom: 1px solid rgba(230, 235, 242, 0.9);
 }
 
 .dark .card-header {
@@ -223,7 +223,7 @@ const fontSize = computed(() => {
 }
 
 :not(.dark) .card-title {
-  color: #3e4555 !important;
+  color: #2d3748;
 }
 
 .dark .card-title {
@@ -237,7 +237,7 @@ const fontSize = computed(() => {
 }
 
 :not(.dark) .card-content {
-  background-color: rgba(236, 240, 244, 0.5) !important;
+  background-color: rgba(240, 242, 247, 0.5);
 }
 
 .dark .card-content {
@@ -267,7 +267,7 @@ const fontSize = computed(() => {
 }
 
 :not(.dark) .item-link:hover {
-  background: rgba(240, 244, 248, 0.8) !important;
+  background: rgba(240, 242, 247, 0.8);
 }
 
 .dark .item-link:hover {
@@ -285,7 +285,7 @@ const fontSize = computed(() => {
 }
 
 :not(.dark) .item-title {
-  color: #4a5568 !important;
+  color: #2d3748;
 }
 
 .dark .item-title {
@@ -293,7 +293,7 @@ const fontSize = computed(() => {
 }
 
 :not(.dark) .item-link:hover .item-title {
-  color: #4c6ef5 !important;
+  color: #3182ce;
 }
 
 .dark .item-link:hover .item-title {
@@ -367,9 +367,9 @@ const fontSize = computed(() => {
 }
 
 :not(.dark) .title-tooltip {
-  background: rgba(240, 244, 248, 0.95);
-  color: #3e4555;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: rgba(245, 247, 250, 0.95);
+  color: #2d3748;
+  border: 1px solid rgba(230, 235, 242, 0.8);
 }
 
 .dark .title-tooltip {
