@@ -197,19 +197,25 @@ const hideTooltip = () => {
 };
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleString("zh-CN", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  if (!date) return "";
+  try {
+    return new Date(date).toLocaleString("zh-CN", {
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch (e) {
+    console.error("日期格式化错误:", e);
+    return "";
+  }
 };
 
 // 修改网格样式计算
 const gridStyle = computed(() => {
   const layout = config.value?.display?.layout || {};
   return {
-    gridTemplateColumns: `repeat(4, 1fr)`,
+    gridTemplateColumns: `repeat(${layout.columns || 4}, 1fr)`,
     gap: `${layout.cardGap || 24}px`,
     maxWidth: layout.containerWidth || "1920px",
     padding: layout.containerPadding || "16px",

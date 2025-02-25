@@ -155,37 +155,23 @@ const fetchFeeds = async () => {
     loading.value = true;
     error.value = null;
     const timestamp = new Date().getTime();
+    const response = await fetch(`/api/feeds?t=${timestamp}`, {
+      headers: {
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+      },
+    });
 
-    // 由于没有实际的 API 调用或 parseRSSFeeds 函数
-    // 这里使用模拟数据
-    setTimeout(() => {
-      feeds.value = [
-        {
-          title: "示例RSS源",
-          url: "https://example.com/rss",
-          lastUpdate: new Date().toISOString(),
-          items: [
-            {
-              id: "1",
-              title: "示例新闻1",
-              link: "https://example.com/news/1",
-              pubDate: new Date().toISOString(),
-            },
-            {
-              id: "2",
-              title: "示例新闻2",
-              link: "https://example.com/news/2",
-              pubDate: new Date().toISOString(),
-            },
-          ],
-        },
-      ];
-      countdown.value = RSS_CONFIG.refresh?.interval || 300;
-      loading.value = false;
-    }, 500);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    feeds.value = await response.json();
+    countdown.value = RSS_CONFIG.refresh?.interval || 300;
   } catch (err) {
     console.error("Error fetching feeds:", err);
     error.value = "加载失败，请稍后重试";
+  } finally {
     loading.value = false;
   }
 };
