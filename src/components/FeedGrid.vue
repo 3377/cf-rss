@@ -230,7 +230,8 @@ const fontSize = computed(() => {
 });
 </script>
 
-<style scoped>
+<style>
+/* 强制全局样式，确保高优先级 */
 .feed-container {
   padding: 0.5rem 1rem;
   width: 100%;
@@ -260,12 +261,14 @@ const fontSize = computed(() => {
   border-radius: 0.75rem;
 }
 
+/* 亮色模式卡片样式 */
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(220, 235, 250, 0.98) !important;
-  border: 1px solid rgba(200, 215, 235, 0.85) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+  background: rgba(200, 225, 245, 1) !important;
+  border: 1px solid rgba(160, 190, 230, 0.9) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05), 0 3px 6px rgba(0, 0, 0, 0.03) !important;
 }
 
+/* 暗色模式卡片样式 - 保持原样 */
 .dark .feed-card {
   background: rgba(31, 41, 55, 0.9) !important;
   border-color: rgba(55, 65, 81, 0.5) !important;
@@ -275,11 +278,12 @@ html body .app-container:not(.dark) .feed-card {
 .card-header {
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
+  border-radius: 0.75rem 0.75rem 0 0;
 }
 
 html body .app-container:not(.dark) .card-header {
-  background-color: rgba(210, 230, 248, 0.98) !important;
-  border-bottom: 1px solid rgba(200, 215, 235, 0.8) !important;
+  background-color: rgba(180, 210, 240, 1) !important;
+  border-bottom: 1px solid rgba(160, 190, 230, 0.9) !important;
 }
 
 .dark .card-header {
@@ -294,7 +298,7 @@ html body .app-container:not(.dark) .card-header {
 }
 
 html body .app-container:not(.dark) .card-title {
-  color: #3a5075 !important;
+  color: #2c4270 !important;
 }
 
 .dark .card-title {
@@ -305,10 +309,17 @@ html body .app-container:not(.dark) .card-title {
   flex: 1;
   padding: 0.5rem 0;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scroll-behavior: smooth;
+}
+
+.card-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(220, 235, 250, 0.98) !important;
+  background-color: rgba(200, 225, 245, 1) !important;
 }
 
 .dark .card-content {
@@ -324,11 +335,11 @@ html body .app-container:not(.dark) .card-content {
 }
 
 .feed-item {
-  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  border-bottom: 1px solid rgba(160, 190, 230, 0.8);
 }
 
 html body .app-container:not(.dark) .feed-item {
-  border-bottom: 1px solid rgba(200, 215, 235, 0.5) !important;
+  border-bottom: 1px solid rgba(160, 190, 230, 0.8) !important;
 }
 
 .dark .feed-item {
@@ -342,7 +353,7 @@ html body .app-container:not(.dark) .feed-item {
 }
 
 html body .app-container:not(.dark) .item-link:hover {
-  background: rgba(210, 230, 245, 0.95) !important;
+  background: rgba(180, 210, 240, 1) !important;
 }
 
 .dark .item-link:hover {
@@ -360,7 +371,7 @@ html body .app-container:not(.dark) .item-link:hover {
 }
 
 html body .app-container:not(.dark) .item-title {
-  color: #3a5075 !important;
+  color: #2c4270 !important;
 }
 
 .dark .item-title {
@@ -390,8 +401,8 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
 }
 
 html body .app-container:not(.dark) .item-date {
-  color: #566a8c !important;
-  background: rgba(210, 230, 245, 0.9) !important;
+  color: #465a7c !important;
+  background: rgba(180, 210, 240, 0.95) !important;
 }
 
 .dark .item-date {
@@ -418,7 +429,7 @@ html body .app-container:not(.dark) .item-link:hover .item-date {
 }
 
 html body .app-container:not(.dark) .empty-message {
-  color: #566a8c !important;
+  color: #465a7c !important;
 }
 
 .dark .empty-message {
@@ -442,9 +453,9 @@ html body .app-container:not(.dark) .empty-message {
 }
 
 html body .app-container:not(.dark) .title-tooltip {
-  background: rgba(210, 230, 245, 0.98) !important;
-  color: #3a5075 !important;
-  border: 1px solid rgba(200, 215, 235, 0.8) !important;
+  background: rgba(180, 210, 240, 0.98) !important;
+  color: #2c4270 !important;
+  border: 1px solid rgba(160, 190, 230, 0.9) !important;
 }
 
 .dark .title-tooltip {
@@ -453,30 +464,7 @@ html body .app-container:not(.dark) .title-tooltip {
   border-color: rgba(55, 65, 81, 0.8);
 }
 
-/* 自定义滚动条 */
-.card-content {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
-}
-
-.card-content::-webkit-scrollbar {
-  width: 4px;
-}
-
-.card-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.card-content::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5);
-  border-radius: 2px;
-}
-
-.card-content::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(156, 163, 175, 0.7);
-}
-
-/* 响应式布局 */
+/* 移动端全局优化 */
 @media (max-width: 768px) {
   .feed-grid {
     grid-template-columns: 1fr !important;
@@ -579,11 +567,6 @@ html body .app-container:not(.dark) .title-tooltip {
 
   .item-link {
     padding: 0.5rem 0.6rem;
-  }
-
-  /* 改进小屏幕上的滚动条 */
-  .card-content::-webkit-scrollbar {
-    width: 3px;
   }
 }
 </style>

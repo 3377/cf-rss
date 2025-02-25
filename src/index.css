@@ -143,6 +143,58 @@
     border-color: rgba(55, 65, 81, 0.8) !important;
 }
 
+/* 添加全局页面滚动箭头样式 */
+::-webkit-scrollbar-button:single-button {
+    background-color: rgba(200, 225, 245, 0.8);
+    border-radius: 10px;
+    border: 1px solid rgba(160, 190, 230, 0.7);
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+}
+
+.dark ::-webkit-scrollbar-button:single-button {
+    background-color: rgba(55, 65, 81, 0.8);
+    border: 1px solid rgba(75, 85, 101, 0.7);
+}
+
+::-webkit-scrollbar-button:single-button:hover {
+    background-color: rgba(180, 210, 240, 1);
+    border: 1px solid rgba(150, 180, 220, 0.8);
+}
+
+.dark ::-webkit-scrollbar-button:single-button:hover {
+    background-color: rgba(75, 85, 101, 0.9);
+    border: 1px solid rgba(95, 105, 121, 0.8);
+}
+
+/* 确保内容区域滚动但不显示滚动条 */
+.card-content {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+}
+
+.card-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* 整体页面滚动箭头 */
+::-webkit-scrollbar-button {
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+}
+
+::-webkit-scrollbar-button:vertical:start:decrement,
+::-webkit-scrollbar-button:vertical:end:increment,
+::-webkit-scrollbar-button:horizontal:start:decrement,
+::-webkit-scrollbar-button:horizontal:end:increment {
+    border-radius: 12px;
+    background-size: 10px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 /* 移动设备优化 */
 @media (max-width: 768px) {
     .feed-grid {
@@ -173,5 +225,11 @@
         transform: none !important;
         margin-top: 0.3rem !important;
         font-size: 0.7rem !important;
+    }
+
+    /* 移动设备上的滚动箭头样式优化 */
+    ::-webkit-scrollbar-button {
+        width: 20px;
+        height: 20px;
     }
 }
