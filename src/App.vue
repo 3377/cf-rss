@@ -203,21 +203,32 @@ onUnmounted(() => {
 
 <style>
 .app-container {
-  height: 100vh;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  background-size: 60px 60px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 15L60 15M15 0L15 60M0 30L60 30M30 0L30 60M0 45L60 45M45 0L45 60' stroke='%23f1f5f9' stroke-width='1'/%3E%3C/svg%3E");
+  overflow: hidden;
 }
 
-/* 亮色模式样式 - 更高优先级 */
-html body .app-container.bg-gray-50 {
-  background-color: #f5f7fa !important;
+.app-container.bg-gray-50 {
+  background-color: #f8fafc !important;
   background-image: linear-gradient(
       to bottom,
-      rgba(245, 247, 250, 0.8),
-      rgba(245, 247, 250, 0.8)
+      rgba(248, 250, 252, 0.85),
+      rgba(248, 250, 252, 0.95)
     ),
-    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 15L60 15M15 0L15 60M0 30L60 30M30 0L30 60M0 45L60 45M45 0L45 60' stroke='%23e5e7eb' stroke-width='1'/%3E%3C/svg%3E") !important;
+}
+
+.app-container.dark {
+  background-color: #111827 !important;
+  background-image: linear-gradient(
+      to bottom,
+      rgba(17, 24, 39, 0.85),
+      rgba(17, 24, 39, 0.95)
+    ),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 15L60 15M15 0L15 60M0 30L60 30M30 0L30 60M0 45L60 45M45 0L45 60' stroke='%23374151' stroke-width='1'/%3E%3C/svg%3E") !important;
 }
 
 .header {

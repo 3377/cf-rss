@@ -186,16 +186,16 @@ const fontSize = computed(() => {
   overflow: hidden;
   backdrop-filter: blur(5px);
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
   border-radius: 0.75rem;
-  background: rgba(242, 243, 245, 0.75);
-  border: 1px solid rgba(220, 225, 235, 0.8);
+  background: rgba(235, 245, 255, 0.85);
+  border: 1px solid rgba(210, 230, 250, 0.9);
 }
 
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(242, 243, 245, 0.75) !important;
-  border: 1px solid rgba(220, 225, 235, 0.8) !important;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
+  background: rgba(235, 245, 255, 0.85) !important;
+  border: 1px solid rgba(210, 230, 250, 0.9) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
 .dark .feed-card {
@@ -206,13 +206,13 @@ html body .app-container:not(.dark) .feed-card {
 .card-header {
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
-  background-color: rgba(238, 240, 245, 0.9);
-  border-bottom: 1px solid rgba(220, 225, 235, 0.9);
+  background-color: rgba(225, 240, 255, 0.9);
+  border-bottom: 1px solid rgba(210, 230, 250, 0.9);
 }
 
 html body .app-container:not(.dark) .card-header {
-  background-color: rgba(238, 240, 245, 0.9) !important;
-  border-bottom: 1px solid rgba(220, 225, 235, 0.9) !important;
+  background-color: rgba(225, 240, 255, 0.9) !important;
+  border-bottom: 1px solid rgba(210, 230, 250, 0.9) !important;
 }
 
 .dark .card-header {
@@ -238,11 +238,11 @@ html body .app-container:not(.dark) .card-title {
   flex: 1;
   padding: 0.5rem 0;
   overflow-y: auto;
-  background-color: rgba(238, 240, 245, 0.5);
+  background-color: rgba(230, 245, 255, 0.5);
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(238, 240, 245, 0.5) !important;
+  background-color: rgba(230, 245, 255, 0.5) !important;
 }
 
 .dark .card-content {
@@ -272,7 +272,7 @@ html body .app-container:not(.dark) .card-content {
 }
 
 html body .app-container:not(.dark) .item-link:hover {
-  background: rgba(232, 235, 240, 0.8) !important;
+  background: rgba(225, 240, 255, 0.8) !important;
 }
 
 .dark .item-link:hover {
@@ -298,7 +298,7 @@ html body .app-container:not(.dark) .item-title {
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-title {
-  color: #3182ce !important;
+  color: #3b82f6 !important;
 }
 
 .dark .item-link:hover .item-title {
@@ -321,11 +321,11 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
 
 html body .app-container:not(.dark) .item-date {
   color: #5a6171 !important;
-  background: rgba(235, 240, 245, 0.9) !important;
+  background: rgba(230, 245, 255, 0.9) !important;
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(230, 235, 242, 0.95) !important;
+  background: rgba(225, 240, 255, 0.95) !important;
 }
 
 .dark .item-date {
@@ -474,7 +474,16 @@ html body .app-container:not(.dark) .title-tooltip {
   }
 
   html body .app-container:not(.dark) .feed-card {
-    background: rgba(238, 240, 245, 0.85) !important;
+    background: rgba(235, 245, 255, 0.85) !important;
+    border: 1px solid rgba(210, 230, 250, 0.9) !important;
+  }
+
+  html body .app-container:not(.dark) .item-link:active {
+    background: rgba(220, 238, 255, 0.9) !important;
+  }
+
+  html body .app-container:not(.dark) .item-link:active .item-title {
+    color: #3b82f6 !important;
   }
 }
 
