@@ -1,156 +1,203 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* 全局亮色模式样式覆盖 */
+html body .app-container.bg-gray-50 {
+    background-color: #f2f4f8 !important;
+    background-image:
+        linear-gradient(to bottom,
+            rgba(242, 244, 248, 0.85),
+            rgba(242, 244, 248, 0.9)),
+        url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+C
+ iAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgP HBhdGggZD0iTSAwIDE1IEwgNjAgMTUgTSAxNSAwIEwgMTUgNjAgTSAwIDMwIEwgNjAgMzAgTSAzMCAwIEwgMzAgNjAgTSAwIDQ1IEwgNjAgNDUgTSA0NSAwIEwgN DUgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U5ZWJlZiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjA4Ii8+CiAgICA8L3BhdHRlcm4+KICA8L2RlZnM+C iAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
 
-:root {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-size: 16px;
-    color: #2c3e50;
-    background-color: #f5f7fa;
-
-    /* Bright mode color variables */
-    --bright-bg-color: #f2f4f8;
-    --bright-card-bg: rgba(225, 235, 252, 0.98);
-    --bright-card-header-bg: rgba(210, 225, 245, 0.98);
-    --bright-card-content-bg: rgba(225, 235, 252, 0.95);
-    --bright-text-primary: #2d4a7a;
-    --bright-text-secondary: #4d6990;
-    --bright-border-color: rgba(190, 210, 235, 0.9);
-    --bright-hover-color: rgba(215, 230, 250, 0.9);
-}
-
-/* 亮色模式的基础样式 */
-.app-container.bg-gray-50 {
-    background-color: var(--bright-bg-color) !important;
-    color: var(--bright-text-primary) !important;
-}
-
-/* 增强卡片样式 - 亮色模式 */
-.app-container:not(.dark) .feed-card {
-    background: var(--bright-card-bg) !important;
-    border: 1px solid var(--bright-border-color) !important;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-}
-
-.app-container:not(.dark) .feed-card:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08), 0 3px 8px rgba(0, 0, 0, 0.05) !important;
-}
-
-/* 卡片标题区域 - 亮色模式 */
-.app-container:not(.dark) .card-header {
-    background-color: var(--bright-card-header-bg) !important;
-    border-bottom: 1px solid var(--bright-border-color) !important;
-    padding: 0.75rem 1rem !important;
-}
-
-/* 卡片内容区域 - 亮色模式 */
-.app-container:not(.dark) .card-content {
-    background-color: var(--bright-card-content-bg) !important;
-    padding: 0.5rem 0 !important;
-    flex: 1 !important;
-}
-
-/* 文本颜色 - 亮色模式 */
-.app-container:not(.dark) .card-title {
-    color: var(--bright-text-primary) !important;
-    font-weight: 600 !important;
-}
-
-.app-container:not(.dark) .item-title {
-    color: var(--bright-text-primary) !important;
-}
-
-.app-container:not(.dark) .item-date {
-    color: var(--bright-text-secondary) !important;
-    background-color: var(--bright-hover-color) !important;
-    border-radius: 4px !important;
-    padding: 0.1rem 0.3rem !important;
-}
-
-/* 列表项样式 - 亮色模式 */
-.app-container:not(.dark) .feed-item {
-    border-bottom: 1px solid var(--bright-border-color) !important;
-}
-
-.app-container:not(.dark) .feed-item:last-child {
-    border-bottom: none !important;
-}
-
-.app-container:not(.dark) .item-link {
-    padding: 0.5rem 1rem !important;
-    transition: background-color 0.2s ease !important;
-}
-
-.app-container:not(.dark) .item-link:hover {
-    background-color: var(--bright-hover-color) !important;
-}
-
-/* 黑暗模式保持原样 */
-.dark {
-    color-scheme: dark;
-    background-color: #111827 !important;
-    color: #f3f4f6 !important;
-}
-
-.dark .feed-card {
-    background: rgba(31, 41, 55, 0.9) !important;
-    border-color: rgba(55, 65, 81, 0.5) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-}
-
-.dark .card-header {
-    background-color: rgba(28, 37, 49, 0.95) !important;
-    border-bottom: 1px solid rgba(55, 65, 81, 0.5) !important;
-}
-
-.dark .card-title {
-    color: #f3f4f6 !important;
-}
-
-.dark .card-content {
-    background-color: rgba(31, 41, 55, 0.85) !important;
-}
-
-.dark .feed-item {
-    border-bottom: 1px solid rgba(55, 65, 81, 0.4) !important;
-}
-
-.dark .item-link:hover {
-    background-color: rgba(55, 65, 81, 0.5) !important;
-}
-
-.dark .item-title {
-    color: #f3f4f6 !important;
-}
-
-.dark .item-date {
-    color: #d1d5db !important;
-    background-color: rgba(55, 65, 81, 0.5) !important;
-}
-
-/* 移动端优化 */
-@media (max-width: 640px) {
-    .feed-grid {
-        grid-template-columns: 1fr !important;
     }
 
-    .app-container:not(.dark) .feed-card,
-    .dark .feed-card {
-        margin-bottom: 1rem !important;
-    }
-}
-
-/* 触摸设备优化 */
-@media (hover: none) {
-    .app-container:not(.dark) .item-link:active {
-        background-color: var(--bright-hover-color) !important;
+    html body .app-container.bg-gray-50 .header {
+        background-color: rgba(238, 242, 247, 0.7) !important;
+        backdrop-filter: blur(8px) !important;
+        border-bottom: 1px solid rgba(225, 230, 238, 0.5) !important;
     }
 
-    .dark .item-link:active {
-        background-color: rgba(55, 65, 81, 0.5) !important;
+    html body .app-container.bg-gray-50 .header-title {
+        color: #445163 !important;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    }
+
+    html body .app-container.bg-gray-50 button:not(.bg-green-500) {
+        background-color: rgba(238, 242, 247, 0.5) !important;
+        border: 1px solid rgba(225, 230, 238, 0.5) !important;
+    }
+
+    html body .app-container.bg-gray-50 button.bg-green-500 {
+        background-color: #5cbc7d !important;
+        box-shadow: 0 2px 4px rgba(92, 188, 125, 0.12) !important;
+    }
+
+    html body .app-container.bg-gray-50 button.bg-green-500:hover {
+        background-color: #52a871 !important;
+        box-shadow: 0 3px 6px rgba(92, 188, 125, 0.15) !important;
+    }
+
+    html body .app-container.bg-gray-50 .content-area {
+        background-color: rgba(238, 242, 247, 0.3) !important;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.01) !important;
+    }
+
+    html body .app-container.bg-gray-50 .footer {
+        background-color: rgba(238, 242, 247, 0.65) !important;
+        border-top: 1px solid rgba(225, 230, 238, 0.5) !important;
+    }
+
+    html body .app-container.bg-gray-50 .text-gray-600 {
+        color: #5f6d85 !important;
+    }
+
+    html body .app-container.bg-gray-50 .text-gray-500 {
+        color: #778299 !important;
+    }
+
+    /* 亮色模式下卡片样式增强 */
+    html body .app-container:not(.dark) .feed-card {
+        background: rgba(210, 230, 248, 0.98) !important;
+        border: 1px solid rgba(185, 205, 230, 0.9) !important;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12) !important;
+        transition: all 0.3s ease;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+
+    html body .app-container:not(.dark) .feed-card:hover {
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15) !important;
+        transform: translateY(-2px);
+    }
+
+    html body .app-container:not(.dark) .card-header {
+        background-color: rgba(200, 220, 245, 0.98) !important;
+        border-bottom: 1px solid rgba(180, 200, 225, 0.9) !important;
+        padding: 0.85rem 1.1rem !important;
+    }
+
+    html body .app-container:not(.dark) .card-title {
+        color: #25365a !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.01em !important;
+    }
+
+    html body .app-container:not(.dark) .card-content {
+        background-color: rgba(210, 230, 248, 0.98) !important;
+        padding: 0.85rem 1rem !important;
+    }
+
+    html body .app-container:not(.dark) .item-link {
+        background-color: rgba(200, 225, 248, 0.85) !important;
+        border-bottom: 1px solid rgba(180, 200, 225, 0.8) !important;
+        border-radius: 6px !important;
+        margin-bottom: 6px !important;
+        padding: 0.7rem 0.9rem !important;
+        transition: all 0.2s ease;
+    }
+
+    html body .app-container:not(.dark) .item-link:hover {
+        background: rgba(190, 215, 245, 0.95) !important;
+        border-bottom: 1px solid rgba(170, 190, 220, 0.9) !important;
+        transform: translateX(3px);
+    }
+
+    html body .app-container:not(.dark) .item-title {
+        color: #30456a !important;
+        font-weight: 500 !important;
+    }
+
+    html body .app-container:not(.dark) .item-date {
+        color: #4c5e7d !important;
+        background: rgba(195, 220, 245, 0.95) !important;
+        border-radius: 4px !important;
+        padding: 0.25rem 0.5rem !important;
+        font-weight: 500 !important;
+    }
+
+    html body .app-container:not(.dark) .item-link:hover .item-date {
+        background: rgba(200, 220, 245, 0.98) !important;
+        color: #445985 !important;
+    }
+
+    /* 确保暗色模式样式不受影响 */
+    html body .dark .feed-card,
+    html body .dark .card-header,
+    html body .dark .card-content,
+    html body .dark .item-link,
+    html body .dark .item-title,
+    html body .dark .item-date {
+        /* 保留原有暗色模式样式 */
+    }
+
+    /* 确保body在亮色模式下也有正确的背景 */
+    body:not(.dark) {
+        background-color: #f2f4f8 !important;
+        color: #445163 !important;
+    }
+
+    /* 暗色模式下的特定体背景色 */
+    body.dark {
+        background-color: #111827 !important;
+        color: #f3f4f6 !important;
+    }
+
+    /* 移动端全局优化 */
+    @media (max-width: 768px) {
+        html body .app-container.bg-gray-50 .feed-card {
+            background: rgba(230, 240, 250, 0.95) !important;
+        }
+
+        html body .app-container.bg-gray-50 .header {
+            backdrop-filter: blur(8px) !important;
+        }
+
+        /* 改善移动端触摸体验 */
+        html body .app-container button {
+            min-height: 2.5rem;
+            min-width: 2.5rem;
+        }
+
+        html body .app-container.bg-gray-50 .item-link:active {
+            background: rgba(225, 235, 250, 0.85) !important;
+        }
+
+        html body .app-container.bg-gray-50 .item-link:active .item-title {
+            color: #2563eb !important;
+        }
+
+        html body .app-container:not(.dark) .feed-card {
+            background: rgba(210, 230, 248, 0.98) !important;
+            border: 1px solid rgba(185, 205, 230, 0.9) !important;
+        }
+
+        html body .app-container:not(.dark) .item-link {
+            background-color: rgba(200, 225, 248, 0.85) !important;
+            padding: 0.8rem 0.9rem !important;
+        }
+    }
+
+    /* 小型移动设备优化 */
+    @media (max-width: 480px) {
+        html body .app-container.bg-gray-50 {
+            background-image: linear-gradient(to bottom,
+                rgba(242, 244, 248, 0.8),
+                rgba(242, 244, 248, 0.85)) !important;
+        }
+
+        html body .app-container.bg-gray-50 .feed-card {
+            border-radius: 0.5rem !important;
+        }
+
+        html body .app-container.bg-gray-50 .card-header {
+            border-radius: 0.5rem 0.5rem 0 0 !important;
+        }
+
+        /* 优化小屏幕上的交互元素大小 */
+        html body .app-container .item-link {
+            min-height: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
     }
 }

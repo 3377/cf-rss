@@ -9,10 +9,9 @@
           isDark
             ? {}
             : {
-                background: 'rgba(225, 235, 252, 0.98)',
-                border: '1px solid rgba(190, 210, 235, 0.9)',
-                boxShadow:
-                  '0 6px 12px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04)',
+                background: 'rgba(220, 235, 250, 0.98)',
+                border: '1px solid rgba(200, 215, 235, 0.8)',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.07)',
               }
         "
       >
@@ -23,8 +22,8 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(210, 225, 245, 0.98)',
-                  borderBottom: '1px solid rgba(190, 210, 235, 0.9)',
+                  backgroundColor: 'rgba(210, 230, 248, 0.98)',
+                  borderBottom: '1px solid rgba(200, 215, 235, 0.8)',
                 }
           "
         >
@@ -40,7 +39,7 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(225, 235, 252, 0.95)',
+                  backgroundColor: 'rgba(220, 235, 250, 0.98)',
                 }
           "
         >
@@ -58,13 +57,6 @@
               )"
               :key="item.id"
               class="feed-item"
-              :style="
-                isDark
-                  ? {}
-                  : {
-                      borderBottom: '1px solid rgba(210, 225, 245, 0.7)',
-                    }
-              "
             >
               <a
                 :href="item.link"
@@ -74,7 +66,10 @@
                 :style="
                   isDark
                     ? {}
-                    : { hover: { background: 'rgba(215, 230, 250, 0.9)' } }
+                    : {
+                        backgroundColor: 'rgba(225, 238, 252, 0.6)',
+                        borderBottom: '1px solid rgba(200, 215, 235, 0.6)',
+                      }
                 "
                 @mouseenter="showTooltip($event, item.title, item.pubDate)"
                 @mouseleave="hideTooltip"
@@ -84,7 +79,7 @@
                   :style="{
                     fontSize: `${fontSize}px`,
                     paddingRight: showItemDate ? '4rem' : '0.5rem',
-                    color: isDark ? '#f3f4f6' : '#2d4a7a',
+                    color: isDark ? '#f3f4f6' : '#3a5075',
                   }"
                 >
                   {{ item.title }}
@@ -96,8 +91,8 @@
                     isDark
                       ? {}
                       : {
-                          color: '#4d6990',
-                          background: 'rgba(215, 230, 250, 0.95)',
+                          color: '#566a8c',
+                          background: 'rgba(210, 230, 248, 0.98)',
                         }
                   "
                 >
@@ -119,8 +114,8 @@
         left: tooltipPosition.left + 'px',
         backgroundColor: isDark
           ? 'rgba(31, 41, 55, 0.95)'
-          : 'rgba(210, 225, 245, 0.98)',
-        color: isDark ? '#f3f4f6' : '#2d4a7a',
+          : 'rgba(210, 230, 248, 0.98)',
+        color: isDark ? '#f3f4f6' : '#3a5075',
         border: isDark
           ? '1px solid rgba(55, 65, 81, 0.8)'
           : '1px solid rgba(190, 210, 235, 0.9)',
@@ -255,9 +250,9 @@ const fontSize = computed(() => {
 }
 
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(225, 235, 252, 0.98) !important;
-  border: 1px solid rgba(190, 210, 235, 0.9) !important;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+  background: rgba(220, 235, 250, 0.98) !important;
+  border: 1px solid rgba(200, 215, 235, 0.8) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07) !important;
 }
 
 .dark .feed-card {
@@ -272,8 +267,8 @@ html body .app-container:not(.dark) .feed-card {
 }
 
 html body .app-container:not(.dark) .card-header {
-  background-color: rgba(210, 225, 245, 0.98) !important;
-  border-bottom: 1px solid rgba(190, 210, 235, 0.9) !important;
+  background-color: rgba(210, 230, 248, 0.98) !important;
+  border-bottom: 1px solid rgba(200, 215, 235, 0.8) !important;
 }
 
 .dark .card-header {
@@ -302,7 +297,7 @@ html body .app-container:not(.dark) .card-title {
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(225, 235, 252, 0.95) !important;
+  background-color: rgba(220, 235, 250, 0.98) !important;
 }
 
 .dark .card-content {
@@ -331,8 +326,9 @@ html body .app-container:not(.dark) .card-content {
   position: relative;
 }
 
-html body .app-container:not(.dark) .item-link:hover {
-  background: rgba(215, 230, 250, 0.9) !important;
+html body .app-container:not(.dark) .item-link {
+  background-color: rgba(225, 238, 252, 0.6) !important;
+  border-bottom: 1px solid rgba(200, 215, 235, 0.6) !important;
 }
 
 .dark .item-link:hover {
@@ -380,12 +376,12 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
 }
 
 html body .app-container:not(.dark) .item-date {
-  color: #778299 !important;
-  background: rgba(242, 244, 248, 0.9) !important;
+  color: #566a8c !important;
+  background: rgba(210, 230, 248, 0.98) !important;
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(238, 242, 247, 0.95) !important;
+  background: rgba(200, 220, 245, 0.98) !important;
 }
 
 .dark .item-date {
