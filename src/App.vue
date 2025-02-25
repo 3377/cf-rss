@@ -1,5 +1,7 @@
 <template>
   <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
+    <BackgroundEffect :isDark="isDark" />
+
     <div class="header">
       <div class="text-center mb-4">
         <h1 class="text-3xl font-bold text-gray-700 header-title">
@@ -12,10 +14,7 @@
         <div
           class="flex justify-center flex-1 text-base text-gray-600 status-text gap-8"
         >
-          <div
-            v-if="loading"
-            class="text-gray-600 font-medium status-text"
-          >
+          <div v-if="loading" class="text-gray-600 font-medium status-text">
             加载中...
           </div>
           <template v-else>
@@ -99,6 +98,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
+import BackgroundEffect from "./components/BackgroundEffect.vue";
 import { RSS_CONFIG } from "./config/rss.config";
 
 const feeds = ref([]);
@@ -196,17 +196,24 @@ onUnmounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  /* 亮色模式背景样式 */
-  background-image: linear-gradient(to bottom right, rgba(240, 245, 252, 0.8), rgba(248, 250, 252, 0.8));
-  background-attachment: fixed;
+}
+
+.app-container.bg-gray-50 {
+  background-color: #f8f9fa !important;
+  background-image: linear-gradient(
+      to bottom,
+      rgba(248, 249, 250, 0.8),
+      rgba(241, 245, 249, 0.6)
+    ),
+    url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23e2e8f0' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
 }
 
 .header {
   padding: 0.75rem 1rem 0.25rem;
   flex-shrink: 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e5e7eb;
   margin-bottom: 0;
-  background-color: rgba(241, 245, 249, 0.85);
+  background-color: rgba(240, 245, 250, 0.85);
   backdrop-filter: blur(5px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
@@ -216,6 +223,11 @@ onUnmounted(() => {
   background-color: rgba(17, 24, 39, 0.6);
 }
 
+.header h1 {
+  color: #334155 !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
 .content-area {
   flex: 1;
   overflow: hidden;
@@ -223,7 +235,7 @@ onUnmounted(() => {
   flex-direction: column;
   margin-top: 0;
   margin-bottom: 0.75rem;
-  background-color: transparent;
+  background-color: rgba(240, 245, 250, 0.4);
 }
 
 .dark .content-area {
@@ -232,8 +244,8 @@ onUnmounted(() => {
 
 .footer {
   flex-shrink: 0;
-  border-top: 1px solid #e2e8f0;
-  background-color: rgba(241, 245, 249, 0.85);
+  border-top: 1px solid #e5e7eb;
+  background-color: rgba(240, 245, 250, 0.85);
   backdrop-filter: blur(8px);
   padding-top: 0.25rem;
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
@@ -251,11 +263,11 @@ body {
   padding: 0;
   overflow: hidden;
   height: 100vh;
-  background-color: #edf2f7;
+  background-color: #f1f5f9;
   color: #334155;
 }
 
-.dark body, 
+.dark body,
 .dark html {
   background-color: #111827;
 }
@@ -269,34 +281,29 @@ body {
   color: #f3f4f6;
 }
 
-.header-title {
-  color: #334155 !important;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-}
-
 .dark .header-title {
   color: #f3f4f6 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.status-text {
-  color: #475569 !important;
 }
 
 .dark .status-text {
   color: #f3f4f6 !important;
 }
 
-.footer-text {
-  color: #475569 !important;
-}
-
 .dark .footer-text {
   color: #f3f4f6 !important;
 }
 
+/* 优化亮色模式下的文字颜色 */
+.status-text {
+  color: #475569 !important;
+}
+
+.footer-text {
+  color: #475569 !important;
+}
+
 .bg-gray-50 {
-  background-color: #edf2f7 !important;
+  background-color: #f1f5f9 !important;
 }
 
 .bg-gray-900 {
@@ -311,33 +318,14 @@ button {
   transition: all 0.2s ease-in-out;
 }
 
-/* 自定义按钮样式 */
-button.px-3 {
-  border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+/* 优化按钮 */
+button.bg-green-500 {
+  background-color: #22c55e !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-button.px-3:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-/* 添加轻微的背景纹理 */
-.app-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a0aec0' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  opacity: 0.4;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.dark .app-container::before {
-  opacity: 0.15;
+button.bg-green-500:hover {
+  background-color: #16a34a !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>
