@@ -1,20 +1,27 @@
 <template>
-  <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-100']">
+  <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
     <div class="header">
       <div class="text-center mb-4">
-        <h1 class="text-3xl font-bold dark:text-gray-200">RSS Reader</h1>
+        <h1 class="text-3xl font-bold dark:text-gray-200 text-gray-700">
+          RSS Reader
+        </h1>
       </div>
 
       <div class="flex justify-between items-center">
         <div class="flex-1"></div>
         <div
-          class="flex justify-center flex-1 text-sm text-gray-600 dark:text-gray-400 gap-8"
+          class="flex justify-center flex-1 text-base text-gray-600 dark:text-gray-400 gap-8"
         >
-          <div>下次刷新: {{ formatCountdown }}</div>
-          <div>最后更新: {{ formatLastUpdate }}</div>
-          <div v-if="loading" class="text-gray-600 dark:text-gray-400">
+          <div
+            v-if="loading"
+            class="text-gray-600 dark:text-gray-400 font-medium"
+          >
             加载中...
           </div>
+          <template v-else>
+            <div>下次刷新: {{ formatCountdown }}</div>
+            <div>最后更新: {{ formatLastUpdate }}</div>
+          </template>
         </div>
         <div class="flex items-center gap-4 flex-1 justify-end">
           <button
@@ -82,7 +89,7 @@
           class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
           >RSS Reader</a
         >.
-        <span>Powered by Vue.js & TailwindCSS. </span>
+        <span>Powered by Drfy & hstz.com. </span>
         <span>All rights reserved.</span>
       </div>
     </footer>
@@ -191,10 +198,13 @@ onUnmounted(() => {
   flex-shrink: 0;
   border-bottom: 1px solid #e5e7eb;
   margin-bottom: 0;
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(5px);
 }
 
 .dark .header {
   border-color: #374151;
+  background-color: rgba(17, 24, 39, 0.6);
 }
 
 .content-area {
@@ -209,13 +219,14 @@ onUnmounted(() => {
 .footer {
   flex-shrink: 0;
   border-top: 1px solid #e5e7eb;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(8px);
   padding-top: 0.25rem;
 }
 
 .dark .footer {
   border-color: #374151;
+  background-color: rgba(17, 24, 39, 0.6);
 }
 
 /* 移除全局滚动条 */

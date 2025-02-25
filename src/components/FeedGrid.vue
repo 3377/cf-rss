@@ -128,17 +128,20 @@ const fontSize = computed(() => {
 }
 
 .feed-card {
-  background: white;
+  background: rgba(255, 255, 255, 0.85);
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(229, 231, 235, 0.5);
 }
 
 .dark .feed-card {
-  background: #1f2937;
+  background: rgba(31, 41, 55, 0.9);
+  border-color: rgba(55, 65, 81, 0.5);
 }
 
 .card-header {
@@ -198,7 +201,7 @@ const fontSize = computed(() => {
 }
 
 .item-title {
-  color: #1f2937;
+  color: #374151;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -224,8 +227,8 @@ const fontSize = computed(() => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.75rem;
-  color: #6b7280;
-  background: white;
+  color: #4b5563;
+  background: rgba(255, 255, 255, 0.8);
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
