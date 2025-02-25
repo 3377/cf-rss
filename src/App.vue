@@ -12,6 +12,9 @@
         >
           <div>下次刷新: {{ formatCountdown }}</div>
           <div>最后更新: {{ formatLastUpdate }}</div>
+          <div v-if="loading" class="text-gray-600 dark:text-gray-400">
+            加载中...
+          </div>
         </div>
         <div class="flex items-center gap-4 flex-1 justify-end">
           <button
@@ -62,10 +65,7 @@
 
     <!-- 内容区域 -->
     <div class="content-area">
-      <div v-if="loading" class="text-center text-gray-600 dark:text-gray-400">
-        加载中...
-      </div>
-      <div v-else-if="error" class="text-center text-red-500">
+      <div v-if="error" class="text-center text-red-500">
         {{ error }}
       </div>
       <FeedGrid v-else :feeds="feeds" :isDark="isDark" class="flex-1" />
@@ -187,9 +187,10 @@ onUnmounted(() => {
 }
 
 .header {
-  padding: 1.5rem 1rem;
+  padding: 1rem 1rem 0.5rem;
   flex-shrink: 0;
   border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0.5rem;
 }
 
 .dark .header {
