@@ -191,9 +191,9 @@ const fontSize = computed(() => {
 }
 
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(245, 247, 250, 0.75) !important;
-  border: 1px solid rgba(230, 235, 242, 0.8) !important;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
+  background: rgba(242, 244, 248, 0.75) !important;
+  border: 1px solid rgba(230, 235, 242, 0.5) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 .dark .feed-card {
@@ -207,8 +207,8 @@ html body .app-container:not(.dark) .feed-card {
 }
 
 html body .app-container:not(.dark) .card-header {
-  background-color: rgba(240, 242, 247, 0.9) !important;
-  border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
+  background-color: rgba(242, 244, 248, 0.8) !important;
+  border-bottom: 1px solid rgba(230, 235, 242, 0.6) !important;
 }
 
 .dark .card-header {
@@ -223,7 +223,7 @@ html body .app-container:not(.dark) .card-header {
 }
 
 html body .app-container:not(.dark) .card-title {
-  color: #2d3748 !important;
+  color: #445163 !important;
 }
 
 .dark .card-title {
@@ -237,7 +237,7 @@ html body .app-container:not(.dark) .card-title {
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(240, 242, 247, 0.5) !important;
+  background-color: rgba(242, 244, 248, 0.35) !important;
 }
 
 .dark .card-content {
@@ -267,7 +267,7 @@ html body .app-container:not(.dark) .card-content {
 }
 
 html body .app-container:not(.dark) .item-link:hover {
-  background: rgba(240, 242, 247, 0.8) !important;
+  background: rgba(242, 244, 248, 0.6) !important;
 }
 
 .dark .item-link:hover {
@@ -285,7 +285,7 @@ html body .app-container:not(.dark) .item-link:hover {
 }
 
 html body .app-container:not(.dark) .item-title {
-  color: #2d3748 !important;
+  color: #445163 !important;
 }
 
 .dark .item-title {
@@ -293,7 +293,7 @@ html body .app-container:not(.dark) .item-title {
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-title {
-  color: #3182ce !important;
+  color: #5f91c7 !important;
 }
 
 .dark .item-link:hover .item-title {
@@ -315,12 +315,12 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
 }
 
 html body .app-container:not(.dark) .item-date {
-  color: #5a6171 !important;
-  background: rgba(240, 244, 248, 0.9) !important;
+  color: #778299 !important;
+  background: rgba(242, 244, 248, 0.8) !important;
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(236, 240, 244, 0.95) !important;
+  background: rgba(238, 242, 247, 0.85) !important;
 }
 
 .dark .item-date {
@@ -343,7 +343,7 @@ html body .app-container:not(.dark) .item-link:hover .item-date {
 }
 
 html body .app-container:not(.dark) .empty-message {
-  color: #5a6171 !important;
+  color: #778299 !important;
 }
 
 .dark .empty-message {
@@ -367,9 +367,9 @@ html body .app-container:not(.dark) .empty-message {
 }
 
 html body .app-container:not(.dark) .title-tooltip {
-  background: rgba(245, 247, 250, 0.95) !important;
-  color: #2d3748 !important;
-  border: 1px solid rgba(230, 235, 242, 0.8) !important;
+  background: rgba(242, 244, 248, 0.9) !important;
+  color: #445163 !important;
+  border: 1px solid rgba(230, 235, 242, 0.5) !important;
 }
 
 .dark .title-tooltip {

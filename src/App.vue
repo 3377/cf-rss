@@ -197,13 +197,14 @@ onUnmounted(() => {
 
 /* 亮色模式样式 - 更高优先级 */
 html body .app-container.bg-gray-50 {
-  background-color: #f5f7fa !important;
+  background-color: #f2f4f8 !important;
   background-image: linear-gradient(
       to bottom,
-      rgba(245, 247, 250, 0.8),
-      rgba(245, 247, 250, 0.8)
+      rgba(242, 244, 248, 0.8),
+      rgba(242, 244, 248, 0.85)
     ),
-    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
+    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjE1Ii8+CiAgICA8L3BhdHRlcm4+KICA8L2RlZnM+CiAgP
+HJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
 }
 
 .header {
@@ -215,9 +216,9 @@ html body .app-container.bg-gray-50 {
 }
 
 html body .app-container.bg-gray-50 .header {
-  background-color: rgba(240, 242, 247, 0.9) !important;
-  backdrop-filter: blur(5px) !important;
-  border-bottom: 1px solid rgba(230, 235, 242, 0.8) !important;
+  background-color: rgba(242, 244, 248, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+  border-bottom: 1px solid rgba(230, 235, 242, 0.5) !important;
 }
 
 .dark .header {
@@ -226,23 +227,23 @@ html body .app-container.bg-gray-50 .header {
 }
 
 html body .app-container.bg-gray-50 .header-title {
-  color: #2d3748 !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  color: #445163 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
 html body .app-container.bg-gray-50 button:not(.bg-green-500) {
-  background-color: rgba(240, 242, 247, 0.6) !important;
-  border: 1px solid rgba(230, 235, 242, 0.8) !important;
+  background-color: rgba(242, 244, 248, 0.5) !important;
+  border: 1px solid rgba(230, 235, 242, 0.5) !important;
 }
 
 html body .app-container.bg-gray-50 button.bg-green-500 {
-  background-color: #4caf50 !important;
-  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
+  background-color: #5cbc7d !important;
+  box-shadow: 0 2px 4px rgba(92, 188, 125, 0.12) !important;
 }
 
 html body .app-container.bg-gray-50 button.bg-green-500:hover {
-  background-color: #43a047 !important;
-  box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3) !important;
+  background-color: #52a871 !important;
+  box-shadow: 0 3px 6px rgba(92, 188, 125, 0.15) !important;
 }
 
 .content-area {
@@ -255,8 +256,8 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 }
 
 html body .app-container.bg-gray-50 .content-area {
-  background-color: rgba(240, 242, 247, 0.4) !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+  background-color: rgba(242, 244, 248, 0.35) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.01) !important;
 }
 
 .dark .content-area {
@@ -272,8 +273,8 @@ html body .app-container.bg-gray-50 .content-area {
 }
 
 html body .app-container.bg-gray-50 .footer {
-  background-color: rgba(240, 242, 247, 0.85) !important;
-  border-top: 1px solid rgba(230, 235, 242, 0.8) !important;
+  background-color: rgba(242, 244, 248, 0.75) !important;
+  border-top: 1px solid rgba(230, 235, 242, 0.5) !important;
 }
 
 .dark .footer {
@@ -291,8 +292,8 @@ body {
 }
 
 body {
-  background-color: #f5f7fa;
-  color: #2d3748;
+  background-color: #f2f4f8;
+  color: #445163;
 }
 
 .dark body,
@@ -326,11 +327,11 @@ body {
 }
 
 html body .app-container.bg-gray-50 .text-gray-600 {
-  color: #4a5568 !important;
+  color: #5f6d85 !important;
 }
 
 html body .app-container.bg-gray-50 .text-gray-500 {
-  color: #5a6986 !important;
+  color: #778299 !important;
 }
 
 button {
@@ -427,12 +428,12 @@ button {
 @media (prefers-color-scheme: light) {
   :root {
     color-scheme: light;
-    --app-background: #f5f7fa;
-    --card-background: rgba(245, 247, 250, 0.75);
-    --card-border: rgba(230, 235, 242, 0.8);
-    --card-header: rgba(240, 242, 247, 0.9);
-    --text-primary: #2d3748;
-    --text-secondary: #4a5568;
+    --app-background: #f2f4f8;
+    --card-background: rgba(242, 244, 248, 0.7);
+    --card-border: rgba(230, 235, 242, 0.5);
+    --card-header: rgba(238, 242, 247, 0.7);
+    --text-primary: #445163;
+    --text-secondary: #5f6d85;
   }
 }
 </style>
