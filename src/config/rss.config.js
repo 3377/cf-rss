@@ -15,13 +15,16 @@ const defaultConfig = {
     },
   ],
   refresh: {
-    interval: 30,
+    interval: 60, // 默认刷新间隔为60秒
     cache: 0,
   },
   display: {
+    appTitle: "FY Pages RSS", // 应用标题
+    defaultDarkMode: true, // 默认使用暗色模式
     itemsPerFeed: 15, // 每个卡片显示的条目数
+    showItemDate: false, // 默认不显示条目日期
     dateFormat: "yyyy-MM-dd HH:mm",
-    fontSize: 16,
+    fontSize: 16, // 条目字体大小
     layout: {
       maxHeight: "98vh", // 控制整体高度在视口范围内
       cardGap: 24, // 调整卡片间距
@@ -77,6 +80,15 @@ export function getRSSConfig(env) {
     }
 
     // 处理显示配置
+    if (env.APP_TITLE) {
+      config.display.appTitle = env.APP_TITLE;
+    }
+    if (env.DEFAULT_DARK_MODE !== undefined) {
+      config.display.defaultDarkMode = env.DEFAULT_DARK_MODE === "true";
+    }
+    if (env.SHOW_ITEM_DATE !== undefined) {
+      config.display.showItemDate = env.SHOW_ITEM_DATE === "true";
+    }
     if (env.DATE_FORMAT) {
       config.display.dateFormat = env.DATE_FORMAT;
     }

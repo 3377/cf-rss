@@ -39,7 +39,7 @@
                 >
                   {{ item.title }}
                 </h3>
-                <span class="item-date">
+                <span v-if="showItemDate" class="item-date">
                   {{ formatDate(item.pubDate) }}
                 </span>
               </a>
@@ -74,10 +74,12 @@ const props = defineProps({
 });
 
 const config = ref(getRSSConfig(null));
+const showItemDate = ref(config.value?.display?.showItemDate || false);
 
 onMounted(() => {
   if (typeof window !== "undefined" && window.__RSS_CONFIG__) {
     config.value = window.__RSS_CONFIG__;
+    showItemDate.value = config.value?.display?.showItemDate || false;
     console.log("Using injected config:", config.value);
   }
 });

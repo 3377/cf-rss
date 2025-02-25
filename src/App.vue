@@ -3,7 +3,7 @@
     <div class="header">
       <div class="text-center mb-4">
         <h1 class="text-3xl font-bold dark:text-gray-200 text-gray-700">
-          RSS Reader
+          {{ appTitle }}
         </h1>
       </div>
 
@@ -105,7 +105,12 @@ const feeds = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const countdown = ref(RSS_CONFIG.refresh.interval);
-const isDark = ref(localStorage.getItem("theme") === "dark");
+const isDark = ref(
+  localStorage.getItem("theme") === null
+    ? RSS_CONFIG.display.defaultDarkMode
+    : localStorage.getItem("theme") === "dark"
+);
+const appTitle = ref(RSS_CONFIG.display.appTitle);
 let refreshTimer = null;
 let countdownTimer = null;
 
