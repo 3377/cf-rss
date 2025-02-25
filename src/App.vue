@@ -202,281 +202,178 @@ onUnmounted(() => {
 </script>
 
 <style>
-.app-container {
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 亮色模式样式 - 更高优先级 */
-html body .app-container.bg-gray-50 {
-  background-color: #f2f4f8 !important;
-  background-image: linear-gradient(
-      to bottom,
-      rgba(242, 244, 248, 0.8),
-      rgba(242, 244, 248, 0.85)
-    ),
-    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjE1Ii8+CiAgICA8L3BhdHRlcm4+KICA8L2RlZnM+CiAgP
-HJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
-}
-
-.header {
-  padding: 0.75rem 1rem 0.25rem;
-  flex-shrink: 0;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-html body .app-container.bg-gray-50 .header {
-  background-color: rgba(242, 244, 248, 0.8) !important;
-  backdrop-filter: blur(8px) !important;
-  border-bottom: 1px solid rgba(230, 235, 242, 0.5) !important;
-}
-
-.dark .header {
-  border-color: #374151;
-  background-color: rgba(17, 24, 39, 0.6);
-}
-
-html body .app-container.bg-gray-50 .header-title {
-  color: #3a5075 !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-}
-
-html body .app-container.bg-gray-50 button:not(.bg-green-500) {
-  background-color: rgba(230, 240, 250, 0.5) !important;
-  border: 1px solid rgba(200, 215, 235, 0.5) !important;
-}
-
-html body .app-container.bg-gray-50 button.bg-green-500 {
-  background-color: #5cbc7d !important;
-  box-shadow: 0 2px 4px rgba(92, 188, 125, 0.12) !important;
-}
-
-html body .app-container.bg-gray-50 button.bg-green-500:hover {
-  background-color: #52a871 !important;
-  box-shadow: 0 3px 6px rgba(92, 188, 125, 0.15) !important;
-}
-
-.content-area {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  margin-top: 0;
-  margin-bottom: 0.75rem;
-}
-
-html body .app-container.bg-gray-50 .content-area {
-  background-color: rgba(242, 244, 248, 0.35) !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.01) !important;
-}
-
-.dark .content-area {
-  background-color: rgba(17, 24, 39, 0.3);
-}
-
-.footer {
-  flex-shrink: 0;
-  border-top: 1px solid #e5e7eb;
-  backdrop-filter: blur(8px);
-  padding-top: 0.25rem;
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
-}
-
-html body .app-container.bg-gray-50 .footer {
-  background-color: rgba(242, 244, 248, 0.75) !important;
-  border-top: 1px solid rgba(230, 235, 242, 0.5) !important;
-}
-
-.dark .footer {
-  border-color: #374151;
-  background-color: rgba(17, 24, 39, 0.6);
-}
-
-/* 移除全局滚动条 */
-html,
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  height: 100vh;
-}
-
-body {
-  background-color: #f2f4f8;
-  color: #445163;
-}
-
-.dark body,
-.dark html {
-  background-color: #111827;
-  color: #f3f4f6;
-}
-
-#app {
-  height: 100vh;
-  overflow: hidden;
+/* 颜色变量 */
+:root {
+  --app-bg: #f7fafc;
+  --app-text: #2d3748;
+  --app-header-bg: rgba(247, 250, 252, 0.9);
+  --app-header-border: #e2e8f0;
+  --app-card-bg: rgba(255, 255, 255, 0.9);
+  --app-card-hover: rgba(237, 242, 247, 0.85);
+  --app-footer-bg: rgba(247, 250, 252, 0.9);
+  --app-button-bg: #edf2f7;
+  --app-button-text: #4a5568;
+  --app-item-hover: #ebf4ff;
 }
 
 .dark {
-  color: #f3f4f6;
+  --app-bg: #1a202c;
+  --app-text: #f7fafc;
+  --app-header-bg: rgba(26, 32, 44, 0.8);
+  --app-header-border: #2d3748;
+  --app-card-bg: rgba(26, 32, 44, 0.6);
+  --app-card-hover: rgba(45, 55, 72, 0.5);
+  --app-footer-bg: rgba(26, 32, 44, 0.8);
+  --app-button-bg: #2d3748;
+  --app-button-text: #e2e8f0;
+  --app-item-hover: #2c5282;
 }
 
-.dark .header-title {
-  color: #f3f4f6;
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.dark .status-text {
-  color: #f3f4f6;
+/* 亮色模式全局样式 */
+.app-container:not(.dark) {
+  background-color: #f2f4f8 !important;
+  color: #3a5075 !important;
 }
 
-.dark .footer-text {
-  color: #f3f4f6;
+.app-header {
+  background-color: var(--app-header-bg);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--app-header-border);
+  padding: 0.75rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  transition: all 0.3s ease;
 }
 
-.text-gray-700 {
-  color: #4b5563;
+.app-container:not(.dark) .app-header {
+  background-color: rgba(235, 240, 245, 0.95) !important;
+  border-bottom: 1px solid rgba(200, 215, 235, 0.75) !important;
 }
 
-html body .app-container.bg-gray-50 .text-gray-600 {
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.app-container:not(.dark) .app-title {
+  color: #3a5075 !important;
+}
+
+.header-controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.theme-toggle {
+  border: none;
+  background-color: var(--app-button-bg);
+  color: var(--app-button-text);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.app-container:not(.dark) .theme-toggle {
+  background-color: rgba(220, 235, 250, 0.95) !important;
+  color: #3a5075 !important;
+  border: 1px solid rgba(200, 215, 235, 0.75) !important;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-content {
+  flex: 1;
+  width: 100%;
+  height: calc(100vh - 4rem);
+  overflow: hidden;
+}
+
+.app-footer {
+  background-color: var(--app-footer-bg);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--app-header-border);
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.app-container:not(.dark) .app-footer {
+  background-color: rgba(235, 240, 245, 0.95) !important;
+  border-top: 1px solid rgba(200, 215, 235, 0.75) !important;
   color: #566a8c !important;
 }
 
-html body .app-container.bg-gray-50 .text-gray-500 {
-  color: #6b7f9e !important;
-}
-
-button {
-  transition: all 0.2s ease-in-out;
-}
-
-/* 应用CSS变量到卡片 */
+/* 全局卡片样式优化 */
 .app-container:not(.dark) .feed-card {
-  background: var(--card-bg, rgba(230, 240, 250, 0.95)) !important;
-  border: 1px solid var(--card-border, rgba(200, 215, 235, 0.75)) !important;
+  background-color: rgba(220, 235, 250, 0.95) !important;
+  border: 1px solid rgba(200, 215, 235, 0.75) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
 }
 
 .app-container:not(.dark) .card-header {
-  background: var(--card-header-bg, rgba(220, 235, 248, 0.95)) !important;
-  border-bottom: 1px solid var(--card-border, rgba(200, 215, 235, 0.75)) !important;
+  background-color: rgba(210, 230, 248, 0.98) !important;
+  border-bottom: 1px solid rgba(200, 215, 235, 0.8) !important;
 }
 
 .app-container:not(.dark) .card-content {
-  background: var(--card-content-bg, rgba(230, 240, 250, 0.75)) !important;
+  background-color: rgba(220, 235, 250, 0.95) !important;
 }
 
-.app-container:not(.dark) .card-title {
-  color: var(--text-primary, #3a5075) !important;
+.app-container:not(.dark) .item-link {
+  background-color: rgba(220, 235, 250, 0.95) !important;
+  border-bottom: 1px solid rgba(200, 215, 235, 0.4) !important;
 }
 
-.app-container:not(.dark) .item-title {
-  color: var(--text-primary, #3a5075) !important;
+.app-container:not(.dark) .item-link:hover {
+  background: rgba(210, 230, 248, 0.98) !important;
 }
 
-.app-container:not(.dark) .item-date {
-  color: var(--text-secondary, #566a8c) !important;
-  background: var(--card-bg, rgba(230, 240, 250, 0.95)) !important;
-}
-
-/* 移动端优化样式 */
-@media (max-width: 768px) {
-  .header {
-    padding: 0.5rem 0.75rem 0.25rem;
+/* 移动端适配 */
+@media (max-width: 640px) {
+  .app-header {
+    padding: 0.5rem 1rem;
   }
 
-  .header-title {
-    font-size: 1.5rem !important;
-    margin-bottom: 0.5rem;
+  .app-title {
+    font-size: 1.125rem;
   }
 
-  .status-text {
-    font-size: 0.8rem;
-    gap: 0.5rem !important;
+  .app-content {
+    height: calc(100vh - 3.5rem);
   }
 
-  .footer {
-    padding: 0.25rem 0;
-  }
-
-  .footer-text {
+  .app-footer {
+    padding: 0.5rem;
     font-size: 0.75rem;
-  }
-
-  button.bg-green-500 {
-    padding: 0.35rem 0.75rem !important;
-    font-size: 0.8rem !important;
-  }
-
-  button:not(.bg-green-500) {
-    padding: 0.35rem !important;
-  }
-
-  button svg {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-}
-
-/* 小型移动设备优化 */
-@media (max-width: 480px) {
-  .app-container {
-    overflow-x: hidden;
-  }
-
-  .header {
-    padding: 0.4rem 0.5rem 0.2rem;
-  }
-
-  .header-title {
-    font-size: 1.25rem !important;
-    margin-bottom: 0.4rem;
-  }
-
-  .status-text {
-    font-size: 0.75rem;
-    flex-direction: column;
-    gap: 0.1rem !important;
-    line-height: 1.3;
-  }
-
-  /* 移动端状态显示优化 */
-  .flex.justify-between.items-center {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .flex.justify-between.items-center > div {
-    width: 100%;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .flex.items-center.gap-4.flex-1.justify-end {
-    justify-content: center;
-    margin-top: 0.2rem;
-  }
-
-  .footer-text {
-    font-size: 0.7rem;
-    padding: 0.25rem 0;
-    display: flex;
-    flex-direction: column;
-    line-height: 1.4;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color-scheme: light;
-    --app-background: #f2f4f8;
-    --card-background: rgba(230, 240, 250, 0.95);
-    --card-border: rgba(200, 215, 235, 0.75);
-    --card-header: rgba(220, 235, 248, 0.95);
-    --text-primary: #3a5075;
-    --text-secondary: #566a8c;
   }
 }
 </style>
