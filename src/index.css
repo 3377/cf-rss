@@ -54,10 +54,10 @@ html body .app-container.bg-gray-50 {
         color: #778299 !important;
     }
 
-    /* 卡片样式全局覆盖 - 使用更强的颜色区分和特异性选择器 */
+    /* 卡片样式全局覆盖 - 使用更鲜明的蓝色调 */
     html body .app-container.bg-gray-50 .feed-card {
-        background: rgba(237, 242, 247, 0.9) !important;
-        border: 1px solid rgba(223, 230, 241, 0.7) !important;
+        background: rgba(230, 240, 250, 0.95) !important;
+        border: 1px solid rgba(200, 215, 235, 0.75) !important;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.05) !important;
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
@@ -78,8 +78,8 @@ html body .app-container.bg-gray-50 {
     }
 
     html body .app-container.bg-gray-50 .card-header {
-        background-color: rgba(232, 240, 247, 0.9) !important;
-        border-bottom: 1px solid rgba(223, 230, 241, 0.7) !important;
+        background-color: rgba(220, 235, 248, 0.95) !important;
+        border-bottom: 1px solid rgba(200, 215, 235, 0.8) !important;
     }
 
     /* 确保暗色模式卡片头部样式不受亮色模式影响 */
@@ -89,7 +89,7 @@ html body .app-container.bg-gray-50 {
     }
 
     html body .app-container.bg-gray-50 .card-title {
-        color: #445163 !important;
+        color: #3a5075 !important;
     }
 
     /* 确保暗色模式卡片标题样式不受亮色模式影响 */
@@ -98,7 +98,7 @@ html body .app-container.bg-gray-50 {
     }
 
     html body .app-container.bg-gray-50 .card-content {
-        background-color: rgba(237, 242, 247, 0.5) !important;
+        background-color: rgba(230, 240, 250, 0.75) !important;
     }
 
     /* 确保暗色模式卡片内容样式不受亮色模式影响 */
@@ -107,7 +107,7 @@ html body .app-container.bg-gray-50 {
     }
 
     html body .app-container.bg-gray-50 .item-link:hover {
-        background: rgba(238, 242, 247, 0.6) !important;
+        background: rgba(225, 235, 250, 0.85) !important;
     }
 
     /* 确保暗色模式项目链接悬停样式不受亮色模式影响 */
@@ -116,7 +116,7 @@ html body .app-container.bg-gray-50 {
     }
 
     html body .app-container.bg-gray-50 .item-title {
-        color: #445163 !important;
+        color: #3a5075 !important;
     }
 
     /* 确保暗色模式项目标题样式不受亮色模式影响 */
@@ -125,7 +125,7 @@ html body .app-container.bg-gray-50 {
     }
 
     html body .app-container.bg-gray-50 .item-link:hover .item-title {
-        color: #5f91c7 !important;
+        color: #2563eb !important;
     }
 
     /* 确保暗色模式项目标题悬停样式不受亮色模式影响 */
@@ -134,8 +134,8 @@ html body .app-container.bg-gray-50 {
     }
 
     html body .app-container.bg-gray-50 .item-date {
-        color: #778299 !important;
-        background: rgba(238, 242, 247, 0.75) !important;
+        color: #566a8c !important;
+        background: rgba(225, 235, 250, 0.9) !important;
     }
 
     /* 确保暗色模式日期样式不受亮色模式影响 */
@@ -145,7 +145,7 @@ html body .app-container.bg-gray-50 {
     }
 
     html body .app-container.bg-gray-50 .item-link:hover .item-date {
-        background: rgba(235, 240, 245, 0.8) !important;
+        background: rgba(220, 230, 245, 0.95) !important;
     }
 
     /* 确保暗色模式日期悬停样式不受亮色模式影响 */
@@ -154,7 +154,7 @@ html body .app-container.bg-gray-50 {
     }
 
     html body .app-container.bg-gray-50 .empty-message {
-        color: #778299 !important;
+        color: #566a8c !important;
     }
 
     /* 确保暗色模式空消息样式不受亮色模式影响 */
@@ -163,9 +163,9 @@ html body .app-container.bg-gray-50 {
     }
 
     html body .app-container.bg-gray-50 .title-tooltip {
-        background: rgba(242, 244, 248, 0.85) !important;
-        color: #445163 !important;
-        border: 1px solid rgba(225, 230, 238, 0.5) !important;
+        background: rgba(220, 235, 250, 0.95) !important;
+        color: #3a5075 !important;
+        border: 1px solid rgba(200, 215, 235, 0.8) !important;
     }
 
     /* 确保暗色模式工具提示样式不受亮色模式影响 */
@@ -190,7 +190,7 @@ html body .app-container.bg-gray-50 {
     /* 移动端全局优化 */
     @media (max-width: 768px) {
         html body .app-container.bg-gray-50 .feed-card {
-            background: rgba(242, 244, 248, 0.75) !important;
+            background: rgba(230, 240, 250, 0.95) !important;
         }
 
         html body .app-container.bg-gray-50 .header {
@@ -204,11 +204,11 @@ html body .app-container.bg-gray-50 {
         }
 
         html body .app-container.bg-gray-50 .item-link:active {
-            background: rgba(235, 240, 245, 0.75) !important;
+            background: rgba(225, 235, 250, 0.85) !important;
         }
 
         html body .app-container.bg-gray-50 .item-link:active .item-title {
-            color: #5f91c7 !important;
+            color: #2563eb !important;
         }
     }
 

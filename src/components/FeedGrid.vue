@@ -1,16 +1,48 @@
 <template>
   <div class="feed-container">
     <div class="feed-grid" :style="gridStyle">
-      <div v-for="feed in feeds" :key="feed.url" class="feed-card">
+      <div
+        v-for="feed in feeds"
+        :key="feed.url"
+        class="feed-card"
+        :style="
+          isDark
+            ? {}
+            : {
+                background: 'rgba(230, 240, 250, 0.95)',
+                border: '1px solid rgba(200, 215, 235, 0.75)',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+              }
+        "
+      >
         <!-- 标题区域 -->
-        <div class="card-header">
+        <div
+          class="card-header"
+          :style="
+            isDark
+              ? {}
+              : {
+                  backgroundColor: 'rgba(220, 235, 248, 0.95)',
+                  borderBottom: '1px solid rgba(200, 215, 235, 0.8)',
+                }
+          "
+        >
           <h2 class="card-title">
             {{ feed.title }}
           </h2>
         </div>
 
         <!-- 内容区域 -->
-        <div class="card-content">
+        <div
+          class="card-content"
+          :style="
+            isDark
+              ? {}
+              : {
+                  backgroundColor: 'rgba(230, 240, 250, 0.75)',
+                }
+          "
+        >
           <div v-if="feed.error" class="error-message">
             {{ feed.error }}
           </div>
@@ -31,6 +63,11 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 class="item-link"
+                :style="
+                  isDark
+                    ? {}
+                    : { hover: { background: 'rgba(225, 235, 250, 0.85)' } }
+                "
                 @mouseenter="showTooltip($event, item.title, item.pubDate)"
                 @mouseleave="hideTooltip"
               >
@@ -39,11 +76,23 @@
                   :style="{
                     fontSize: `${fontSize}px`,
                     paddingRight: showItemDate ? '4rem' : '0.5rem',
+                    color: isDark ? '#f3f4f6' : '#3a5075',
                   }"
                 >
                   {{ item.title }}
                 </h3>
-                <span v-if="showItemDate" class="item-date">
+                <span
+                  v-if="showItemDate"
+                  class="item-date"
+                  :style="
+                    isDark
+                      ? {}
+                      : {
+                          color: '#566a8c',
+                          background: 'rgba(225, 235, 250, 0.9)',
+                        }
+                  "
+                >
                   {{ formatDate(item.pubDate) }}
                 </span>
               </a>
@@ -60,6 +109,13 @@
       :style="{
         top: tooltipPosition.top + 'px',
         left: tooltipPosition.left + 'px',
+        backgroundColor: isDark
+          ? 'rgba(31, 41, 55, 0.95)'
+          : 'rgba(220, 235, 250, 0.95)',
+        color: isDark ? '#f3f4f6' : '#3a5075',
+        border: isDark
+          ? '1px solid rgba(55, 65, 81, 0.8)'
+          : '1px solid rgba(200, 215, 235, 0.8)',
       }"
     >
       {{ tooltipText }}
@@ -191,14 +247,15 @@ const fontSize = computed(() => {
 }
 
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(237, 242, 247, 0.85) !important;
-  border: 1px solid rgba(223, 230, 241, 0.65) !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03), 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+  background: rgba(230, 240, 250, 0.95) !important;
+  border: 1px solid rgba(200, 215, 235, 0.75) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
 }
 
 .dark .feed-card {
-  background: rgba(31, 41, 55, 0.9);
-  border-color: rgba(55, 65, 81, 0.5);
+  background: rgba(31, 41, 55, 0.9) !important;
+  border-color: rgba(55, 65, 81, 0.5) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
 .card-header {
@@ -207,8 +264,8 @@ html body .app-container:not(.dark) .feed-card {
 }
 
 html body .app-container:not(.dark) .card-header {
-  background-color: rgba(232, 240, 247, 0.9) !important;
-  border-bottom: 1px solid rgba(223, 230, 241, 0.7) !important;
+  background-color: rgba(220, 235, 248, 0.95) !important;
+  border-bottom: 1px solid rgba(200, 215, 235, 0.8) !important;
 }
 
 .dark .card-header {
@@ -237,7 +294,7 @@ html body .app-container:not(.dark) .card-title {
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(237, 242, 247, 0.5) !important;
+  background-color: rgba(230, 240, 250, 0.75) !important;
 }
 
 .dark .card-content {

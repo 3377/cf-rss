@@ -1,7 +1,18 @@
 <template>
   <div
     :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']"
-    :style="containerStyle"
+    :style="
+      !isDark
+        ? {
+            '--card-bg': 'rgba(230, 240, 250, 0.95)',
+            '--card-header-bg': 'rgba(220, 235, 248, 0.95)',
+            '--card-content-bg': 'rgba(230, 240, 250, 0.75)',
+            '--card-border': 'rgba(200, 215, 235, 0.75)',
+            '--text-primary': '#3a5075',
+            '--text-secondary': '#566a8c',
+          }
+        : {}
+    "
   >
     <div class="header">
       <div class="text-center mb-4">
@@ -188,17 +199,6 @@ onUnmounted(() => {
     clearInterval(countdownTimer);
   }
 });
-
-// 添加容器样式计算属性，确保亮色模式卡片背景色一致
-const containerStyle = computed(() => {
-  return !isDark.value
-    ? {
-        "--card-bg": "rgba(237, 242, 247, 0.9)",
-        "--card-header-bg": "rgba(232, 240, 247, 0.9)",
-        "--card-content-bg": "rgba(237, 242, 247, 0.5)",
-      }
-    : {};
-});
 </script>
 
 <style>
@@ -241,13 +241,13 @@ html body .app-container.bg-gray-50 .header {
 }
 
 html body .app-container.bg-gray-50 .header-title {
-  color: #445163 !important;
+  color: #3a5075 !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
 html body .app-container.bg-gray-50 button:not(.bg-green-500) {
-  background-color: rgba(242, 244, 248, 0.5) !important;
-  border: 1px solid rgba(230, 235, 242, 0.5) !important;
+  background-color: rgba(230, 240, 250, 0.5) !important;
+  border: 1px solid rgba(200, 215, 235, 0.5) !important;
 }
 
 html body .app-container.bg-gray-50 button.bg-green-500 {
@@ -342,15 +342,43 @@ body {
 }
 
 html body .app-container.bg-gray-50 .text-gray-600 {
-  color: #5f6d85 !important;
+  color: #566a8c !important;
 }
 
 html body .app-container.bg-gray-50 .text-gray-500 {
-  color: #778299 !important;
+  color: #6b7f9e !important;
 }
 
 button {
   transition: all 0.2s ease-in-out;
+}
+
+/* 应用CSS变量到卡片 */
+.app-container:not(.dark) .feed-card {
+  background: var(--card-bg, rgba(230, 240, 250, 0.95)) !important;
+  border: 1px solid var(--card-border, rgba(200, 215, 235, 0.75)) !important;
+}
+
+.app-container:not(.dark) .card-header {
+  background: var(--card-header-bg, rgba(220, 235, 248, 0.95)) !important;
+  border-bottom: 1px solid var(--card-border, rgba(200, 215, 235, 0.75)) !important;
+}
+
+.app-container:not(.dark) .card-content {
+  background: var(--card-content-bg, rgba(230, 240, 250, 0.75)) !important;
+}
+
+.app-container:not(.dark) .card-title {
+  color: var(--text-primary, #3a5075) !important;
+}
+
+.app-container:not(.dark) .item-title {
+  color: var(--text-primary, #3a5075) !important;
+}
+
+.app-container:not(.dark) .item-date {
+  color: var(--text-secondary, #566a8c) !important;
+  background: var(--card-bg, rgba(230, 240, 250, 0.95)) !important;
 }
 
 /* 移动端优化样式 */
@@ -444,24 +472,11 @@ button {
   :root {
     color-scheme: light;
     --app-background: #f2f4f8;
-    --card-background: rgba(237, 242, 247, 0.9);
-    --card-border: rgba(223, 230, 241, 0.7);
-    --card-header: rgba(232, 240, 247, 0.9);
-    --text-primary: #445163;
-    --text-secondary: #5f6d85;
+    --card-background: rgba(230, 240, 250, 0.95);
+    --card-border: rgba(200, 215, 235, 0.75);
+    --card-header: rgba(220, 235, 248, 0.95);
+    --text-primary: #3a5075;
+    --text-secondary: #566a8c;
   }
-}
-
-/* CSS变量应用到卡片 */
-.app-container:not(.dark) .feed-card {
-  background: var(--card-bg, rgba(237, 242, 247, 0.9)) !important;
-}
-
-.app-container:not(.dark) .card-header {
-  background: var(--card-header-bg, rgba(232, 240, 247, 0.9)) !important;
-}
-
-.app-container:not(.dark) .card-content {
-  background: var(--card-content-bg, rgba(237, 242, 247, 0.5)) !important;
 }
 </style>
