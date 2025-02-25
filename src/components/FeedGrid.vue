@@ -31,7 +31,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 class="item-link"
-                @mouseenter="showTooltip($event, item.title)"
+                @mouseenter="showTooltip($event, item.title, item.pubDate)"
                 @mouseleave="hideTooltip"
               >
                 <h3
@@ -106,19 +106,20 @@ onMounted(() => {
 });
 
 // 显示标题提示框方法
-const showTooltip = (event, text) => {
+const showTooltip = (event, text, pubDate) => {
   // 获取标题元素
   const titleEl = event.target.querySelector(".item-title");
 
   // 只有当标题内容溢出时才显示提示框
   if (titleEl && titleEl.offsetWidth < titleEl.scrollWidth) {
-    tooltipText.value = text;
+    // 对于溢出的多行标题，添加时间前缀
+    tooltipText.value = formatDate(pubDate) + " " + text;
 
-    // 计算提示框位置（右上角）
+    // 计算提示框位置（上方）
     const rect = titleEl.getBoundingClientRect();
     tooltipPosition.value = {
-      top: rect.top + window.scrollY - 30,
-      left: rect.right + window.scrollX - 20,
+      top: rect.top + window.scrollY - 40, // 放在上方
+      left: rect.left + window.scrollX,
     };
 
     nextTick(() => {
@@ -330,7 +331,7 @@ const fontSize = computed(() => {
   padding: 0.5rem 0.75rem;
   border-radius: 0.375rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 350px;
+  max-width: 90%;
   z-index: 100;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -338,12 +339,17 @@ const fontSize = computed(() => {
   border: 1px solid rgba(229, 231, 235, 0.8);
   backdrop-filter: blur(5px);
   transition: opacity 0.2s ease;
+  text-align: left;
 }
 
 .dark .title-tooltip {
   background: rgba(31, 41, 55, 0.95);
-  color: #e5e7eb;
+  color: #f3f4f6; /* 调整为更亮的颜色 */
   border-color: rgba(55, 65, 81, 0.8);
+}
+
+.dark .item-title {
+  color: #f3f4f6; /* 调整为更亮的颜色，不要太灰 */
 }
 
 /* 自定义滚动条 */

@@ -2,7 +2,7 @@
   <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
     <div class="header">
       <div class="text-center mb-4">
-        <h1 class="text-3xl font-bold dark:text-gray-200 text-gray-700">
+        <h1 class="text-3xl font-bold dark:text-gray-100 text-gray-700">
           {{ appTitle }}
         </h1>
       </div>
@@ -10,11 +10,11 @@
       <div class="flex justify-between items-center">
         <div class="flex-1"></div>
         <div
-          class="flex justify-center flex-1 text-base text-gray-600 dark:text-gray-400 gap-8"
+          class="flex justify-center flex-1 text-base text-gray-600 dark:text-gray-300 gap-8"
         >
           <div
             v-if="loading"
-            class="text-gray-600 dark:text-gray-400 font-medium"
+            class="text-gray-600 dark:text-gray-300 font-medium"
           >
             加载中...
           </div>
@@ -60,7 +60,7 @@
           </button>
           <button
             @click="fetchFeeds"
-            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
+            class="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
             :disabled="loading"
           >
             <span v-if="loading">刷新中...</span>
@@ -80,7 +80,7 @@
 
     <!-- 底部版权信息 -->
     <footer class="footer">
-      <div class="text-center text-sm text-gray-500 dark:text-gray-400 py-2">
+      <div class="text-center text-sm text-gray-500 dark:text-gray-300 py-2">
         <span>© {{ new Date().getFullYear() }} </span>
         <a
           href="https://github.com/3377/cf-rss"
@@ -261,6 +261,22 @@ body {
 
 .dark {
   @apply text-gray-100;
+}
+
+.dark .text-gray-100 {
+  color: #f3f4f6 !important;
+}
+
+.dark .text-gray-200 {
+  color: #f3f4f6 !important;
+}
+
+.dark .text-gray-300 {
+  color: #f3f4f6 !important;
+}
+
+.dark .text-gray-400 {
+  color: #e5e7eb !important;
 }
 
 .bg-gray-50 {
