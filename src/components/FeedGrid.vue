@@ -9,7 +9,7 @@
           isDark
             ? {}
             : {
-                background: 'rgba(226, 238, 250, 0.98)',
+                background: 'rgba(230, 240, 250, 0.95)',
                 border: '1px solid rgba(200, 215, 235, 0.75)',
                 boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
               }
@@ -39,7 +39,7 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(226, 238, 250, 0.95)',
+                  backgroundColor: 'rgba(230, 240, 250, 0.75)',
                 }
           "
         >
@@ -66,9 +66,7 @@
                 :style="
                   isDark
                     ? {}
-                    : {
-                        backgroundColor: 'rgba(226, 238, 250, 0.95)',
-                      }
+                    : { hover: { background: 'rgba(225, 235, 250, 0.85)' } }
                 "
                 @mouseenter="showTooltip($event, item.title, item.pubDate)"
                 @mouseleave="hideTooltip"
@@ -91,7 +89,7 @@
                       ? {}
                       : {
                           color: '#566a8c',
-                          background: 'rgba(220, 235, 248, 0.95)',
+                          background: 'rgba(225, 235, 250, 0.9)',
                         }
                   "
                 >
@@ -249,7 +247,7 @@ const fontSize = computed(() => {
 }
 
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(226, 238, 250, 0.98) !important;
+  background: rgba(230, 240, 250, 0.95) !important;
   border: 1px solid rgba(200, 215, 235, 0.75) !important;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
 }
@@ -282,7 +280,7 @@ html body .app-container:not(.dark) .card-header {
 }
 
 html body .app-container:not(.dark) .card-title {
-  color: #3a5075 !important;
+  color: #445163 !important;
 }
 
 .dark .card-title {
@@ -296,7 +294,7 @@ html body .app-container:not(.dark) .card-title {
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(226, 238, 250, 0.95) !important;
+  background-color: rgba(230, 240, 250, 0.75) !important;
 }
 
 .dark .card-content {
@@ -325,12 +323,8 @@ html body .app-container:not(.dark) .card-content {
   position: relative;
 }
 
-html body .app-container:not(.dark) .item-link {
-  background-color: rgba(226, 238, 250, 0.95) !important;
-}
-
 html body .app-container:not(.dark) .item-link:hover {
-  background: rgba(218, 232, 248, 0.98) !important;
+  background: rgba(240, 242, 247, 0.8) !important;
 }
 
 .dark .item-link:hover {
@@ -348,7 +342,7 @@ html body .app-container:not(.dark) .item-link:hover {
 }
 
 html body .app-container:not(.dark) .item-title {
-  color: #3a5075 !important;
+  color: #445163 !important;
 }
 
 .dark .item-title {
@@ -356,7 +350,7 @@ html body .app-container:not(.dark) .item-title {
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-title {
-  color: #2563eb !important;
+  color: #5f91c7 !important;
 }
 
 .dark .item-link:hover .item-title {
@@ -378,12 +372,12 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
 }
 
 html body .app-container:not(.dark) .item-date {
-  color: #566a8c !important;
-  background: rgba(220, 235, 248, 0.95) !important;
+  color: #778299 !important;
+  background: rgba(242, 244, 248, 0.9) !important;
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(218, 232, 248, 0.98) !important;
+  background: rgba(238, 242, 247, 0.95) !important;
 }
 
 .dark .item-date {
@@ -406,7 +400,7 @@ html body .app-container:not(.dark) .item-link:hover .item-date {
 }
 
 html body .app-container:not(.dark) .empty-message {
-  color: #566a8c !important;
+  color: #778299 !important;
 }
 
 .dark .empty-message {
@@ -430,9 +424,9 @@ html body .app-container:not(.dark) .empty-message {
 }
 
 html body .app-container:not(.dark) .title-tooltip {
-  background: rgba(220, 235, 250, 0.95) !important;
-  color: #3a5075 !important;
-  border: 1px solid rgba(200, 215, 235, 0.8) !important;
+  background: rgba(242, 244, 248, 0.95) !important;
+  color: #445163 !important;
+  border: 1px solid rgba(230, 235, 242, 0.5) !important;
 }
 
 .dark .title-tooltip {
