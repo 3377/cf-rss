@@ -40,7 +40,6 @@
                     fontSize: `${fontSize}px`,
                     paddingRight: showItemDate ? '4rem' : '0.5rem',
                   }"
-                  :title="item.title"
                 >
                   {{ item.title }}
                 </h3>
@@ -53,20 +52,23 @@
         </div>
       </div>
     </div>
-    <!-- 全局浮动提示框 -->
+
+    <!-- 标题弹窗 -->
     <div
       v-show="tooltipVisible"
-      ref="tooltip"
-      class="global-tooltip"
-      :style="tooltipStyle"
+      class="title-tooltip"
+      :style="{
+        top: tooltipPosition.top + 'px',
+        left: tooltipPosition.left + 'px',
+      }"
     >
-      {{ tooltipContent }}
+      {{ tooltipText }}
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from "vue";
+import { computed, ref, onMounted, nextTick } from "vue";
 import { getRSSConfig } from "../config/rss.config";
 
 const props = defineProps({
@@ -90,60 +92,10 @@ const props = defineProps({
 const config = ref(getRSSConfig(null));
 const showItemDate = ref(config.value?.display?.showItemDate || false);
 
-// 添加tooltip相关状态
+// 标题提示框相关状态
 const tooltipVisible = ref(false);
-const tooltipContent = ref("");
-const tooltipStyle = ref({
-  top: "0px",
-  left: "0px",
-});
-const tooltip = ref(null);
-
-// 显示tooltip的方法
-const showTooltip = (event, content) => {
-  tooltipContent.value = content;
-  tooltipVisible.value = true;
-
-  // 计算位置 - 确保不超出视窗
-  nextTick(() => {
-    const rect = event.target.getBoundingClientRect();
-    const tooltipEl = tooltip.value;
-
-    if (tooltipEl) {
-      const tooltipWidth = tooltipEl.offsetWidth;
-      const tooltipHeight = tooltipEl.offsetHeight;
-
-      // 默认显示在链接下方
-      let top = rect.bottom + window.scrollY + 10;
-      let left = rect.left + window.scrollX;
-
-      // 调整避免超出右侧
-      if (left + tooltipWidth > window.innerWidth) {
-        left = window.innerWidth - tooltipWidth - 20;
-      }
-
-      // 调整避免超出底部
-      if (top + tooltipHeight > window.innerHeight) {
-        top = rect.top + window.scrollY - tooltipHeight - 10;
-      }
-
-      tooltipStyle.value = {
-        top: `${top}px`,
-        left: `${left}px`,
-      };
-    }
-  });
-};
-
-// 隐藏tooltip的方法
-const hideTooltip = () => {
-  tooltipVisible.value = false;
-};
-
-// 添加nextTick方法
-const nextTick = (callback) => {
-  setTimeout(callback, 0);
-};
+const tooltipText = ref("");
+const tooltipPosition = ref({ top: 0, left: 0 });
 
 onMounted(() => {
   if (typeof window !== "undefined" && window.__RSS_CONFIG__) {
@@ -152,6 +104,33 @@ onMounted(() => {
     console.log("Using injected config:", config.value);
   }
 });
+
+// 显示标题提示框方法
+const showTooltip = (event, text) => {
+  // 获取标题元素
+  const titleEl = event.target.querySelector(".item-title");
+
+  // 只有当标题内容溢出时才显示提示框
+  if (titleEl && titleEl.offsetWidth < titleEl.scrollWidth) {
+    tooltipText.value = text;
+
+    // 计算提示框位置（右上角）
+    const rect = titleEl.getBoundingClientRect();
+    tooltipPosition.value = {
+      top: rect.top + window.scrollY - 30,
+      left: rect.right + window.scrollX - 20,
+    };
+
+    nextTick(() => {
+      tooltipVisible.value = true;
+    });
+  }
+};
+
+// 隐藏标题提示框方法
+const hideTooltip = () => {
+  tooltipVisible.value = false;
+};
 
 const formatDate = (date) => {
   return new Date(date).toLocaleString("zh-CN", {
@@ -186,6 +165,7 @@ const fontSize = computed(() => {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  position: relative;
 }
 
 .feed-grid {
@@ -199,15 +179,15 @@ const fontSize = computed(() => {
 }
 
 .feed-card {
-  background: rgba(249, 250, 251, 0.9);
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: rgba(249, 250, 251, 0.95);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(229, 231, 235, 0.3);
+  border: 1px solid rgba(229, 231, 235, 0.5);
   transition: all 0.3s ease;
 }
 
@@ -218,37 +198,35 @@ const fontSize = computed(() => {
 
 .card-header {
   padding: 1rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-  background: rgba(249, 250, 251, 0.6);
+  border-bottom: 1px solid #e5e7eb;
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
 .dark .card-header {
   border-color: #374151;
-  background: rgba(31, 41, 55, 0.6);
+  background-color: rgba(31, 41, 55, 0.7);
 }
 
 .card-title {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #4b5563;
+  color: #1f2937;
   text-align: center;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
 .dark .card-title {
   color: #e5e7eb;
-  text-shadow: none;
 }
 
 .card-content {
   flex: 1;
   padding: 0.5rem 0;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .dark .card-content {
-  background: rgba(17, 24, 39, 0.3);
+  background-color: rgba(31, 41, 55, 1);
 }
 
 .items-list {
@@ -260,7 +238,7 @@ const fontSize = computed(() => {
 }
 
 .feed-item {
-  border-bottom: 1px solid rgba(229, 231, 235, 0.7);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .dark .feed-item {
@@ -271,21 +249,18 @@ const fontSize = computed(() => {
   display: block;
   padding: 0.75rem 1rem;
   position: relative;
-  overflow: hidden;
 }
 
 .item-link:hover {
-  background: rgba(243, 244, 246, 0.8);
-  overflow: visible;
-  z-index: 10;
+  background: rgba(243, 244, 246, 0.7);
 }
 
 .dark .item-link:hover {
-  background: rgba(55, 65, 81, 0.5);
+  background: rgba(55, 65, 81, 0.7);
 }
 
 .item-title {
-  color: #4b5563;
+  color: #374151;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -301,46 +276,6 @@ const fontSize = computed(() => {
 
 .item-link:hover .item-title {
   color: #3b82f6;
-  white-space: nowrap;
-}
-
-/* 全局浮动提示框 */
-.global-tooltip {
-  position: fixed;
-  z-index: 1000;
-  background: white;
-  color: #374151;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  white-space: normal;
-  line-height: 1.6;
-  border: 1px solid rgba(229, 231, 235, 0.8);
-  font-weight: normal;
-  font-size: 14px;
-  animation: fadeIn 0.2s ease;
-  pointer-events: none; /* 允许鼠标穿透 */
-  text-align: left;
-  word-break: break-word;
-}
-
-.dark .global-tooltip {
-  background: #1f2937;
-  color: #e5e7eb;
-  border-color: #374151;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.3);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .item-date {
@@ -349,8 +284,8 @@ const fontSize = computed(() => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.75rem;
-  color: #6b7280;
-  background: rgba(249, 250, 251, 0.9);
+  color: #4b5563;
+  background: rgba(255, 255, 255, 0.8);
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -359,19 +294,17 @@ const fontSize = computed(() => {
   white-space: nowrap;
 }
 
+.item-link:hover .item-date {
+  background: rgba(243, 244, 246, 0.9);
+}
+
 .dark .item-date {
   background: #1f2937;
   color: #9ca3af;
 }
 
-.item-link:hover .item-date {
-  position: relative;
-  display: inline-block;
-  right: auto;
-  top: auto;
-  transform: none;
-  margin-left: 0.5rem;
-  vertical-align: middle;
+.dark .item-link:hover .item-date {
+  background: rgba(55, 65, 81, 0.9);
 }
 
 .error-message {
@@ -387,6 +320,30 @@ const fontSize = computed(() => {
 
 .dark .empty-message {
   color: #9ca3af;
+}
+
+/* 标题弹窗样式 */
+.title-tooltip {
+  position: fixed;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1f2937;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 350px;
+  z-index: 100;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  pointer-events: none;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  backdrop-filter: blur(5px);
+  transition: opacity 0.2s ease;
+}
+
+.dark .title-tooltip {
+  background: rgba(31, 41, 55, 0.95);
+  color: #e5e7eb;
+  border-color: rgba(55, 65, 81, 0.8);
 }
 
 /* 自定义滚动条 */
