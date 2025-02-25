@@ -1,80 +1,107 @@
 <template>
   <div
-    class="app-container"
-    :class="{ dark: isDark, 'bg-gray-50': !isDark }"
+    :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']"
     :style="
       !isDark
         ? {
-            backgroundColor: 'rgba(240, 245, 252, 0.95)',
-            color: '#3a5075',
+            '--card-bg': 'rgba(230, 240, 250, 0.95)',
+            '--card-header-bg': 'rgba(220, 235, 248, 0.95)',
+            '--card-content-bg': 'rgba(230, 240, 250, 0.75)',
+            '--card-border': 'rgba(200, 215, 235, 0.75)',
+            '--text-primary': '#3a5075',
+            '--text-secondary': '#566a8c',
           }
         : {}
     "
   >
-    <header
-      class="app-header header"
-      :style="
-        !isDark
-          ? {
-              backgroundColor: 'rgba(230, 240, 250, 0.98)',
-              borderBottom: '1px solid rgba(200, 215, 235, 0.8)',
-            }
-          : {}
-      "
-    >
+    <div class="header">
       <div class="text-center mb-4">
         <h1 class="text-3xl font-bold text-gray-700 header-title">
-          {{ projectName }} RSS阅读器
+          {{ appTitle }}
         </h1>
-        <div class="flex justify-center items-center mb-2">
+      </div>
+
+      <div class="flex justify-between items-center">
+        <div class="flex-1"></div>
+        <div
+          class="flex justify-center flex-1 text-base text-gray-600 status-text gap-8"
+        >
+          <div v-if="loading" class="text-gray-600 font-medium status-text">
+            加载中...
+          </div>
+          <template v-else>
+            <div>下次刷新: {{ formatCountdown }}</div>
+            <div>最后更新: {{ formatLastUpdate }}</div>
+          </template>
+        </div>
+        <div class="flex items-center gap-4 flex-1 justify-end">
           <button
-            @click="toggleDarkMode"
-            class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 mr-2"
+            @click="toggleTheme"
+            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+            :title="isDark ? '切换到亮色模式' : '切换到暗色模式'"
           >
-            {{ isDark ? "亮色" : "暗色" }}模式
+            <svg
+              v-if="isDark"
+              class="w-6 h-6 text-gray-200"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+            <svg
+              v-else
+              class="w-6 h-6 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+              />
+            </svg>
           </button>
           <button
-            @click="refreshFeeds"
-            class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            @click="fetchFeeds"
+            class="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
+            :disabled="loading"
           >
-            刷新
+            <span v-if="loading">刷新中...</span>
+            <span v-else>立即刷新</span>
           </button>
         </div>
       </div>
-    </header>
+    </div>
 
-    <main
-      class="app-content content-area"
-      :style="!isDark ? { backgroundColor: 'rgba(240, 245, 252, 0.95)' } : {}"
-    >
+    <!-- 内容区域 -->
+    <div class="content-area">
       <div v-if="error" class="text-center text-red-500">
         {{ error }}
       </div>
       <FeedGrid v-else :feeds="feeds" :isDark="isDark" class="flex-1" />
-    </main>
+    </div>
 
-    <footer
-      class="app-footer footer"
-      :style="
-        !isDark
-          ? {
-              backgroundColor: 'rgba(230, 240, 250, 0.98)',
-              borderTop: '1px solid rgba(200, 215, 235, 0.8)',
-              color: '#566a8c',
-            }
-          : {}
-      "
-    >
+    <!-- 底部版权信息 -->
+    <footer class="footer">
       <div class="text-center text-sm text-gray-500 footer-text py-2">
         <span>© {{ new Date().getFullYear() }} </span>
         <a
-          href="https://github.com/xxxx/xxx-rss"
+          href="https://github.com/3377/cf-rss"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
-        >
-          {{ projectName }} RSS
-        </a>
+          class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
+          >RSS Reader</a
+        >.
+        <span>Powered by Drfy & hstz.com. </span>
+        <span>All rights reserved.</span>
       </div>
     </footer>
   </div>
@@ -95,7 +122,6 @@ const isDark = ref(
     : localStorage.getItem("theme") === "dark"
 );
 const appTitle = ref(RSS_CONFIG.display.appTitle);
-const projectName = ref(RSS_CONFIG.display.projectName);
 let refreshTimer = null;
 let countdownTimer = null;
 
@@ -119,12 +145,12 @@ const formatLastUpdate = computed(() => {
   });
 });
 
-const toggleDarkMode = () => {
+const toggleTheme = () => {
   isDark.value = !isDark.value;
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
 };
 
-const refreshFeeds = async () => {
+const fetchFeeds = async () => {
   try {
     loading.value = true;
     error.value = null;
@@ -158,9 +184,9 @@ const updateCountdown = () => {
 };
 
 onMounted(async () => {
-  await refreshFeeds();
+  await fetchFeeds();
   // 设置定时刷新
-  refreshTimer = setInterval(refreshFeeds, RSS_CONFIG.refresh.interval * 1000);
+  refreshTimer = setInterval(fetchFeeds, RSS_CONFIG.refresh.interval * 1000);
   // 设置倒计时更新
   countdownTimer = setInterval(updateCountdown, 1000);
 });
@@ -183,42 +209,16 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-/* 亮色模式全局样式增强 */
-.app-container.bg-gray-50 {
-  background-color: rgba(240, 245, 252, 0.95) !important;
-  color: #3a5075 !important;
-}
-
-.app-container.bg-gray-50 .app-header {
-  background-color: rgba(230, 240, 250, 0.98) !important;
-  border-bottom: 1px solid rgba(200, 215, 235, 0.8) !important;
-}
-
-.app-container.bg-gray-50 .app-content {
-  background-color: rgba(240, 245, 252, 0.95) !important;
-}
-
-.app-container.bg-gray-50 .app-footer {
-  background-color: rgba(230, 240, 250, 0.98) !important;
-  border-top: 1px solid rgba(200, 215, 235, 0.8) !important;
-  color: #566a8c !important;
-}
-
-/* 全局按钮和链接样式增强 */
-.app-container.bg-gray-50 button,
-.app-container.bg-gray-50 .btn {
-  background-color: rgba(220, 235, 250, 0.98) !important;
-  border: 1px solid rgba(200, 215, 235, 0.8) !important;
-  color: #3a5075 !important;
-  transition: all 0.2s ease !important;
-}
-
-.app-container.bg-gray-50 button:hover,
-.app-container.bg-gray-50 .btn:hover {
-  background-color: rgba(210, 230, 248, 0.98) !important;
-  border-color: rgba(180, 200, 225, 0.9) !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+/* 亮色模式样式 - 更高优先级 */
+html body .app-container.bg-gray-50 {
+  background-color: #f2f4f8 !important;
+  background-image: linear-gradient(
+      to bottom,
+      rgba(242, 244, 248, 0.8),
+      rgba(242, 244, 248, 0.85)
+    ),
+    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjE1Ii8+CiAgICA8L3BhdHRlcm4+KICA8L2RlZnM+CiAgP
+HJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
 }
 
 .header {

@@ -9,9 +9,9 @@
           isDark
             ? {}
             : {
-                background: 'rgba(220, 235, 250, 0.98)',
-                border: '1px solid rgba(200, 215, 235, 0.8)',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.07)',
+                background: 'rgba(230, 240, 250, 0.95)',
+                border: '1px solid rgba(200, 215, 235, 0.75)',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
               }
         "
       >
@@ -22,7 +22,7 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(210, 230, 248, 0.98)',
+                  backgroundColor: 'rgba(220, 235, 248, 0.95)',
                   borderBottom: '1px solid rgba(200, 215, 235, 0.8)',
                 }
           "
@@ -39,7 +39,7 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(220, 235, 250, 0.98)',
+                  backgroundColor: 'rgba(230, 240, 250, 0.75)',
                 }
           "
         >
@@ -66,10 +66,7 @@
                 :style="
                   isDark
                     ? {}
-                    : {
-                        backgroundColor: 'rgba(225, 238, 252, 0.6)',
-                        borderBottom: '1px solid rgba(200, 215, 235, 0.6)',
-                      }
+                    : { hover: { background: 'rgba(225, 235, 250, 0.85)' } }
                 "
                 @mouseenter="showTooltip($event, item.title, item.pubDate)"
                 @mouseleave="hideTooltip"
@@ -92,7 +89,7 @@
                       ? {}
                       : {
                           color: '#566a8c',
-                          background: 'rgba(210, 230, 248, 0.98)',
+                          background: 'rgba(225, 235, 250, 0.9)',
                         }
                   "
                 >
@@ -114,11 +111,11 @@
         left: tooltipPosition.left + 'px',
         backgroundColor: isDark
           ? 'rgba(31, 41, 55, 0.95)'
-          : 'rgba(210, 230, 248, 0.98)',
+          : 'rgba(220, 235, 250, 0.95)',
         color: isDark ? '#f3f4f6' : '#3a5075',
         border: isDark
           ? '1px solid rgba(55, 65, 81, 0.8)'
-          : '1px solid rgba(190, 210, 235, 0.9)',
+          : '1px solid rgba(200, 215, 235, 0.8)',
       }"
     >
       {{ tooltipText }}
@@ -250,9 +247,9 @@ const fontSize = computed(() => {
 }
 
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(220, 235, 250, 0.98) !important;
-  border: 1px solid rgba(200, 215, 235, 0.8) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07) !important;
+  background: rgba(230, 240, 250, 0.95) !important;
+  border: 1px solid rgba(200, 215, 235, 0.75) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
 }
 
 .dark .feed-card {
@@ -267,7 +264,7 @@ html body .app-container:not(.dark) .feed-card {
 }
 
 html body .app-container:not(.dark) .card-header {
-  background-color: rgba(210, 230, 248, 0.98) !important;
+  background-color: rgba(220, 235, 248, 0.95) !important;
   border-bottom: 1px solid rgba(200, 215, 235, 0.8) !important;
 }
 
@@ -297,7 +294,7 @@ html body .app-container:not(.dark) .card-title {
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(220, 235, 250, 0.98) !important;
+  background-color: rgba(230, 240, 250, 0.75) !important;
 }
 
 .dark .card-content {
@@ -326,9 +323,8 @@ html body .app-container:not(.dark) .card-content {
   position: relative;
 }
 
-html body .app-container:not(.dark) .item-link {
-  background-color: rgba(225, 238, 252, 0.6) !important;
-  border-bottom: 1px solid rgba(200, 215, 235, 0.6) !important;
+html body .app-container:not(.dark) .item-link:hover {
+  background: rgba(240, 242, 247, 0.8) !important;
 }
 
 .dark .item-link:hover {
@@ -376,12 +372,12 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
 }
 
 html body .app-container:not(.dark) .item-date {
-  color: #566a8c !important;
-  background: rgba(210, 230, 248, 0.98) !important;
+  color: #778299 !important;
+  background: rgba(242, 244, 248, 0.9) !important;
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(200, 220, 245, 0.98) !important;
+  background: rgba(238, 242, 247, 0.95) !important;
 }
 
 .dark .item-date {
