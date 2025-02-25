@@ -1,16 +1,20 @@
 <template>
-  <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'light-mode']">
+  <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
     <div class="header">
       <div class="text-center mb-4">
-        <h1 class="text-3xl font-bold header-title">
+        <h1 class="text-3xl font-bold text-gray-700 header-title">
           {{ appTitle }}
         </h1>
       </div>
 
       <div class="flex justify-between items-center">
         <div class="flex-1"></div>
-        <div class="flex justify-center flex-1 text-base status-text gap-8">
-          <div v-if="loading" class="font-medium status-text">加载中...</div>
+        <div
+          class="flex justify-center flex-1 text-base text-gray-600 status-text gap-8"
+        >
+          <div v-if="loading" class="text-gray-600 font-medium status-text">
+            加载中...
+          </div>
           <template v-else>
             <div>下次刷新: {{ formatCountdown }}</div>
             <div>最后更新: {{ formatLastUpdate }}</div>
@@ -19,12 +23,12 @@
         <div class="flex items-center gap-4 flex-1 justify-end">
           <button
             @click="toggleTheme"
-            class="p-2 rounded-full theme-toggle-btn"
+            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
             :title="isDark ? '切换到亮色模式' : '切换到暗色模式'"
           >
             <svg
               v-if="isDark"
-              class="w-6 h-6"
+              class="w-6 h-6 text-gray-200"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -38,7 +42,7 @@
             </svg>
             <svg
               v-else
-              class="w-6 h-6"
+              class="w-6 h-6 text-gray-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -53,7 +57,7 @@
           </button>
           <button
             @click="fetchFeeds"
-            class="refresh-btn px-3 py-1.5 text-white rounded text-sm"
+            class="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
             :disabled="loading"
           >
             <span v-if="loading">刷新中...</span>
@@ -73,7 +77,7 @@
 
     <!-- 底部版权信息 -->
     <footer class="footer">
-      <div class="text-center text-sm footer-text py-2">
+      <div class="text-center text-sm text-gray-500 footer-text py-2">
         <span>© {{ new Date().getFullYear() }} </span>
         <a
           href="https://github.com/3377/cf-rss"
@@ -191,10 +195,32 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-/* 暗色模式样式 */
-.dark {
-  color: #f3f4f6;
-  background-color: #111827;
+.bg-gray-50 {
+  background-color: #f0f2f5 !important;
+  background-image: linear-gradient(
+      to bottom,
+      rgba(240, 242, 245, 0.8),
+      rgba(240, 242, 245, 0.8)
+    ),
+    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAg
+ICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDA
+gMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2
+U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZ
+mlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
+}
+
+.header {
+  padding: 0.75rem 1rem 0.25rem;
+  flex-shrink: 0;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.bg-gray-50 .header {
+  background-color: rgba(235, 238, 242, 0.85) !important;
+  backdrop-filter: blur(5px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .dark .header {
@@ -202,102 +228,24 @@ onUnmounted(() => {
   background-color: rgba(17, 24, 39, 0.6);
 }
 
-.dark .content-area {
-  background-color: rgba(17, 24, 39, 0.3);
-}
-
-.dark .footer {
-  border-color: #374151;
-  background-color: rgba(17, 24, 39, 0.6);
-}
-
-.dark .header-title {
-  color: #f3f4f6;
-}
-
-.dark .status-text {
-  color: #f3f4f6;
-}
-
-.dark .footer-text {
-  color: #f3f4f6;
-}
-
-.dark .theme-toggle-btn {
-  color: #f3f4f6;
-  background-color: rgba(55, 65, 81, 0.5);
-}
-
-.dark .refresh-btn {
-  background-color: #4ade80;
-}
-
-.dark .refresh-btn:hover {
-  background-color: #34d399;
-}
-
-/* 亮色模式样式 */
-.light-mode {
-  color: #4b5563;
-  background: #f0f2f5;
-  background-image: linear-gradient(
-      to bottom,
-      rgba(240, 242, 245, 0.8),
-      rgba(240, 242, 245, 0.8)
-    ),
-    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
-}
-
-.light-mode .header {
-  background-color: rgba(235, 238, 242, 0.85);
-  backdrop-filter: blur(5px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.light-mode .content-area {
-  background-color: rgba(235, 238, 242, 0.4);
-}
-
-.light-mode .footer {
-  background-color: rgba(235, 238, 242, 0.85);
-  border-top: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.light-mode .header-title {
-  color: #3e4555;
+.bg-gray-50 .header-title {
+  color: #3e4555 !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-.light-mode .status-text {
-  color: #5a6171;
+.bg-gray-50 button:not(.bg-green-500) {
+  background-color: rgba(235, 238, 242, 0.5) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
-.light-mode .footer-text {
-  color: #666f7f;
-}
-
-.light-mode .theme-toggle-btn {
-  color: #5a6171;
-  background-color: rgba(226, 232, 240, 0.8);
-}
-
-.light-mode .refresh-btn {
-  background-color: #4caf50;
+.bg-gray-50 button.bg-green-500 {
+  background-color: #4caf50 !important;
   box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
 }
 
-.light-mode .refresh-btn:hover {
-  background-color: #43a047;
+.bg-gray-50 button.bg-green-500:hover {
+  background-color: #43a047 !important;
   box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3);
-}
-
-/* 共享样式 */
-.header {
-  padding: 0.75rem 1rem 0.25rem;
-  flex-shrink: 0;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .content-area {
@@ -309,6 +257,14 @@ onUnmounted(() => {
   margin-bottom: 0.75rem;
 }
 
+.bg-gray-50 .content-area {
+  background-color: rgba(235, 238, 242, 0.4);
+}
+
+.dark .content-area {
+  background-color: rgba(17, 24, 39, 0.3);
+}
+
 .footer {
   flex-shrink: 0;
   border-top: 1px solid #e5e7eb;
@@ -317,12 +273,13 @@ onUnmounted(() => {
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
 }
 
-.theme-toggle-btn {
-  transition: all 0.2s ease;
+.bg-gray-50 .footer {
+  background-color: rgba(235, 238, 242, 0.85);
 }
 
-.refresh-btn {
-  transition: all 0.2s ease;
+.dark .footer {
+  border-color: #374151;
+  background-color: rgba(17, 24, 39, 0.6);
 }
 
 /* 移除全局滚动条 */
@@ -334,8 +291,62 @@ body {
   height: 100vh;
 }
 
+body {
+  background-color: #f0f2f5 !important;
+  color: #4b5563;
+}
+
+.dark body,
+.dark html {
+  background-color: #111827;
+}
+
 #app {
   height: 100vh;
   overflow: hidden;
+}
+
+.dark {
+  color: #f3f4f6;
+}
+
+.dark .header-title {
+  color: #f3f4f6 !important;
+}
+
+.dark .status-text {
+  color: #f3f4f6 !important;
+}
+
+.dark .footer-text {
+  color: #f3f4f6 !important;
+}
+
+.text-gray-700 {
+  color: #4b5563 !important;
+}
+
+.bg-gray-50 .text-gray-600 {
+  color: #5a6171 !important;
+}
+
+.bg-gray-50 .text-gray-500 {
+  color: #666f7f !important;
+}
+
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --app-background: #f0f2f5;
+    --card-background: rgba(240, 244, 248, 0.75);
+    --card-border: rgba(226, 232, 240, 0.8);
+    --card-header: rgba(236, 240, 244, 0.9);
+    --text-primary: #3e4555;
+    --text-secondary: #5a6171;
+  }
 }
 </style>
