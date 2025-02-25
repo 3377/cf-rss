@@ -52,8 +52,9 @@ html body .app-container.bg-gray-50 .text-gray-500 {
     color: #5a6986 !important;
 }
 
-/* 卡片样式全局覆盖 */
-html body .app-container.bg-gray-50 .feed-card {
+/* 卡片样式全局覆盖 - 使用更高优先级选择器 */
+html body .app-container.bg-gray-50 .feed-card,
+html body:not(.dark) .app-container .feed-card {
     background: rgba(235, 245, 255, 0.85) !important;
     border: 1px solid rgba(210, 230, 250, 0.9) !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
@@ -63,13 +64,15 @@ html body .app-container.bg-gray-50 .feed-card {
     transition: all 0.3s ease !important;
 }
 
-html body .app-container.bg-gray-50 .feed-card:hover {
+html body .app-container.bg-gray-50 .feed-card:hover,
+html body:not(.dark) .app-container .feed-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     background: rgba(240, 248, 255, 0.9) !important;
 }
 
-html body .app-container.bg-gray-50 .card-header {
+html body .app-container.bg-gray-50 .card-header,
+html body:not(.dark) .app-container .card-header {
     background-color: rgba(225, 240, 255, 0.9) !important;
     border-bottom: 1px solid rgba(210, 230, 250, 0.9) !important;
 }
@@ -78,11 +81,13 @@ html body .app-container.bg-gray-50 .card-title {
     color: #2d3748 !important;
 }
 
-html body .app-container.bg-gray-50 .card-content {
+html body .app-container.bg-gray-50 .card-content,
+html body:not(.dark) .app-container .card-content {
     background-color: rgba(230, 245, 255, 0.5) !important;
 }
 
-html body .app-container.bg-gray-50 .item-link:hover {
+html body .app-container.bg-gray-50 .item-link:hover,
+html body:not(.dark) .app-container .item-link:hover {
     background: rgba(225, 240, 255, 0.8) !important;
 }
 

@@ -3,32 +3,32 @@
 @tailwind utilities;
 
 /* 全局卡片样式覆盖 */
-:root .feed-card {
+html body:not(.dark) .feed-card {
     background: rgba(235, 245, 255, 0.85) !important;
     border: 1px solid rgba(210, 230, 250, 0.9) !important;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
-:root .card-header {
+html body:not(.dark) .card-header {
     background-color: rgba(225, 240, 255, 0.9) !important;
     border-bottom: 1px solid rgba(210, 230, 250, 0.9) !important;
 }
 
-:root .card-content {
+html body:not(.dark) .card-content {
     background-color: rgba(230, 245, 255, 0.5) !important;
 }
 
 /* 暗色模式覆盖 */
-:root.dark .feed-card {
+html body.dark .feed-card {
     background: rgba(31, 41, 55, 0.9) !important;
     border-color: rgba(55, 65, 81, 0.5) !important;
 }
 
-:root.dark .card-header {
+html body.dark .card-header {
     background-color: rgba(31, 41, 55, 0.7) !important;
     border-color: #374151 !important;
 }
 
-:root.dark .card-content {
+html body.dark .card-content {
     background-color: rgba(31, 41, 55, 1) !important;
 }

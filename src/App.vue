@@ -135,11 +135,13 @@ const toggleTheme = () => {
   isDark.value = !isDark.value;
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
 
-  // 更新根元素类名，确保全局样式正确应用
+  // 更新根元素和body类名，确保全局样式正确应用
   if (isDark.value) {
     document.documentElement.classList.add("dark");
+    document.body.classList.add("dark");
   } else {
     document.documentElement.classList.remove("dark");
+    document.body.classList.remove("dark");
   }
 };
 
@@ -180,8 +182,10 @@ onMounted(async () => {
   // 初始化时设置正确的主题类
   if (isDark.value) {
     document.documentElement.classList.add("dark");
+    document.body.classList.add("dark");
   } else {
     document.documentElement.classList.remove("dark");
+    document.body.classList.remove("dark");
   }
 
   await fetchFeeds();
@@ -205,38 +209,38 @@ onUnmounted(() => {
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background-size: 60px 60px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 15L60 15M15 0L15 60M0 30L60 30M30 0L30 60M0 45L60 45M45 0L45 60' stroke='%23f1f5f9' stroke-width='1'/%3E%3C/svg%3E");
+  height: 100vh;
   overflow: hidden;
 }
 
-.app-container.bg-gray-50 {
-  background-color: #f8fafc !important;
+/* 亮色模式样式 - 更高优先级 */
+html body .app-container.bg-gray-50 {
+  background-color: #f5f7fa !important;
   background-image: linear-gradient(
       to bottom,
-      rgba(248, 250, 252, 0.85),
-      rgba(248, 250, 252, 0.95)
+      rgba(245, 247, 250, 0.8),
+      rgba(245, 247, 250, 0.8)
     ),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 15L60 15M15 0L15 60M0 30L60 30M30 0L30 60M0 45L60 45M45 0L45 60' stroke='%23e5e7eb' stroke-width='1'/%3E%3C/svg%3E") !important;
+    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
 }
 
-.app-container.dark {
+.dark.app-container {
   background-color: #111827 !important;
   background-image: linear-gradient(
       to bottom,
-      rgba(17, 24, 39, 0.85),
-      rgba(17, 24, 39, 0.95)
+      rgba(17, 24, 39, 0.8),
+      rgba(17, 24, 39, 0.8)
     ),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 15L60 15M15 0L15 60M0 30L60 30M30 0L30 60M0 45L60 45M45 0L45 60' stroke='%23374151' stroke-width='1'/%3E%3C/svg%3E") !important;
+    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzM3NDE1MSIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
 }
 
 .header {
-  padding: 0.75rem 1rem 0.25rem;
-  flex-shrink: 0;
+  padding: 0.75rem 1rem 0.5rem;
   border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
 html body .app-container.bg-gray-50 .header {
@@ -250,14 +254,36 @@ html body .app-container.bg-gray-50 .header {
   background-color: rgba(17, 24, 39, 0.6);
 }
 
+.header-title {
+  color: #4b5563;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
 html body .app-container.bg-gray-50 .header-title {
   color: #2d3748 !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
+button {
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  background-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
 html body .app-container.bg-gray-50 button:not(.bg-green-500) {
   background-color: rgba(240, 242, 247, 0.6) !important;
   border: 1px solid rgba(230, 235, 242, 0.8) !important;
+}
+
+.dark button {
+  border-color: #374151;
+  background-color: rgba(31, 41, 55, 0.4);
+}
+
+button.bg-green-500 {
+  background-color: #10b981;
 }
 
 html body .app-container.bg-gray-50 button.bg-green-500 {

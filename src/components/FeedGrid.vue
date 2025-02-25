@@ -1,16 +1,45 @@
 <template>
   <div class="feed-container">
     <div class="feed-grid" :style="gridStyle">
-      <div v-for="feed in feeds" :key="feed.url" class="feed-card">
+      <div
+        v-for="feed in feeds"
+        :key="feed.url"
+        class="feed-card"
+        :style="
+          !isDark
+            ? {
+                background: 'rgba(235, 245, 255, 0.85)',
+                border: '1px solid rgba(210, 230, 250, 0.9)',
+                boxShadow:
+                  '0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
+              }
+            : {}
+        "
+      >
         <!-- 标题区域 -->
-        <div class="card-header">
+        <div
+          class="card-header"
+          :style="
+            !isDark
+              ? {
+                  backgroundColor: 'rgba(225, 240, 255, 0.9)',
+                  borderBottom: '1px solid rgba(210, 230, 250, 0.9)',
+                }
+              : {}
+          "
+        >
           <h2 class="card-title">
             {{ feed.title }}
           </h2>
         </div>
 
         <!-- 内容区域 -->
-        <div class="card-content">
+        <div
+          class="card-content"
+          :style="
+            !isDark ? { backgroundColor: 'rgba(230, 245, 255, 0.5)' } : {}
+          "
+        >
           <div v-if="feed.error" class="error-message">
             {{ feed.error }}
           </div>
@@ -188,11 +217,16 @@ const fontSize = computed(() => {
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
   border-radius: 0.75rem;
-  background: rgba(235, 245, 255, 0.85);
-  border: 1px solid rgba(210, 230, 250, 0.9);
+  background: rgba(235, 245, 255, 0.85) !important;
+  border: 1px solid rgba(210, 230, 250, 0.9) !important;
 }
 
-html body .app-container:not(.dark) .feed-card {
+/* 使用极高优先级选择器 */
+body:not(.dark) .feed-card,
+html:not(.dark) .feed-card,
+:root:not(.dark) .feed-card,
+body:not(.dark) .app-container .feed-card,
+html .app-container:not(.dark) .feed-card {
   background: rgba(235, 245, 255, 0.85) !important;
   border: 1px solid rgba(210, 230, 250, 0.9) !important;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
@@ -210,14 +244,14 @@ html body .app-container:not(.dark) .feed-card {
   border-bottom: 1px solid rgba(210, 230, 250, 0.9);
 }
 
-html body .app-container:not(.dark) .card-header {
+/* 使用极高优先级选择器 */
+body:not(.dark) .card-header,
+html:not(.dark) .card-header,
+:root:not(.dark) .card-header,
+body:not(.dark) .app-container .card-header,
+html .app-container:not(.dark) .card-header {
   background-color: rgba(225, 240, 255, 0.9) !important;
   border-bottom: 1px solid rgba(210, 230, 250, 0.9) !important;
-}
-
-.dark .card-header {
-  border-color: #374151;
-  background-color: rgba(31, 41, 55, 0.7);
 }
 
 .card-title {
@@ -532,5 +566,31 @@ html body .app-container:not(.dark) .title-tooltip {
   html body .app-container:not(.dark) .feed-card {
     background: rgba(235, 238, 242, 0.9) !important;
   }
+}
+
+.dark .card-header {
+  border-color: #374151;
+  background-color: rgba(31, 41, 55, 0.7);
+}
+
+/* 暗色模式下的内容区域 */
+.card-content {
+  flex: 1;
+  padding: 0.5rem 0;
+  overflow-y: auto;
+  background-color: rgba(230, 245, 255, 0.5);
+}
+
+/* 使用极高优先级选择器 */
+body:not(.dark) .card-content,
+html:not(.dark) .card-content,
+:root:not(.dark) .card-content,
+body:not(.dark) .app-container .card-content,
+html .app-container:not(.dark) .card-content {
+  background-color: rgba(230, 245, 255, 0.5) !important;
+}
+
+.dark .card-content {
+  background-color: rgba(31, 41, 55, 1);
 }
 </style>
