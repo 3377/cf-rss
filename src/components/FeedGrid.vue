@@ -1,49 +1,16 @@
 <template>
   <div class="feed-container">
     <div class="feed-grid" :style="gridStyle">
-      <div
-        v-for="feed in feeds"
-        :key="feed.url"
-        class="feed-card"
-        :style="{
-          background: isDark
-            ? 'rgba(31, 41, 55, 0.9)'
-            : 'rgba(235, 245, 255, 0.85)',
-          border: isDark
-            ? '1px solid rgba(55, 65, 81, 0.5)'
-            : '1px solid rgba(210, 230, 250, 0.9)',
-          boxShadow: isDark
-            ? 'none'
-            : '0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
-        }"
-      >
+      <div v-for="feed in feeds" :key="feed.url" class="feed-card">
         <!-- 标题区域 -->
-        <div
-          class="card-header"
-          :style="{
-            backgroundColor: isDark
-              ? 'rgba(31, 41, 55, 0.7)'
-              : 'rgba(225, 240, 255, 0.9)',
-            borderBottom: isDark
-              ? '1px solid #374151'
-              : '1px solid rgba(210, 230, 250, 0.9)',
-          }"
-        >
+        <div class="card-header">
           <h2 class="card-title">
             {{ feed.title }}
           </h2>
         </div>
 
         <!-- 内容区域 -->
-        <div
-          class="card-content"
-          :style="{
-            backgroundColor: isDark
-              ? 'rgba(31, 41, 55, 1)'
-              : 'rgba(230, 245, 255, 0.5)',
-            paddingBottom: '1rem',
-          }"
-        >
+        <div class="card-content">
           <div v-if="feed.error" class="error-message">
             {{ feed.error }}
           </div>
@@ -66,16 +33,12 @@
                 class="item-link"
                 @mouseenter="showTooltip($event, item.title, item.pubDate)"
                 @mouseleave="hideTooltip"
-                :style="{
-                  marginBottom: '4px',
-                }"
               >
                 <h3
                   class="item-title"
                   :style="{
                     fontSize: `${fontSize}px`,
                     paddingRight: showItemDate ? '4rem' : '0.5rem',
-                    color: isDark ? '#f3f4f6' : '#2d3748',
                   }"
                 >
                   {{ item.title }}
@@ -97,13 +60,6 @@
       :style="{
         top: tooltipPosition.top + 'px',
         left: tooltipPosition.left + 'px',
-        backgroundColor: isDark
-          ? 'rgba(31, 41, 55, 0.95)'
-          : 'rgba(235, 245, 255, 0.95)',
-        color: isDark ? '#f3f4f6' : '#2d3748',
-        border: isDark
-          ? '1px solid rgba(55, 65, 81, 0.8)'
-          : '1px solid rgba(210, 230, 250, 0.9)',
       }"
     >
       {{ tooltipText }}
@@ -230,53 +186,34 @@ const fontSize = computed(() => {
   overflow: hidden;
   backdrop-filter: blur(5px);
   transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07);
   border-radius: 0.75rem;
 }
 
-/* 亮色模式高优先级选择器 */
-body:not(.dark) .feed-card,
-html:not(.dark) .feed-card,
-:root:not(.dark) .feed-card,
-body:not(.dark) .app-container .feed-card,
-html:not(.dark) .app-container .feed-card {
-  background: rgba(235, 245, 255, 0.85) !important;
-  border: 1px solid rgba(210, 230, 250, 0.9) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+html body .app-container:not(.dark) .feed-card {
+  background: rgba(245, 247, 250, 0.75) !important;
+  border: 1px solid rgba(230, 235, 242, 0.8) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
 }
 
-/* 暗色模式高优先级选择器 */
-body.dark .feed-card,
-html.dark .feed-card,
-:root.dark .feed-card,
-body.dark .app-container .feed-card,
-html.dark .app-container .feed-card {
-  background: rgba(31, 41, 55, 0.9) !important;
-  border: 1px solid rgba(55, 65, 81, 0.5) !important;
-  box-shadow: none !important;
+.dark .feed-card {
+  background: rgba(31, 41, 55, 0.9);
+  border-color: rgba(55, 65, 81, 0.5);
 }
 
 .card-header {
   padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-/* 亮色模式卡片头部 */
-body:not(.dark) .card-header,
-html:not(.dark) .card-header,
-:root:not(.dark) .card-header,
-body:not(.dark) .app-container .card-header,
-html:not(.dark) .app-container .card-header {
-  background-color: rgba(225, 240, 255, 0.9) !important;
-  border-bottom: 1px solid rgba(210, 230, 250, 0.9) !important;
+html body .app-container:not(.dark) .card-header {
+  background-color: rgba(240, 242, 247, 0.9) !important;
+  border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
 }
 
-/* 暗色模式卡片头部 */
-body.dark .card-header,
-html.dark .card-header,
-:root.dark .card-header,
-body.dark .app-container .card-header,
-html.dark .app-container .card-header {
-  background-color: rgba(31, 41, 55, 0.7) !important;
-  border-bottom: 1px solid #374151 !important;
+.dark .card-header {
+  border-color: #374151;
+  background-color: rgba(31, 41, 55, 0.7);
 }
 
 .card-title {
@@ -285,22 +222,12 @@ html.dark .app-container .card-header {
   text-align: center;
 }
 
-/* 亮色模式标题颜色 */
-body:not(.dark) .card-title,
-html:not(.dark) .card-title,
-:root:not(.dark) .card-title,
-body:not(.dark) .app-container .card-title,
-html:not(.dark) .app-container .card-title {
+html body .app-container:not(.dark) .card-title {
   color: #2d3748 !important;
 }
 
-/* 暗色模式标题颜色 */
-body.dark .card-title,
-html.dark .card-title,
-:root.dark .card-title,
-body.dark .app-container .card-title,
-html.dark .app-container .card-title {
-  color: #f3f4f6 !important;
+.dark .card-title {
+  color: #f3f4f6;
 }
 
 .card-content {
@@ -309,22 +236,12 @@ html.dark .app-container .card-title {
   overflow-y: auto;
 }
 
-/* 亮色模式内容区域 */
-body:not(.dark) .card-content,
-html:not(.dark) .card-content,
-:root:not(.dark) .card-content,
-body:not(.dark) .app-container .card-content,
-html:not(.dark) .app-container .card-content {
-  background-color: rgba(230, 245, 255, 0.5) !important;
+html body .app-container:not(.dark) .card-content {
+  background-color: rgba(240, 242, 247, 0.5) !important;
 }
 
-/* 暗色模式内容区域 */
-body.dark .card-content,
-html.dark .card-content,
-:root.dark .card-content,
-body.dark .app-container .card-content,
-html.dark .app-container .card-content {
-  background-color: rgba(31, 41, 55, 1) !important;
+.dark .card-content {
+  background-color: rgba(31, 41, 55, 1);
 }
 
 .items-list {
@@ -349,22 +266,12 @@ html.dark .app-container .card-content {
   position: relative;
 }
 
-/* 亮色模式链接悬停效果 */
-body:not(.dark) .item-link:hover,
-html:not(.dark) .item-link:hover,
-:root:not(.dark) .item-link:hover,
-body:not(.dark) .app-container .item-link:hover,
-html:not(.dark) .app-container .item-link:hover {
-  background: rgba(225, 240, 255, 0.8) !important;
+html body .app-container:not(.dark) .item-link:hover {
+  background: rgba(240, 242, 247, 0.8) !important;
 }
 
-/* 暗色模式链接悬停效果 */
-body.dark .item-link:hover,
-html.dark .item-link:hover,
-:root.dark .item-link:hover,
-body.dark .app-container .item-link:hover,
-html.dark .app-container .item-link:hover {
-  background: rgba(55, 65, 81, 0.7) !important;
+.dark .item-link:hover {
+  background: rgba(55, 65, 81, 0.7);
 }
 
 .item-title {
@@ -377,40 +284,20 @@ html.dark .app-container .item-link:hover {
   max-width: 100%;
 }
 
-/* 亮色模式文本颜色 */
-body:not(.dark) .item-title,
-html:not(.dark) .item-title,
-:root:not(.dark) .item-title,
-body:not(.dark) .app-container .item-title,
-html:not(.dark) .app-container .item-title {
+html body .app-container:not(.dark) .item-title {
   color: #2d3748 !important;
 }
 
-/* 暗色模式文本颜色 */
-body.dark .item-title,
-html.dark .item-title,
-:root.dark .item-title,
-body.dark .app-container .item-title,
-html.dark .app-container .item-title {
-  color: #f3f4f6 !important;
+.dark .item-title {
+  color: #f3f4f6;
 }
 
-/* 亮色模式链接悬停标题颜色 */
-body:not(.dark) .item-link:hover .item-title,
-html:not(.dark) .item-link:hover .item-title,
-:root:not(.dark) .item-link:hover .item-title,
-body:not(.dark) .app-container .item-link:hover .item-title,
-html:not(.dark) .app-container .item-link:hover .item-title {
-  color: #3b82f6 !important;
+html body .app-container:not(.dark) .item-link:hover .item-title {
+  color: #3182ce !important;
 }
 
-/* 暗色模式链接悬停标题颜色 */
-body.dark .item-link:hover .item-title,
-html.dark .item-link:hover .item-title,
-:root.dark .item-link:hover .item-title,
-body.dark .app-container .item-link:hover .item-title,
-html.dark .app-container .item-link:hover .item-title {
-  color: #3b82f6 !important;
+.dark .item-link:hover .item-title {
+  color: #3b82f6;
 }
 
 .item-date {
@@ -429,11 +316,11 @@ html.dark .app-container .item-link:hover .item-title {
 
 html body .app-container:not(.dark) .item-date {
   color: #5a6171 !important;
-  background: rgba(230, 245, 255, 0.9) !important;
+  background: rgba(240, 244, 248, 0.9) !important;
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(225, 240, 255, 0.95) !important;
+  background: rgba(236, 240, 244, 0.95) !important;
 }
 
 .dark .item-date {
@@ -522,6 +409,7 @@ html body .app-container:not(.dark) .title-tooltip {
     width: 100%;
     padding: 0.5rem;
     height: calc(100vh - 7rem);
+    overflow-y: auto;
   }
 
   .feed-card {
@@ -579,19 +467,6 @@ html body .app-container:not(.dark) .title-tooltip {
     font-size: 0.8rem;
     line-height: 1.3;
   }
-
-  html body .app-container:not(.dark) .feed-card {
-    background: rgba(235, 245, 255, 0.85) !important;
-    border: 1px solid rgba(210, 230, 250, 0.9) !important;
-  }
-
-  html body .app-container:not(.dark) .item-link:active {
-    background: rgba(220, 238, 255, 0.9) !important;
-  }
-
-  html body .app-container:not(.dark) .item-link:active .item-title {
-    color: #3b82f6 !important;
-  }
 }
 
 /* 适配中等屏幕 */
@@ -635,35 +510,5 @@ html body .app-container:not(.dark) .title-tooltip {
   .card-content::-webkit-scrollbar {
     width: 3px;
   }
-
-  html body .app-container:not(.dark) .feed-card {
-    background: rgba(235, 238, 242, 0.9) !important;
-  }
-}
-
-.dark .card-header {
-  border-color: #374151;
-  background-color: rgba(31, 41, 55, 0.7);
-}
-
-/* 暗色模式下的内容区域 */
-.card-content {
-  flex: 1;
-  padding: 0.5rem 0;
-  overflow-y: auto;
-  background-color: rgba(230, 245, 255, 0.5);
-}
-
-/* 使用极高优先级选择器 */
-body:not(.dark) .card-content,
-html:not(.dark) .card-content,
-:root:not(.dark) .card-content,
-body:not(.dark) .app-container .card-content,
-html .app-container:not(.dark) .card-content {
-  background-color: rgba(230, 245, 255, 0.5) !important;
-}
-
-.dark .card-content {
-  background-color: rgba(31, 41, 55, 1);
 }
 </style>

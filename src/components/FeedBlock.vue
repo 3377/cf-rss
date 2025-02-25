@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-4">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
     <div class="border-b pb-2 mb-3">
       <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
         {{ feed.title }}
@@ -20,7 +20,7 @@
         v-else
         v-for="(item, index) in feed.items"
         :key="item.id"
-        class="text-sm hover:bg-blue-50 dark:hover:bg-gray-700 p-1 rounded"
+        class="text-sm hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded"
       >
         <span class="text-gray-500 mr-2">{{ index + 1 }}.</span>
         <a
@@ -64,24 +64,5 @@ const formatDate = (dateStr) => {
 <style scoped>
 .hover\:bg-gray-50:hover {
   transition: background-color 0.2s;
-}
-
-.hover\:bg-blue-50:hover {
-  background-color: rgba(235, 245, 255, 0.8) !important;
-  transition: background-color 0.2s;
-}
-
-/* 亮色模式下的卡片灰度背景样式 */
-.bg-gray-50 {
-  background-color: rgba(235, 245, 255, 0.85) !important;
-  border: 1px solid rgba(210, 230, 250, 0.9) !important;
-}
-
-/* 卡片悬停效果增强 */
-@media (hover: hover) {
-  .bg-gray-50:hover {
-    background-color: rgba(240, 248, 255, 0.9) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
-  }
 }
 </style>
