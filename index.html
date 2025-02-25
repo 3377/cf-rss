@@ -1,108 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/rss.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      name="theme-color"
+      content="#f5f7fa"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#111827"
+      media="(prefers-color-scheme: dark)"
+    />
+    <meta
+      name="description"
+      content="RSS阅读器 - 简洁、高效的在线RSS订阅工具"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="format-detection" content="telephone=no" />
     <title>RSS Reader</title>
-    <style>
-      /* 直接在根HTML文件中添加亮色模式样式 - 确保不影响暗色模式 */
-      html:not(.dark),
-      body:not(.dark) {
-        background-color: #f5f7fa !important;
-        color: #2d3748 !important;
-      }
-
-      #app div:not(.dark) {
-        background-color: #f5f7fa !important;
-        color: #2d3748 !important;
-        background-image: linear-gradient(
-            to bottom,
-            rgba(245, 247, 250, 0.8),
-            rgba(245, 247, 250, 0.8)
-          ),
-          url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
-      }
-
-      /* 暗色模式专用样式，确保暗色模式正常 */
-      #app div.dark,
-      .dark {
-        background-color: #1a202c !important;
-        color: #f7fafc !important;
-      }
-
-      /* 亮色模式其他元素样式 */
-      #app div:not(.dark) .header {
-        background-color: rgba(240, 242, 247, 0.9) !important;
-        backdrop-filter: blur(5px) !important;
-        border-bottom: 1px solid rgba(230, 235, 242, 0.8) !important;
-      }
-
-      #app div:not(.dark) .header-title {
-        color: #2d3748 !important;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
-      }
-
-      #app div:not(.dark) button:not(.bg-green-500) {
-        background-color: rgba(240, 242, 247, 0.6) !important;
-        border: 1px solid rgba(230, 235, 242, 0.8) !important;
-      }
-
-      #app div:not(.dark) button.bg-green-500 {
-        background-color: #4caf50 !important;
-        box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
-      }
-
-      #app div:not(.dark) .content-area {
-        background-color: rgba(240, 242, 247, 0.4) !important;
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
-      }
-
-      #app div:not(.dark) .footer {
-        background-color: rgba(240, 242, 247, 0.85) !important;
-        border-top: 1px solid rgba(230, 235, 242, 0.8) !important;
-      }
-
-      #app div:not(.dark) .feed-card {
-        background: rgba(245, 247, 250, 0.75) !important;
-        border: 1px solid rgba(230, 235, 242, 0.8) !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
-      }
-
-      #app div:not(.dark) .card-header {
-        background-color: rgba(240, 242, 247, 0.9) !important;
-        border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
-      }
-
-      #app div:not(.dark) .card-title {
-        color: #2d3748 !important;
-      }
-
-      #app div:not(.dark) .card-content {
-        background-color: rgba(240, 242, 247, 0.5) !important;
-      }
-
-      #app div:not(.dark) .item-title {
-        color: #2d3748 !important;
-      }
-
-      #app div:not(.dark) .text-gray-700,
-      #app div:not(.dark) h1,
-      #app div:not(.dark) h2,
-      #app div:not(.dark) h3 {
-        color: #2d3748 !important;
-      }
-
-      #app div:not(.dark) .text-gray-600,
-      #app div:not(.dark) .status-text {
-        color: #4a5568 !important;
-      }
-
-      #app div:not(.dark) .text-gray-500,
-      #app div:not(.dark) .footer-text {
-        color: #5a6986 !important;
-      }
-    </style>
   </head>
   <body>
     <div id="app"></div>

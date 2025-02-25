@@ -190,8 +190,7 @@ const fontSize = computed(() => {
   border-radius: 0.75rem;
 }
 
-/* 高优先级选择器 - 针对非暗色模式 */
-html body #app div:not(.dark) .feed-card {
+html body .app-container:not(.dark) .feed-card {
   background: rgba(245, 247, 250, 0.75) !important;
   border: 1px solid rgba(230, 235, 242, 0.8) !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
@@ -207,7 +206,7 @@ html body #app div:not(.dark) .feed-card {
   border-bottom: 1px solid #e5e7eb;
 }
 
-html body #app div:not(.dark) .card-header {
+html body .app-container:not(.dark) .card-header {
   background-color: rgba(240, 242, 247, 0.9) !important;
   border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
 }
@@ -223,7 +222,7 @@ html body #app div:not(.dark) .card-header {
   text-align: center;
 }
 
-html body #app div:not(.dark) .card-title {
+html body .app-container:not(.dark) .card-title {
   color: #2d3748 !important;
 }
 
@@ -237,7 +236,7 @@ html body #app div:not(.dark) .card-title {
   overflow-y: auto;
 }
 
-html body #app div:not(.dark) .card-content {
+html body .app-container:not(.dark) .card-content {
   background-color: rgba(240, 242, 247, 0.5) !important;
 }
 
@@ -267,7 +266,7 @@ html body #app div:not(.dark) .card-content {
   position: relative;
 }
 
-html body #app div:not(.dark) .item-link:hover {
+html body .app-container:not(.dark) .item-link:hover {
   background: rgba(240, 242, 247, 0.8) !important;
 }
 
@@ -285,7 +284,7 @@ html body #app div:not(.dark) .item-link:hover {
   max-width: 100%;
 }
 
-html body #app div:not(.dark) .item-title {
+html body .app-container:not(.dark) .item-title {
   color: #2d3748 !important;
 }
 
@@ -293,7 +292,7 @@ html body #app div:not(.dark) .item-title {
   color: #f3f4f6;
 }
 
-html body #app div:not(.dark) .item-link:hover .item-title {
+html body .app-container:not(.dark) .item-link:hover .item-title {
   color: #3182ce !important;
 }
 
@@ -315,12 +314,12 @@ html body #app div:not(.dark) .item-link:hover .item-title {
   white-space: nowrap;
 }
 
-html body #app div:not(.dark) .item-date {
+html body .app-container:not(.dark) .item-date {
   color: #5a6171 !important;
   background: rgba(240, 244, 248, 0.9) !important;
 }
 
-html body #app div:not(.dark) .item-link:hover .item-date {
+html body .app-container:not(.dark) .item-link:hover .item-date {
   background: rgba(236, 240, 244, 0.95) !important;
 }
 
@@ -343,7 +342,7 @@ html body #app div:not(.dark) .item-link:hover .item-date {
   padding: 1rem;
 }
 
-html body #app div:not(.dark) .empty-message {
+html body .app-container:not(.dark) .empty-message {
   color: #5a6171 !important;
 }
 
@@ -367,7 +366,7 @@ html body #app div:not(.dark) .empty-message {
   text-align: left;
 }
 
-html body #app div:not(.dark) .title-tooltip {
+html body .app-container:not(.dark) .title-tooltip {
   background: rgba(245, 247, 250, 0.95) !important;
   color: #2d3748 !important;
   border: 1px solid rgba(230, 235, 242, 0.8) !important;
@@ -406,18 +405,67 @@ html body #app div:not(.dark) .title-tooltip {
 @media (max-width: 768px) {
   .feed-grid {
     grid-template-columns: 1fr !important;
-    gap: 1.5rem;
+    gap: 1rem;
     width: 100%;
     padding: 0.5rem;
-    height: calc(100vh - 1rem);
+    height: calc(100vh - 7rem);
+    overflow-y: auto;
   }
 
   .feed-card {
-    height: 100%;
+    height: auto;
+    min-height: 300px;
+    max-height: 90vh;
+    margin-bottom: 1rem;
+  }
+
+  .card-header {
+    padding: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    line-height: 1.4;
   }
 
   .card-content {
-    max-height: calc(100vh - 10rem);
+    padding: 0.25rem 0;
+    max-height: none;
+    overflow-y: auto;
+  }
+
+  .item-link {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .item-title {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    padding-right: 0 !important;
+  }
+
+  .item-date {
+    position: relative;
+    display: block;
+    right: auto;
+    top: auto;
+    transform: none;
+    margin-top: 0.3rem;
+    font-size: 0.7rem;
+    opacity: 0.8;
+    padding: 0.15rem 0.3rem;
+  }
+
+  /* 优化标题提示框在移动端的展示 */
+  .title-tooltip {
+    max-width: 94%;
+    left: 3% !important;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    line-height: 1.3;
   }
 }
 
@@ -425,7 +473,42 @@ html body #app div:not(.dark) .title-tooltip {
 @media (min-width: 769px) and (max-width: 1200px) {
   .feed-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 2rem;
+    gap: 1.5rem;
+  }
+}
+
+/* 优化小型移动设备 */
+@media (max-width: 480px) {
+  .feed-container {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .feed-grid {
+    gap: 0.75rem;
+    padding: 0.25rem;
+    height: calc(100vh - 6.5rem);
+  }
+
+  .feed-card {
+    min-height: 250px;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-header {
+    padding: 0.6rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .item-link {
+    padding: 0.5rem 0.6rem;
+  }
+
+  /* 改进小屏幕上的滚动条 */
+  .card-content::-webkit-scrollbar {
+    width: 3px;
   }
 }
 </style>

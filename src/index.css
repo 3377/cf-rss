@@ -1,12 +1,5 @@
-/* 强制覆盖类 - 确保亮色模式样式优先级最高，但不影响暗色模式 */
-body:not(.dark) {
-    background-color: #f5f7fa !important;
-    color: #2d3748 !important;
-}
-
-.bg-gray-50:not(.dark),
-#app div.bg-gray-50:not(.dark),
-#app .bg-gray-50:not(.dark) {
+/* 全局亮色模式样式覆盖 */
+html body .app-container.bg-gray-50 {
     background-color: #f5f7fa !important;
     background-image: linear-gradient(to bottom,
             rgba(245, 247, 250, 0.8),
@@ -14,124 +7,153 @@ body:not(.dark) {
         url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
 }
 
-/* 直接针对根元素应用样式，分别设置亮色和暗色模式 */
-:root {
-    color-scheme: light;
-    --app-background: #f5f7fa;
-    --card-background: rgba(245, 247, 250, 0.75);
-    --card-border: rgba(230, 235, 242, 0.8);
-    --card-header: rgba(240, 242, 247, 0.9);
-    --text-primary: #2d3748;
-    --text-secondary: #4a5568;
-}
-
-:root.dark {
-    color-scheme: dark;
-    --app-background: #1a202c;
-    --card-background: rgba(26, 32, 44, 0.75);
-    --card-border: rgba(45, 55, 72, 0.8);
-    --card-header: rgba(26, 32, 44, 0.9);
-    --text-primary: #f7fafc;
-    --text-secondary: #e2e8f0;
-}
-
-/* 直接设置html和body元素 */
-html,
-body {
-    background-color: #f5f7fa !important;
-}
-
-/* 亮色模式强制覆盖 */
-#app div:not(.dark) {
-    background-color: #f5f7fa !important;
-    color: #2d3748 !important;
-    background-image: linear-gradient(to bottom,
-            rgba(245, 247, 250, 0.8),
-            rgba(245, 247, 250, 0.8)),
-        url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
-}
-
-#app div:not(.dark) .header {
+html body .app-container.bg-gray-50 .header {
     background-color: rgba(240, 242, 247, 0.9) !important;
     backdrop-filter: blur(5px) !important;
     border-bottom: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
-#app div:not(.dark) .header-title {
+html body .app-container.bg-gray-50 .header-title {
     color: #2d3748 !important;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
-#app div:not(.dark) button:not(.bg-green-500) {
+html body .app-container.bg-gray-50 button:not(.bg-green-500) {
     background-color: rgba(240, 242, 247, 0.6) !important;
     border: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
-#app div:not(.dark) button.bg-green-500 {
+html body .app-container.bg-gray-50 button.bg-green-500 {
     background-color: #4caf50 !important;
     box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
 }
 
-#app div:not(.dark) button.bg-green-500:hover {
+html body .app-container.bg-gray-50 button.bg-green-500:hover {
     background-color: #43a047 !important;
     box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3) !important;
 }
 
-#app div:not(.dark) .content-area {
+html body .app-container.bg-gray-50 .content-area {
     background-color: rgba(240, 242, 247, 0.4) !important;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
 
-#app div:not(.dark) .footer {
+html body .app-container.bg-gray-50 .footer {
     background-color: rgba(240, 242, 247, 0.85) !important;
     border-top: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
-/* 直接针对内容元素 */
-#app div:not(.dark) .feed-card {
+html body .app-container.bg-gray-50 .text-gray-600 {
+    color: #4a5568 !important;
+}
+
+html body .app-container.bg-gray-50 .text-gray-500 {
+    color: #5a6986 !important;
+}
+
+/* 卡片样式全局覆盖 */
+html body .app-container.bg-gray-50 .feed-card {
     background: rgba(245, 247, 250, 0.75) !important;
     border: 1px solid rgba(230, 235, 242, 0.8) !important;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
 }
 
-#app div:not(.dark) .card-header {
+html body .app-container.bg-gray-50 .card-header {
     background-color: rgba(240, 242, 247, 0.9) !important;
     border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
 }
 
-#app div:not(.dark) .card-title {
+html body .app-container.bg-gray-50 .card-title {
     color: #2d3748 !important;
 }
 
-#app div:not(.dark) .card-content {
+html body .app-container.bg-gray-50 .card-content {
     background-color: rgba(240, 242, 247, 0.5) !important;
 }
 
-#app div:not(.dark) .item-link:hover {
+html body .app-container.bg-gray-50 .item-link:hover {
     background: rgba(240, 242, 247, 0.8) !important;
 }
 
-#app div:not(.dark) .item-title {
+html body .app-container.bg-gray-50 .item-title {
     color: #2d3748 !important;
 }
 
-#app div:not(.dark) .item-link:hover .item-title {
+html body .app-container.bg-gray-50 .item-link:hover .item-title {
     color: #3182ce !important;
 }
 
-#app div:not(.dark) .text-gray-700,
-#app div:not(.dark) h1,
-#app div:not(.dark) h2,
-#app div:not(.dark) h3 {
+html body .app-container.bg-gray-50 .item-date {
+    color: #5a6171 !important;
+    background: rgba(240, 244, 248, 0.9) !important;
+}
+
+html body .app-container.bg-gray-50 .item-link:hover .item-date {
+    background: rgba(236, 240, 244, 0.95) !important;
+}
+
+html body .app-container.bg-gray-50 .empty-message {
+    color: #5a6171 !important;
+}
+
+html body .app-container.bg-gray-50 .title-tooltip {
+    background: rgba(245, 247, 250, 0.95) !important;
+    color: #2d3748 !important;
+    border: 1px solid rgba(230, 235, 242, 0.8) !important;
+}
+
+/* 确保body在亮色模式下也有正确的背景 */
+body:not(.dark) {
+    background-color: #f5f7fa !important;
     color: #2d3748 !important;
 }
 
-#app div:not(.dark) .text-gray-600,
-#app div:not(.dark) .status-text {
-    color: #4a5568 !important;
+/* 移动端全局优化 */
+@media (max-width: 768px) {
+    html body .app-container.bg-gray-50 .feed-card {
+        background: rgba(245, 247, 250, 0.85) !important;
+    }
+
+    html body .app-container.bg-gray-50 .header {
+        backdrop-filter: blur(7px) !important;
+    }
+
+    /* 改善移动端触摸体验 */
+    html body .app-container button {
+        min-height: 2.5rem;
+        min-width: 2.5rem;
+    }
+
+    html body .app-container.bg-gray-50 .item-link:active {
+        background: rgba(235, 240, 245, 0.9) !important;
+    }
+
+    html body .app-container.bg-gray-50 .item-link:active .item-title {
+        color: #3182ce !important;
+    }
 }
 
-#app div:not(.dark) .text-gray-500,
-#app div:not(.dark) .footer-text {
-    color: #5a6986 !important;
+/* 小型移动设备优化 */
+@media (max-width: 480px) {
+    html body .app-container.bg-gray-50 {
+        background-image: linear-gradient(to bottom,
+                rgba(245, 247, 250, 0.9),
+                rgba(245, 247, 250, 0.9)) !important;
+    }
+
+    html body .app-container.bg-gray-50 .feed-card {
+        border-radius: 0.5rem !important;
+    }
+
+    html body .app-container.bg-gray-50 .card-header {
+        border-radius: 0.5rem 0.5rem 0 0 !important;
+    }
+
+    /* 优化小屏幕上的交互元素大小 */
+    html body .app-container .item-link {
+        min-height: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
 }

@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']"
-    :data-theme="isDark ? 'dark' : 'light'"
-  >
+  <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
     <div class="header">
       <div class="text-center mb-4">
         <h1 class="text-3xl font-bold text-gray-700 header-title">
@@ -137,13 +134,6 @@ const formatLastUpdate = computed(() => {
 const toggleTheme = () => {
   isDark.value = !isDark.value;
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
-
-  // 同步更新文档根元素类
-  if (isDark.value) {
-    document.documentElement.classList.add("dark");
-  } else {
-    document.documentElement.classList.remove("dark");
-  }
 };
 
 const fetchFeeds = async () => {
@@ -180,13 +170,6 @@ const updateCountdown = () => {
 };
 
 onMounted(async () => {
-  // 在文档根元素上设置暗色模式类，确保全局样式正确应用
-  if (isDark.value) {
-    document.documentElement.classList.add("dark");
-  } else {
-    document.documentElement.classList.remove("dark");
-  }
-
   await fetchFeeds();
   // 设置定时刷新
   refreshTimer = setInterval(fetchFeeds, RSS_CONFIG.refresh.interval * 1000);
@@ -212,12 +195,9 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-html body #app div.app-container:not(.dark) {
+/* 亮色模式样式 - 更高优先级 */
+html body .app-container.bg-gray-50 {
   background-color: #f5f7fa !important;
-  color: #2d3748 !important;
-}
-
-html body #app div.app-container:not(.dark) {
   background-image: linear-gradient(
       to bottom,
       rgba(245, 247, 250, 0.8),
@@ -234,7 +214,7 @@ html body #app div.app-container:not(.dark) {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-html body #app div.app-container:not(.dark) .header {
+html body .app-container.bg-gray-50 .header {
   background-color: rgba(240, 242, 247, 0.9) !important;
   backdrop-filter: blur(5px) !important;
   border-bottom: 1px solid rgba(230, 235, 242, 0.8) !important;
@@ -245,22 +225,22 @@ html body #app div.app-container:not(.dark) .header {
   background-color: rgba(17, 24, 39, 0.6);
 }
 
-html body #app div.app-container:not(.dark) .header-title {
+html body .app-container.bg-gray-50 .header-title {
   color: #2d3748 !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
-html body #app div.app-container:not(.dark) button:not(.bg-green-500) {
+html body .app-container.bg-gray-50 button:not(.bg-green-500) {
   background-color: rgba(240, 242, 247, 0.6) !important;
   border: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
-html body #app div.app-container:not(.dark) button.bg-green-500 {
+html body .app-container.bg-gray-50 button.bg-green-500 {
   background-color: #4caf50 !important;
   box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
 }
 
-html body #app div.app-container:not(.dark) button.bg-green-500:hover {
+html body .app-container.bg-gray-50 button.bg-green-500:hover {
   background-color: #43a047 !important;
   box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3) !important;
 }
@@ -274,7 +254,7 @@ html body #app div.app-container:not(.dark) button.bg-green-500:hover {
   margin-bottom: 0.75rem;
 }
 
-html body #app div.app-container:not(.dark) .content-area {
+html body .app-container.bg-gray-50 .content-area {
   background-color: rgba(240, 242, 247, 0.4) !important;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
@@ -291,7 +271,7 @@ html body #app div.app-container:not(.dark) .content-area {
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
 }
 
-html body #app div.app-container:not(.dark) .footer {
+html body .app-container.bg-gray-50 .footer {
   background-color: rgba(240, 242, 247, 0.85) !important;
   border-top: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
@@ -299,57 +279,6 @@ html body #app div.app-container:not(.dark) .footer {
 .dark .footer {
   border-color: #374151;
   background-color: rgba(17, 24, 39, 0.6);
-}
-
-/* 全局卡片样式覆盖 */
-html body #app div.app-container:not(.dark) .feed-card {
-  background: rgba(245, 247, 250, 0.75) !important;
-  border: 1px solid rgba(230, 235, 242, 0.8) !important;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
-}
-
-html body #app div.app-container:not(.dark) .card-header {
-  background-color: rgba(240, 242, 247, 0.9) !important;
-  border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
-}
-
-html body #app div.app-container:not(.dark) .card-title {
-  color: #2d3748 !important;
-}
-
-html body #app div.app-container:not(.dark) .card-content {
-  background-color: rgba(240, 242, 247, 0.5) !important;
-}
-
-html body #app div.app-container:not(.dark) .item-link:hover {
-  background: rgba(240, 242, 247, 0.8) !important;
-}
-
-html body #app div.app-container:not(.dark) .item-title {
-  color: #2d3748 !important;
-}
-
-html body #app div.app-container:not(.dark) .item-link:hover .item-title {
-  color: #3182ce !important;
-}
-
-html body #app div.app-container:not(.dark) .item-date {
-  color: #5a6171 !important;
-  background: rgba(240, 244, 248, 0.9) !important;
-}
-
-html body #app div.app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(236, 240, 244, 0.95) !important;
-}
-
-html body #app div.app-container:not(.dark) .empty-message {
-  color: #5a6171 !important;
-}
-
-html body #app div.app-container:not(.dark) .title-tooltip {
-  background: rgba(245, 247, 250, 0.95) !important;
-  color: #2d3748 !important;
-  border: 1px solid rgba(230, 235, 242, 0.8) !important;
 }
 
 /* 移除全局滚动条 */
@@ -392,22 +321,107 @@ body {
   color: #f3f4f6;
 }
 
-html body #app div.app-container:not(.dark) .text-gray-700 {
-  color: #2d3748 !important;
+.text-gray-700 {
+  color: #4b5563;
 }
 
-html body #app div.app-container:not(.dark) .text-gray-600,
-html body #app div.app-container:not(.dark) .status-text {
+html body .app-container.bg-gray-50 .text-gray-600 {
   color: #4a5568 !important;
 }
 
-html body #app div.app-container:not(.dark) .text-gray-500,
-html body #app div.app-container:not(.dark) .footer-text {
+html body .app-container.bg-gray-50 .text-gray-500 {
   color: #5a6986 !important;
 }
 
 button {
   transition: all 0.2s ease-in-out;
+}
+
+/* 移动端优化样式 */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.5rem 0.75rem 0.25rem;
+  }
+
+  .header-title {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.5rem;
+  }
+
+  .status-text {
+    font-size: 0.8rem;
+    gap: 0.5rem !important;
+  }
+
+  .footer {
+    padding: 0.25rem 0;
+  }
+
+  .footer-text {
+    font-size: 0.75rem;
+  }
+
+  button.bg-green-500 {
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  button:not(.bg-green-500) {
+    padding: 0.35rem !important;
+  }
+
+  button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+/* 小型移动设备优化 */
+@media (max-width: 480px) {
+  .app-container {
+    overflow-x: hidden;
+  }
+
+  .header {
+    padding: 0.4rem 0.5rem 0.2rem;
+  }
+
+  .header-title {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.4rem;
+  }
+
+  .status-text {
+    font-size: 0.75rem;
+    flex-direction: column;
+    gap: 0.1rem !important;
+    line-height: 1.3;
+  }
+
+  /* 移动端状态显示优化 */
+  .flex.justify-between.items-center {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .flex.justify-between.items-center > div {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .flex.items-center.gap-4.flex-1.justify-end {
+    justify-content: center;
+    margin-top: 0.2rem;
+  }
+
+  .footer-text {
+    font-size: 0.7rem;
+    padding: 0.25rem 0;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.4;
+  }
 }
 
 @media (prefers-color-scheme: light) {
