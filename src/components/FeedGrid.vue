@@ -1,16 +1,21 @@
 <template>
   <div class="feed-container">
     <div class="feed-grid" :style="gridStyle">
-      <div v-for="feed in feeds" :key="feed.url" class="feed-card">
+      <div
+        v-for="feed in feeds"
+        :key="feed.url"
+        class="feed-card"
+        :style="!isDark ? cardStyle : {}"
+      >
         <!-- 标题区域 -->
-        <div class="card-header">
+        <div class="card-header" :style="!isDark ? headerStyle : {}">
           <h2 class="card-title">
             {{ feed.title }}
           </h2>
         </div>
 
         <!-- 内容区域 -->
-        <div class="card-content">
+        <div class="card-content" :style="!isDark ? contentStyle : {}">
           <div v-if="feed.error" class="error-message">
             {{ feed.error }}
           </div>
@@ -158,6 +163,22 @@ const fontSize = computed(() => {
   const size = config.value?.display?.fontSize;
   return typeof size === "number" ? size : 16;
 });
+
+// 添加卡片内联样式
+const cardStyle = {
+  background: "rgba(237, 242, 247, 0.9)",
+  border: "1px solid rgba(223, 230, 241, 0.7)",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.03), 0 1px 4px rgba(0, 0, 0, 0.05)",
+};
+
+const headerStyle = {
+  backgroundColor: "rgba(232, 240, 247, 0.9)",
+  borderBottom: "1px solid rgba(223, 230, 241, 0.7)",
+};
+
+const contentStyle = {
+  backgroundColor: "rgba(237, 242, 247, 0.5)",
+};
 </script>
 
 <style scoped>
@@ -191,9 +212,9 @@ const fontSize = computed(() => {
 }
 
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(242, 244, 248, 0.75) !important;
-  border: 1px solid rgba(230, 235, 242, 0.5) !important;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  background: rgba(237, 242, 247, 0.85) !important;
+  border: 1px solid rgba(223, 230, 241, 0.65) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03), 0 1px 4px rgba(0, 0, 0, 0.05) !important;
 }
 
 .dark .feed-card {
@@ -207,8 +228,8 @@ html body .app-container:not(.dark) .feed-card {
 }
 
 html body .app-container:not(.dark) .card-header {
-  background-color: rgba(242, 244, 248, 0.8) !important;
-  border-bottom: 1px solid rgba(230, 235, 242, 0.6) !important;
+  background-color: rgba(232, 240, 247, 0.9) !important;
+  border-bottom: 1px solid rgba(223, 230, 241, 0.7) !important;
 }
 
 .dark .card-header {
@@ -237,7 +258,7 @@ html body .app-container:not(.dark) .card-title {
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(242, 244, 248, 0.35) !important;
+  background-color: rgba(237, 242, 247, 0.5) !important;
 }
 
 .dark .card-content {

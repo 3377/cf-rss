@@ -54,33 +54,41 @@ html body .app-container.bg-gray-50 {
         color: #778299 !important;
     }
 
-    /* 卡片样式全局覆盖 */
-    html body .app-container.bg-gray-50 .feed-card {
-        background: rgba(242, 244, 248, 0.8) !important;
-        border: 1px solid rgba(225, 230, 238, 0.6) !important;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02), 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    /* 卡片样式全局覆盖 - 使用更强的颜色区分 */
+    html body .app-container.bg-gray-50 .feed-card,
+    html[data-theme="light"] .feed-card,
+    body:not(.dark) .feed-card {
+        background: rgba(237, 242, 247, 0.9) !important;
+        border: 1px solid rgba(223, 230, 241, 0.7) !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.05) !important;
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
         transform: translateZ(0);
         transition: all 0.3s ease !important;
     }
 
-    html body .app-container.bg-gray-50 .feed-card:hover {
+    html body .app-container.bg-gray-50 .feed-card:hover,
+    html[data-theme="light"] .feed-card:hover,
+    body:not(.dark) .feed-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06) !important;
     }
 
-    html body .app-container.bg-gray-50 .card-header {
-        background-color: rgba(238, 242, 247, 0.7) !important;
-        border-bottom: 1px solid rgba(225, 230, 238, 0.6) !important;
+    html body .app-container.bg-gray-50 .card-header,
+    html[data-theme="light"] .card-header,
+    body:not(.dark) .card-header {
+        background-color: rgba(232, 240, 247, 0.9) !important;
+        border-bottom: 1px solid rgba(223, 230, 241, 0.7) !important;
     }
 
     html body .app-container.bg-gray-50 .card-title {
         color: #445163 !important;
     }
 
-    html body .app-container.bg-gray-50 .card-content {
-        background-color: rgba(238, 242, 247, 0.35) !important;
+    html body .app-container.bg-gray-50 .card-content,
+    html[data-theme="light"] .card-content,
+    body:not(.dark) .card-content {
+        background-color: rgba(237, 242, 247, 0.5) !important;
     }
 
     html body .app-container.bg-gray-50 .item-link:hover {

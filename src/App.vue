@@ -1,5 +1,8 @@
 <template>
-  <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
+  <div
+    :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']"
+    :style="containerStyle"
+  >
     <div class="header">
       <div class="text-center mb-4">
         <h1 class="text-3xl font-bold text-gray-700 header-title">
@@ -184,6 +187,17 @@ onUnmounted(() => {
   if (countdownTimer) {
     clearInterval(countdownTimer);
   }
+});
+
+// 添加容器样式计算属性，确保亮色模式卡片背景色一致
+const containerStyle = computed(() => {
+  return !isDark.value
+    ? {
+        "--card-bg": "rgba(237, 242, 247, 0.9)",
+        "--card-header-bg": "rgba(232, 240, 247, 0.9)",
+        "--card-content-bg": "rgba(237, 242, 247, 0.5)",
+      }
+    : {};
 });
 </script>
 
@@ -429,11 +443,24 @@ button {
   :root {
     color-scheme: light;
     --app-background: #f2f4f8;
-    --card-background: rgba(242, 244, 248, 0.7);
-    --card-border: rgba(230, 235, 242, 0.5);
-    --card-header: rgba(238, 242, 247, 0.7);
+    --card-background: rgba(237, 242, 247, 0.9);
+    --card-border: rgba(223, 230, 241, 0.7);
+    --card-header: rgba(232, 240, 247, 0.9);
     --text-primary: #445163;
     --text-secondary: #5f6d85;
   }
+}
+
+/* CSS变量应用到卡片 */
+.app-container:not(.dark) .feed-card {
+  background: var(--card-bg, rgba(237, 242, 247, 0.9)) !important;
+}
+
+.app-container:not(.dark) .card-header {
+  background: var(--card-header-bg, rgba(232, 240, 247, 0.9)) !important;
+}
+
+.app-container:not(.dark) .card-content {
+  background: var(--card-content-bg, rgba(237, 242, 247, 0.5)) !important;
 }
 </style>
