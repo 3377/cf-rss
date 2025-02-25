@@ -9,9 +9,10 @@
           isDark
             ? {}
             : {
-                background: 'rgba(230, 240, 250, 0.95)',
-                border: '1px solid rgba(200, 215, 235, 0.75)',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+                background: 'rgba(225, 235, 252, 0.98)',
+                border: '1px solid rgba(190, 210, 235, 0.9)',
+                boxShadow:
+                  '0 6px 12px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04)',
               }
         "
       >
@@ -22,8 +23,8 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(220, 235, 248, 0.95)',
-                  borderBottom: '1px solid rgba(200, 215, 235, 0.8)',
+                  backgroundColor: 'rgba(210, 225, 245, 0.98)',
+                  borderBottom: '1px solid rgba(190, 210, 235, 0.9)',
                 }
           "
         >
@@ -39,7 +40,7 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(230, 240, 250, 0.75)',
+                  backgroundColor: 'rgba(225, 235, 252, 0.95)',
                 }
           "
         >
@@ -57,6 +58,13 @@
               )"
               :key="item.id"
               class="feed-item"
+              :style="
+                isDark
+                  ? {}
+                  : {
+                      borderBottom: '1px solid rgba(210, 225, 245, 0.7)',
+                    }
+              "
             >
               <a
                 :href="item.link"
@@ -66,7 +74,7 @@
                 :style="
                   isDark
                     ? {}
-                    : { hover: { background: 'rgba(225, 235, 250, 0.85)' } }
+                    : { hover: { background: 'rgba(215, 230, 250, 0.9)' } }
                 "
                 @mouseenter="showTooltip($event, item.title, item.pubDate)"
                 @mouseleave="hideTooltip"
@@ -76,7 +84,7 @@
                   :style="{
                     fontSize: `${fontSize}px`,
                     paddingRight: showItemDate ? '4rem' : '0.5rem',
-                    color: isDark ? '#f3f4f6' : '#3a5075',
+                    color: isDark ? '#f3f4f6' : '#2d4a7a',
                   }"
                 >
                   {{ item.title }}
@@ -88,8 +96,8 @@
                     isDark
                       ? {}
                       : {
-                          color: '#566a8c',
-                          background: 'rgba(225, 235, 250, 0.9)',
+                          color: '#4d6990',
+                          background: 'rgba(215, 230, 250, 0.95)',
                         }
                   "
                 >
@@ -111,11 +119,11 @@
         left: tooltipPosition.left + 'px',
         backgroundColor: isDark
           ? 'rgba(31, 41, 55, 0.95)'
-          : 'rgba(220, 235, 250, 0.95)',
-        color: isDark ? '#f3f4f6' : '#3a5075',
+          : 'rgba(210, 225, 245, 0.98)',
+        color: isDark ? '#f3f4f6' : '#2d4a7a',
         border: isDark
           ? '1px solid rgba(55, 65, 81, 0.8)'
-          : '1px solid rgba(200, 215, 235, 0.8)',
+          : '1px solid rgba(190, 210, 235, 0.9)',
       }"
     >
       {{ tooltipText }}
@@ -247,9 +255,9 @@ const fontSize = computed(() => {
 }
 
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(230, 240, 250, 0.95) !important;
-  border: 1px solid rgba(200, 215, 235, 0.75) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+  background: rgba(225, 235, 252, 0.98) !important;
+  border: 1px solid rgba(190, 210, 235, 0.9) !important;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
 }
 
 .dark .feed-card {
@@ -264,8 +272,8 @@ html body .app-container:not(.dark) .feed-card {
 }
 
 html body .app-container:not(.dark) .card-header {
-  background-color: rgba(220, 235, 248, 0.95) !important;
-  border-bottom: 1px solid rgba(200, 215, 235, 0.8) !important;
+  background-color: rgba(210, 225, 245, 0.98) !important;
+  border-bottom: 1px solid rgba(190, 210, 235, 0.9) !important;
 }
 
 .dark .card-header {
@@ -294,7 +302,7 @@ html body .app-container:not(.dark) .card-title {
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(230, 240, 250, 0.75) !important;
+  background-color: rgba(225, 235, 252, 0.95) !important;
 }
 
 .dark .card-content {
@@ -324,7 +332,7 @@ html body .app-container:not(.dark) .card-content {
 }
 
 html body .app-container:not(.dark) .item-link:hover {
-  background: rgba(240, 242, 247, 0.8) !important;
+  background: rgba(215, 230, 250, 0.9) !important;
 }
 
 .dark .item-link:hover {
