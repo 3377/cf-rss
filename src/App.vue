@@ -2,7 +2,7 @@
   <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
     <div class="header">
       <div class="text-center mb-4">
-        <h1 class="text-3xl font-bold dark:text-gray-100 text-gray-700">
+        <h1 class="text-3xl font-bold text-gray-700 header-title">
           {{ appTitle }}
         </h1>
       </div>
@@ -10,11 +10,11 @@
       <div class="flex justify-between items-center">
         <div class="flex-1"></div>
         <div
-          class="flex justify-center flex-1 text-base text-gray-600 dark:text-gray-300 gap-8"
+          class="flex justify-center flex-1 text-base text-gray-600 status-text gap-8"
         >
           <div
             v-if="loading"
-            class="text-gray-600 dark:text-gray-300 font-medium"
+            class="text-gray-600 font-medium status-text"
           >
             加载中...
           </div>
@@ -80,7 +80,7 @@
 
     <!-- 底部版权信息 -->
     <footer class="footer">
-      <div class="text-center text-sm text-gray-500 dark:text-gray-300 py-2">
+      <div class="text-center text-sm text-gray-500 footer-text py-2">
         <span>© {{ new Date().getFullYear() }} </span>
         <a
           href="https://github.com/3377/cf-rss"
@@ -249,7 +249,7 @@ body {
   background-color: #f9fafb;
 }
 
-.dark body,
+.dark body, 
 .dark html {
   background-color: #111827;
 }
@@ -260,23 +260,19 @@ body {
 }
 
 .dark {
-  @apply text-gray-100;
+  color: #f3f4f6;
 }
 
-.dark .text-gray-100 {
+.dark .header-title {
   color: #f3f4f6 !important;
 }
 
-.dark .text-gray-200 {
+.dark .status-text {
   color: #f3f4f6 !important;
 }
 
-.dark .text-gray-300 {
+.dark .footer-text {
   color: #f3f4f6 !important;
-}
-
-.dark .text-gray-400 {
-  color: #e5e7eb !important;
 }
 
 .bg-gray-50 {
