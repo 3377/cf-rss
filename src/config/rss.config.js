@@ -41,15 +41,12 @@ const defaultConfig = {
 
 // 导出配置获取函数
 export function getRSSConfig(env) {
-  console.log("Getting RSS config with env:", env); // 调试日志
-
   // 创建新的配置对象，避免修改默认配置
   const config = JSON.parse(JSON.stringify(defaultConfig));
 
   try {
     // 如果没有环境变量，直接返回默认配置
     if (!env) {
-      console.log("No env provided, using default config");
       return config;
     }
 
@@ -57,14 +54,9 @@ export function getRSSConfig(env) {
     if (env.RSS_FEEDS) {
       try {
         const feedsStr = env.RSS_FEEDS.trim();
-        console.log("RSS_FEEDS string:", feedsStr);
-
         const parsedFeeds = JSON.parse(feedsStr);
         if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
           config.feeds = parsedFeeds;
-          console.log("Successfully parsed RSS feeds:", parsedFeeds);
-        } else {
-          console.warn("Parsed RSS_FEEDS is not a valid array");
         }
       } catch (parseError) {
         console.error("Error parsing RSS_FEEDS:", parseError);
@@ -113,7 +105,6 @@ export function getRSSConfig(env) {
     console.error("Error in getRSSConfig:", error);
   }
 
-  console.log("Final config:", config);
   return config;
 }
 
