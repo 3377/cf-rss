@@ -168,7 +168,7 @@ const fontSize = computed(() => {
 }
 
 .items-list {
-  border-top: 1px solid #e5e7eb;
+  border-top: none;
 }
 
 .dark .items-list {
@@ -290,7 +290,7 @@ const fontSize = computed(() => {
 @media (max-width: 768px) {
   .feed-grid {
     grid-template-columns: 1fr !important;
-    gap: 3rem;
+    gap: 1.5rem;
     width: 100%;
     padding: 0.5rem;
     height: calc(100vh - 1rem);
@@ -298,6 +298,22 @@ const fontSize = computed(() => {
 
   .feed-card {
     height: 100%;
+  }
+
+  .card-content {
+    max-height: calc(100vh - 10rem);
+  }
+
+  .item-title {
+    padding-right: 3.5rem; /* 移动端日期显示更紧凑 */
+  }
+}
+
+/* 适配中等屏幕 */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .feed-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 2rem;
   }
 }
 </style>

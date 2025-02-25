@@ -187,10 +187,10 @@ onUnmounted(() => {
 }
 
 .header {
-  padding: 1rem 1rem 0.5rem;
+  padding: 0.75rem 1rem 0.25rem;
   flex-shrink: 0;
   border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
 .dark .header {
@@ -202,7 +202,8 @@ onUnmounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
 }
 
 .footer {
