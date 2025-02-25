@@ -1,12 +1,12 @@
-/* 强制覆盖类 - 确保亮色模式样式优先级最高 */
-body {
+/* 强制覆盖类 - 确保亮色模式样式优先级最高，但不影响暗色模式 */
+body:not(.dark) {
     background-color: #f5f7fa !important;
     color: #2d3748 !important;
 }
 
-.bg-gray-50,
-#app div.bg-gray-50,
-#app .bg-gray-50 {
+.bg-gray-50:not(.dark),
+#app div.bg-gray-50:not(.dark),
+#app .bg-gray-50:not(.dark) {
     background-color: #f5f7fa !important;
     background-image: linear-gradient(to bottom,
             rgba(245, 247, 250, 0.8),
@@ -14,7 +14,7 @@ body {
         url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
 }
 
-/* 直接针对根元素应用样式，最高优先级 */
+/* 直接针对根元素应用样式，分别设置亮色和暗色模式 */
 :root {
     color-scheme: light;
     --app-background: #f5f7fa;
@@ -23,6 +23,16 @@ body {
     --card-header: rgba(240, 242, 247, 0.9);
     --text-primary: #2d3748;
     --text-secondary: #4a5568;
+}
+
+:root.dark {
+    color-scheme: dark;
+    --app-background: #1a202c;
+    --card-background: rgba(26, 32, 44, 0.75);
+    --card-border: rgba(45, 55, 72, 0.8);
+    --card-header: rgba(26, 32, 44, 0.9);
+    --text-primary: #f7fafc;
+    --text-secondary: #e2e8f0;
 }
 
 /* 直接设置html和body元素 */

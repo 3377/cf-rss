@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RSS Reader</title>
     <style>
-      /* 直接在根HTML文件中添加亮色模式样式 */
-      body {
+      /* 直接在根HTML文件中添加亮色模式样式 - 确保不影响暗色模式 */
+      html:not(.dark),
+      body:not(.dark) {
         background-color: #f5f7fa !important;
         color: #2d3748 !important;
       }
@@ -23,6 +24,14 @@
           url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
       }
 
+      /* 暗色模式专用样式，确保暗色模式正常 */
+      #app div.dark,
+      .dark {
+        background-color: #1a202c !important;
+        color: #f7fafc !important;
+      }
+
+      /* 亮色模式其他元素样式 */
       #app div:not(.dark) .header {
         background-color: rgba(240, 242, 247, 0.9) !important;
         backdrop-filter: blur(5px) !important;

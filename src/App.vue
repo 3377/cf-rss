@@ -1,5 +1,8 @@
 <template>
-  <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
+  <div
+    :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']"
+    :data-theme="isDark ? 'dark' : 'light'"
+  >
     <div class="header">
       <div class="text-center mb-4">
         <h1 class="text-3xl font-bold text-gray-700 header-title">
@@ -102,7 +105,11 @@ const feeds = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const countdown = ref(RSS_CONFIG.refresh.interval);
-const isDark = ref(false);
+const isDark = ref(
+  localStorage.getItem("theme") === null
+    ? RSS_CONFIG.display.defaultDarkMode
+    : localStorage.getItem("theme") === "dark"
+);
 const appTitle = ref(RSS_CONFIG.display.appTitle);
 let refreshTimer = null;
 let countdownTimer = null;
@@ -130,6 +137,13 @@ const formatLastUpdate = computed(() => {
 const toggleTheme = () => {
   isDark.value = !isDark.value;
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
+
+  // 同步更新文档根元素类
+  if (isDark.value) {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
 };
 
 const fetchFeeds = async () => {
@@ -166,6 +180,13 @@ const updateCountdown = () => {
 };
 
 onMounted(async () => {
+  // 在文档根元素上设置暗色模式类，确保全局样式正确应用
+  if (isDark.value) {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+
   await fetchFeeds();
   // 设置定时刷新
   refreshTimer = setInterval(fetchFeeds, RSS_CONFIG.refresh.interval * 1000);
