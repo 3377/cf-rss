@@ -1,7 +1,5 @@
 <template>
   <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
-    <BackgroundEffect :isDark="isDark" />
-
     <div class="header">
       <div class="text-center mb-4">
         <h1 class="text-3xl font-bold text-gray-700 header-title">
@@ -98,7 +96,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
-import BackgroundEffect from "./components/BackgroundEffect.vue";
 import { RSS_CONFIG } from "./config/rss.config";
 
 const feeds = ref([]);
@@ -198,14 +195,14 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
-.app-container.bg-gray-50 {
-  background-color: #f8f9fa !important;
+.bg-gray-50 {
+  background: #f0f2f5;
   background-image: linear-gradient(
       to bottom,
-      rgba(248, 249, 250, 0.8),
-      rgba(241, 245, 249, 0.6)
+      rgba(240, 242, 245, 0.8),
+      rgba(240, 242, 245, 0.8)
     ),
-    url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23e2e8f0' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
+    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
 }
 
 .header {
@@ -213,9 +210,13 @@ onUnmounted(() => {
   flex-shrink: 0;
   border-bottom: 1px solid #e5e7eb;
   margin-bottom: 0;
-  background-color: rgba(240, 245, 250, 0.85);
-  backdrop-filter: blur(5px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.bg-gray-50 .header {
+  background-color: rgba(235, 238, 242, 0.85);
+  backdrop-filter: blur(5px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .dark .header {
@@ -223,9 +224,24 @@ onUnmounted(() => {
   background-color: rgba(17, 24, 39, 0.6);
 }
 
-.header h1 {
-  color: #334155 !important;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+.bg-gray-50 .header-title {
+  color: #3e4555;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.bg-gray-50 button:not(.bg-green-500) {
+  background-color: rgba(235, 238, 242, 0.5);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.bg-gray-50 button.bg-green-500 {
+  background-color: #4caf50 !important;
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+}
+
+.bg-gray-50 button.bg-green-500:hover {
+  background-color: #43a047 !important;
+  box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3);
 }
 
 .content-area {
@@ -235,7 +251,10 @@ onUnmounted(() => {
   flex-direction: column;
   margin-top: 0;
   margin-bottom: 0.75rem;
-  background-color: rgba(240, 245, 250, 0.4);
+}
+
+.bg-gray-50 .content-area {
+  background-color: rgba(235, 238, 242, 0.4);
 }
 
 .dark .content-area {
@@ -245,10 +264,13 @@ onUnmounted(() => {
 .footer {
   flex-shrink: 0;
   border-top: 1px solid #e5e7eb;
-  background-color: rgba(240, 245, 250, 0.85);
   backdrop-filter: blur(8px);
   padding-top: 0.25rem;
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.bg-gray-50 .footer {
+  background-color: rgba(235, 238, 242, 0.85);
 }
 
 .dark .footer {
@@ -263,8 +285,11 @@ body {
   padding: 0;
   overflow: hidden;
   height: 100vh;
-  background-color: #f1f5f9;
-  color: #334155;
+}
+
+body {
+  background-color: #f0f2f5;
+  color: #4b5563;
 }
 
 .dark body,
@@ -293,39 +318,31 @@ body {
   color: #f3f4f6 !important;
 }
 
-/* 优化亮色模式下的文字颜色 */
-.status-text {
-  color: #475569 !important;
-}
-
-.footer-text {
-  color: #475569 !important;
-}
-
-.bg-gray-50 {
-  background-color: #f1f5f9 !important;
-}
-
-.bg-gray-900 {
-  background-color: #111827 !important;
-}
-
 .text-gray-700 {
-  color: #334155 !important;
+  color: #4b5563 !important;
+}
+
+.bg-gray-50 .text-gray-600 {
+  color: #5a6171 !important;
+}
+
+.bg-gray-50 .text-gray-500 {
+  color: #666f7f !important;
 }
 
 button {
   transition: all 0.2s ease-in-out;
 }
 
-/* 优化按钮 */
-button.bg-green-500 {
-  background-color: #22c55e !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-button.bg-green-500:hover {
-  background-color: #16a34a !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --app-background: #f0f2f5;
+    --card-background: rgba(240, 244, 248, 0.75);
+    --card-border: rgba(226, 232, 240, 0.8);
+    --card-header: rgba(236, 240, 244, 0.9);
+    --text-primary: #3e4555;
+    --text-secondary: #5a6171;
+  }
 }
 </style>

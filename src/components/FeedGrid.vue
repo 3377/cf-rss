@@ -180,21 +180,19 @@ const fontSize = computed(() => {
 }
 
 .feed-card {
-  background: rgba(246, 248, 250, 0.9);
-  border-radius: 0.75rem;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
   backdrop-filter: blur(5px);
-  border: 1px solid rgba(229, 231, 235, 0.7);
   transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07);
+  border-radius: 0.75rem;
 }
 
-.feed-card:hover {
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.03);
-  transform: translateY(-2px);
+:not(.dark) .feed-card {
+  background: rgba(240, 244, 248, 0.75);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .dark .feed-card {
@@ -205,27 +203,11 @@ const fontSize = computed(() => {
 .card-header {
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.9),
-    rgba(246, 248, 250, 0.85)
-  );
-  position: relative;
 }
 
-.card-header::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    rgba(99, 102, 241, 0.1),
-    transparent
-  );
+:not(.dark) .card-header {
+  background-color: rgba(236, 240, 244, 0.9);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .dark .card-header {
@@ -236,21 +218,25 @@ const fontSize = computed(() => {
 .card-title {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #334155;
   text-align: center;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+:not(.dark) .card-title {
+  color: #3e4555;
 }
 
 .dark .card-title {
   color: #f3f4f6;
-  text-shadow: none;
 }
 
 .card-content {
   flex: 1;
   padding: 0.5rem 0;
   overflow-y: auto;
-  background-color: rgba(246, 248, 250, 0.6);
+}
+
+:not(.dark) .card-content {
+  background-color: rgba(236, 240, 244, 0.5);
 }
 
 .dark .card-content {
@@ -266,12 +252,7 @@ const fontSize = computed(() => {
 }
 
 .feed-item {
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-  transition: all 0.2s ease;
-}
-
-.feed-item:hover {
-  background-color: rgba(243, 244, 246, 0.5);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
 }
 
 .dark .feed-item {
@@ -284,8 +265,8 @@ const fontSize = computed(() => {
   position: relative;
 }
 
-.item-link:hover {
-  background: rgba(243, 244, 246, 0.7);
+:not(.dark) .item-link:hover {
+  background: rgba(240, 244, 248, 0.8);
 }
 
 .dark .item-link:hover {
@@ -293,7 +274,6 @@ const fontSize = computed(() => {
 }
 
 .item-title {
-  color: #334155;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -301,19 +281,22 @@ const fontSize = computed(() => {
   position: relative;
   width: 100%;
   max-width: 100%;
-  font-weight: 500;
+}
+
+:not(.dark) .item-title {
+  color: #4a5568;
 }
 
 .dark .item-title {
   color: #f3f4f6;
 }
 
-.item-link:hover .item-title {
-  color: #4f46e5;
+:not(.dark) .item-link:hover .item-title {
+  color: #4c6ef5;
 }
 
 .dark .item-link:hover .item-title {
-  color: #818cf8;
+  color: #3b82f6;
 }
 
 .item-date {
@@ -322,8 +305,6 @@ const fontSize = computed(() => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.75rem;
-  color: #64748b;
-  background: rgba(248, 250, 252, 0.9);
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -332,8 +313,13 @@ const fontSize = computed(() => {
   white-space: nowrap;
 }
 
-.item-link:hover .item-date {
-  background: rgba(243, 244, 246, 0.9);
+:not(.dark) .item-date {
+  color: #5a6171;
+  background: rgba(240, 244, 248, 0.9);
+}
+
+:not(.dark) .item-link:hover .item-date {
+  background: rgba(236, 240, 244, 0.95);
 }
 
 .dark .item-date {
@@ -351,9 +337,12 @@ const fontSize = computed(() => {
 }
 
 .empty-message {
-  color: #64748b;
   text-align: center;
   padding: 1rem;
+}
+
+:not(.dark) .empty-message {
+  color: #5a6171;
 }
 
 .dark .empty-message {
@@ -363,20 +352,23 @@ const fontSize = computed(() => {
 /* 标题弹窗样式 */
 .title-tooltip {
   position: fixed;
-  background: rgba(255, 255, 255, 0.95);
-  color: #334155;
   padding: 0.5rem 0.75rem;
   border-radius: 0.375rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 90%;
   z-index: 100;
   font-size: 0.875rem;
   line-height: 1.25rem;
   pointer-events: none;
-  border: 1px solid rgba(229, 231, 235, 0.8);
   backdrop-filter: blur(5px);
   transition: opacity 0.2s ease;
   text-align: left;
+}
+
+:not(.dark) .title-tooltip {
+  background: rgba(240, 244, 248, 0.95);
+  color: #3e4555;
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .dark .title-tooltip {
@@ -424,10 +416,6 @@ const fontSize = computed(() => {
 
   .card-content {
     max-height: calc(100vh - 10rem);
-  }
-
-  .item-title {
-    /* 这里的内联样式已经通过:style绑定了，不需要在CSS中重复设置 */
   }
 }
 
