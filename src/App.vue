@@ -313,6 +313,7 @@ body {
 .dark body,
 .dark html {
   background-color: #111827;
+  color: #f3f4f6;
 }
 
 #app {

@@ -54,10 +54,8 @@ html body .app-container.bg-gray-50 {
         color: #778299 !important;
     }
 
-    /* 卡片样式全局覆盖 - 使用更强的颜色区分 */
-    html body .app-container.bg-gray-50 .feed-card,
-    html[data-theme="light"] .feed-card,
-    body:not(.dark) .feed-card {
+    /* 卡片样式全局覆盖 - 使用更强的颜色区分和特异性选择器 */
+    html body .app-container.bg-gray-50 .feed-card {
         background: rgba(237, 242, 247, 0.9) !important;
         border: 1px solid rgba(223, 230, 241, 0.7) !important;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.05) !important;
@@ -67,40 +65,72 @@ html body .app-container.bg-gray-50 {
         transition: all 0.3s ease !important;
     }
 
-    html body .app-container.bg-gray-50 .feed-card:hover,
-    html[data-theme="light"] .feed-card:hover,
-    body:not(.dark) .feed-card:hover {
+    /* 确保暗色模式卡片样式不受亮色模式影响 */
+    html body .app-container.dark .feed-card {
+        background: rgba(31, 41, 55, 0.9) !important;
+        border-color: rgba(55, 65, 81, 0.5) !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    html body .app-container.bg-gray-50 .feed-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06) !important;
     }
 
-    html body .app-container.bg-gray-50 .card-header,
-    html[data-theme="light"] .card-header,
-    body:not(.dark) .card-header {
+    html body .app-container.bg-gray-50 .card-header {
         background-color: rgba(232, 240, 247, 0.9) !important;
         border-bottom: 1px solid rgba(223, 230, 241, 0.7) !important;
+    }
+
+    /* 确保暗色模式卡片头部样式不受亮色模式影响 */
+    html body .app-container.dark .card-header {
+        border-color: #374151 !important;
+        background-color: rgba(31, 41, 55, 0.7) !important;
     }
 
     html body .app-container.bg-gray-50 .card-title {
         color: #445163 !important;
     }
 
-    html body .app-container.bg-gray-50 .card-content,
-    html[data-theme="light"] .card-content,
-    body:not(.dark) .card-content {
+    /* 确保暗色模式卡片标题样式不受亮色模式影响 */
+    html body .app-container.dark .card-title {
+        color: #f3f4f6 !important;
+    }
+
+    html body .app-container.bg-gray-50 .card-content {
         background-color: rgba(237, 242, 247, 0.5) !important;
+    }
+
+    /* 确保暗色模式卡片内容样式不受亮色模式影响 */
+    html body .app-container.dark .card-content {
+        background-color: rgba(31, 41, 55, 1) !important;
     }
 
     html body .app-container.bg-gray-50 .item-link:hover {
         background: rgba(238, 242, 247, 0.6) !important;
     }
 
+    /* 确保暗色模式项目链接悬停样式不受亮色模式影响 */
+    html body .app-container.dark .item-link:hover {
+        background: rgba(55, 65, 81, 0.7) !important;
+    }
+
     html body .app-container.bg-gray-50 .item-title {
         color: #445163 !important;
     }
 
+    /* 确保暗色模式项目标题样式不受亮色模式影响 */
+    html body .app-container.dark .item-title {
+        color: #f3f4f6 !important;
+    }
+
     html body .app-container.bg-gray-50 .item-link:hover .item-title {
         color: #5f91c7 !important;
+    }
+
+    /* 确保暗色模式项目标题悬停样式不受亮色模式影响 */
+    html body .app-container.dark .item-link:hover .item-title {
+        color: #3b82f6 !important;
     }
 
     html body .app-container.bg-gray-50 .item-date {
@@ -108,12 +138,28 @@ html body .app-container.bg-gray-50 {
         background: rgba(238, 242, 247, 0.75) !important;
     }
 
+    /* 确保暗色模式日期样式不受亮色模式影响 */
+    html body .app-container.dark .item-date {
+        background: #1f2937 !important;
+        color: #9ca3af !important;
+    }
+
     html body .app-container.bg-gray-50 .item-link:hover .item-date {
         background: rgba(235, 240, 245, 0.8) !important;
     }
 
+    /* 确保暗色模式日期悬停样式不受亮色模式影响 */
+    html body .app-container.dark .item-link:hover .item-date {
+        background: rgba(55, 65, 81, 0.9) !important;
+    }
+
     html body .app-container.bg-gray-50 .empty-message {
         color: #778299 !important;
+    }
+
+    /* 确保暗色模式空消息样式不受亮色模式影响 */
+    html body .app-container.dark .empty-message {
+        color: #9ca3af !important;
     }
 
     html body .app-container.bg-gray-50 .title-tooltip {
@@ -122,10 +168,23 @@ html body .app-container.bg-gray-50 {
         border: 1px solid rgba(225, 230, 238, 0.5) !important;
     }
 
+    /* 确保暗色模式工具提示样式不受亮色模式影响 */
+    html body .app-container.dark .title-tooltip {
+        background: rgba(31, 41, 55, 0.95) !important;
+        color: #f3f4f6 !important;
+        border-color: rgba(55, 65, 81, 0.8) !important;
+    }
+
     /* 确保body在亮色模式下也有正确的背景 */
     body:not(.dark) {
         background-color: #f2f4f8 !important;
         color: #445163 !important;
+    }
+
+    /* 暗色模式下的特定体背景色 */
+    body.dark {
+        background-color: #111827 !important;
+        color: #f3f4f6 !important;
     }
 
     /* 移动端全局优化 */

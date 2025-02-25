@@ -1,21 +1,16 @@
 <template>
   <div class="feed-container">
     <div class="feed-grid" :style="gridStyle">
-      <div
-        v-for="feed in feeds"
-        :key="feed.url"
-        class="feed-card"
-        :style="!isDark ? cardStyle : {}"
-      >
+      <div v-for="feed in feeds" :key="feed.url" class="feed-card">
         <!-- 标题区域 -->
-        <div class="card-header" :style="!isDark ? headerStyle : {}">
+        <div class="card-header">
           <h2 class="card-title">
             {{ feed.title }}
           </h2>
         </div>
 
         <!-- 内容区域 -->
-        <div class="card-content" :style="!isDark ? contentStyle : {}">
+        <div class="card-content">
           <div v-if="feed.error" class="error-message">
             {{ feed.error }}
           </div>
@@ -163,22 +158,6 @@ const fontSize = computed(() => {
   const size = config.value?.display?.fontSize;
   return typeof size === "number" ? size : 16;
 });
-
-// 添加卡片内联样式
-const cardStyle = {
-  background: "rgba(237, 242, 247, 0.9)",
-  border: "1px solid rgba(223, 230, 241, 0.7)",
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.03), 0 1px 4px rgba(0, 0, 0, 0.05)",
-};
-
-const headerStyle = {
-  backgroundColor: "rgba(232, 240, 247, 0.9)",
-  borderBottom: "1px solid rgba(223, 230, 241, 0.7)",
-};
-
-const contentStyle = {
-  backgroundColor: "rgba(237, 242, 247, 0.5)",
-};
 </script>
 
 <style scoped>
@@ -288,7 +267,7 @@ html body .app-container:not(.dark) .card-content {
 }
 
 html body .app-container:not(.dark) .item-link:hover {
-  background: rgba(242, 244, 248, 0.6) !important;
+  background: rgba(240, 242, 247, 0.8) !important;
 }
 
 .dark .item-link:hover {
@@ -337,11 +316,11 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
 
 html body .app-container:not(.dark) .item-date {
   color: #778299 !important;
-  background: rgba(242, 244, 248, 0.8) !important;
+  background: rgba(242, 244, 248, 0.9) !important;
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(238, 242, 247, 0.85) !important;
+  background: rgba(238, 242, 247, 0.95) !important;
 }
 
 .dark .item-date {
@@ -388,7 +367,7 @@ html body .app-container:not(.dark) .empty-message {
 }
 
 html body .app-container:not(.dark) .title-tooltip {
-  background: rgba(242, 244, 248, 0.9) !important;
+  background: rgba(242, 244, 248, 0.95) !important;
   color: #445163 !important;
   border: 1px solid rgba(230, 235, 242, 0.5) !important;
 }
