@@ -303,11 +303,12 @@ body {
 .tooltip-date {
     font-weight: 500 !important;
     font-size: 0.85rem !important;
-    opacity: 0.95 !important;
+    opacity: 1 !important;
     margin-bottom: 0.3rem !important;
     padding-bottom: 0.3rem !important;
     border-bottom: 1px dashed rgba(160, 190, 230, 0.5) !important;
     text-align: center !important;
+    display: block !important;
 }
 
 /* 亮色模式下的提示框日期样式 */

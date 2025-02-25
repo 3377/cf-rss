@@ -127,8 +127,17 @@ const showTooltip = (event, text, date) => {
   if (!text) return;
 
   tooltipText.value = text;
+  console.log("提示框触发，日期数据:", date); // 调试日志
+
   // 格式化并设置日期
-  tooltipDate.value = date ? formatDate(date) : "";
+  if (date) {
+    tooltipDate.value = formatDate(date);
+    console.log("格式化后的日期:", tooltipDate.value); // 调试日志
+  } else {
+    tooltipDate.value = "";
+    console.log("未提供日期数据");
+  }
+
   showTooltipText.value = true;
 
   // 延迟计算位置，确保DOM已更新
@@ -325,11 +334,12 @@ onMounted(() => {
 .tooltip-date {
   font-weight: 500;
   font-size: 0.85rem;
-  opacity: 0.95;
+  opacity: 1;
   margin-bottom: 0.3rem;
   padding-bottom: 0.3rem;
   border-bottom: 1px dashed rgba(160, 190, 230, 0.5);
   text-align: center;
+  display: block !important; /* 确保显示 */
 }
 
 /* 亮色模式下的提示框日期样式 */

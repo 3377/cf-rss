@@ -152,35 +152,76 @@ const fontLoaded = ref({
   Yozai: false,
 });
 
-// 修改加载字体的函数，确保悠哉字体正确加载
-const loadFont = (fontName) => {
-  if (fontLoaded.value[fontName]) return;
-
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-
-  if (fontName === "DingTalk JinBuTi") {
-    link.href =
-      "https://cdn.jsdelivr.net/npm/cn-fontsource-ding-talk-jin-bu-ti-regular/font.css";
-  } else if (fontName === "Yozai") {
-    link.href = "https://cdn.jsdelivr.net/npm/cn-fontsource-yozai/font.css";
+// 完全重写字体加载和切换逻辑
+// 加载字体
+const loadFont = async (fontName) => {
+  console.log(`准备加载字体: ${fontName}`);
+  if (fontLoaded.value[fontName]) {
+    console.log(`字体 ${fontName} 已加载过，直接应用`);
+    applyFont(fontName);
+    return;
   }
 
-  // 确保字体加载完成后才应用
-  link.onload = () => {
-    console.log(`${fontName} 字体加载完成`);
-    fontLoaded.value[fontName] = true;
-    document.documentElement.style.fontFamily = `Roboto, "${fontName}", sans-serif`;
-  };
+  try {
+    let fontCss = "";
+    if (fontName === "DingTalk JinBuTi") {
+      fontCss =
+        "https://cdn.jsdelivr.net/npm/cn-fontsource-ding-talk-jin-bu-ti-regular/font.css";
+    } else if (fontName === "Yozai") {
+      fontCss = "https://cdn.jsdelivr.net/npm/cn-fontsource-yozai/font.css";
+    }
 
-  document.head.appendChild(link);
+    // 使用动态导入加载CSS
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = fontCss;
+    document.head.appendChild(link);
+
+    // 设置加载状态标记
+    fontLoaded.value[fontName] = true;
+    console.log(`字体 ${fontName} 加载成功`);
+
+    // 立即应用字体
+    applyFont(fontName);
+  } catch (error) {
+    console.error(`加载字体 ${fontName} 失败:`, error);
+  }
+};
+
+// 应用字体到页面
+const applyFont = (fontName) => {
+  console.log(`正在应用字体: ${fontName}`);
+
+  // 保存用户选择
+  localStorage.setItem("selectedFont", fontName);
+
+  // 应用字体到根元素和所有重要元素
+  document.documentElement.style.fontFamily = `"${fontName}", Roboto, sans-serif`;
+  document.body.style.fontFamily = `"${fontName}", Roboto, sans-serif`;
+
+  // 添加一个带有新字体的类到body，强制重新渲染
+  document.body.classList.remove("font-dingtalk", "font-yozai");
+
+  if (fontName === "DingTalk JinBuTi") {
+    document.body.classList.add("font-dingtalk");
+  } else if (fontName === "Yozai") {
+    document.body.classList.add("font-yozai");
+  }
+
+  // 强制DOM重绘
+  const currentHeight = document.body.style.height;
+  document.body.style.height = document.body.offsetHeight + 1 + "px";
+  setTimeout(() => {
+    document.body.style.height = currentHeight;
+  }, 10);
+
+  console.log(`已应用字体: ${fontName}`);
 };
 
 // 切换字体
 const changeFont = () => {
-  console.log(`正在切换到: ${selectedFont.value}`);
+  console.log(`字体选择变更为: ${selectedFont.value}`);
   loadFont(selectedFont.value);
-  localStorage.setItem("selectedFont", selectedFont.value);
 };
 
 // 监视字体变化
@@ -247,9 +288,10 @@ const updateCountdown = () => {
 };
 
 onMounted(async () => {
-  // 初始化加载选定的字体
-  loadFont(selectedFont.value);
-  changeFont();
+  // 初始化加载选定的字体并强制应用
+  const savedFont = localStorage.getItem("selectedFont") || "DingTalk JinBuTi";
+  selectedFont.value = savedFont;
+  loadFont(savedFont);
 
   await fetchFeeds();
   // 设置定时刷新
@@ -695,5 +737,25 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
     margin-left: 0.25rem;
     margin-right: 0.25rem;
   }
+}
+
+/* 添加强制字体应用的样式 */
+.font-dingtalk * {
+  font-family: "DingTalk JinBuTi", Roboto, sans-serif !important;
+}
+
+.font-yozai * {
+  font-family: "Yozai", Roboto, sans-serif !important;
+}
+
+/* 确保特定元素也应用字体 */
+.app-container.font-dingtalk .card-title,
+.app-container.font-dingtalk .item-title {
+  font-family: "DingTalk JinBuTi", Roboto, sans-serif !important;
+}
+
+.app-container.font-yozai .card-title,
+.app-container.font-yozai .item-title {
+  font-family: "Yozai", Roboto, sans-serif !important;
 }
 </style>
