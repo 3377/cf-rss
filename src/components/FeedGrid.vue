@@ -191,8 +191,8 @@ const fontSize = computed(() => {
 }
 
 html body .app-container:not(.dark) .feed-card {
-  background: rgba(245, 247, 250, 0.75) !important;
-  border: 1px solid rgba(230, 235, 242, 0.8) !important;
+  background: rgba(242, 243, 245, 0.75) !important;
+  border: 1px solid rgba(220, 225, 235, 0.8) !important;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07) !important;
 }
 
@@ -207,8 +207,8 @@ html body .app-container:not(.dark) .feed-card {
 }
 
 html body .app-container:not(.dark) .card-header {
-  background-color: rgba(240, 242, 247, 0.9) !important;
-  border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
+  background-color: rgba(238, 240, 245, 0.9) !important;
+  border-bottom: 1px solid rgba(220, 225, 235, 0.9) !important;
 }
 
 .dark .card-header {
@@ -237,7 +237,7 @@ html body .app-container:not(.dark) .card-title {
 }
 
 html body .app-container:not(.dark) .card-content {
-  background-color: rgba(240, 242, 247, 0.5) !important;
+  background-color: rgba(238, 240, 245, 0.5) !important;
 }
 
 .dark .card-content {
@@ -267,7 +267,7 @@ html body .app-container:not(.dark) .card-content {
 }
 
 html body .app-container:not(.dark) .item-link:hover {
-  background: rgba(240, 242, 247, 0.8) !important;
+  background: rgba(232, 235, 240, 0.8) !important;
 }
 
 .dark .item-link:hover {
@@ -316,11 +316,11 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
 
 html body .app-container:not(.dark) .item-date {
   color: #5a6171 !important;
-  background: rgba(240, 244, 248, 0.9) !important;
+  background: rgba(235, 240, 245, 0.9) !important;
 }
 
 html body .app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(236, 240, 244, 0.95) !important;
+  background: rgba(230, 235, 242, 0.95) !important;
 }
 
 .dark .item-date {
@@ -467,6 +467,10 @@ html body .app-container:not(.dark) .title-tooltip {
     font-size: 0.8rem;
     line-height: 1.3;
   }
+
+  html body .app-container:not(.dark) .feed-card {
+    background: rgba(238, 240, 245, 0.85) !important;
+  }
 }
 
 /* 适配中等屏幕 */
@@ -509,6 +513,10 @@ html body .app-container:not(.dark) .title-tooltip {
   /* 改进小屏幕上的滚动条 */
   .card-content::-webkit-scrollbar {
     width: 3px;
+  }
+
+  html body .app-container:not(.dark) .feed-card {
+    background: rgba(235, 238, 242, 0.9) !important;
   }
 }
 </style>

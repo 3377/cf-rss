@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
+  <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-4">
     <div class="border-b pb-2 mb-3">
       <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
         {{ feed.title }}
@@ -64,5 +64,19 @@ const formatDate = (dateStr) => {
 <style scoped>
 .hover\:bg-gray-50:hover {
   transition: background-color 0.2s;
+}
+
+/* 亮色模式下的卡片灰度背景样式 */
+.bg-gray-50 {
+  background-color: #f7f7f9;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 卡片悬停效果增强 */
+@media (hover: hover) {
+  .bg-gray-50:hover {
+    background-color: #f9f9fb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
 }
 </style>

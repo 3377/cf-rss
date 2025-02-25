@@ -1,11 +1,10 @@
 /* 全局亮色模式样式覆盖 */
 html body .app-container.bg-gray-50 {
     background-color: #f0f4f8 !important;
-    background-image: 
+    background-image:
         linear-gradient(to bottom,
             rgba(240, 244, 248, 0.85),
-            rgba(240, 244, 248, 0.95)
-        ),
+            rgba(240, 244, 248, 0.95)),
         url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDE1IEwgNjAgMTUgTSAxNSAwIEwgMTUgNjAgTSAwIDMwIEwgNjAgMzAgTSAzMCAwIEwgMzAgNjAgTSAwIDQ1IEwgNjAgNDUgTSA0NSAwIEwgNDUgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjE1Ii8+CiAgICA8L3BhdHRlcm4+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiIC8+Cjwvc3ZnPg==") !important;
 }
 
@@ -55,8 +54,8 @@ html body .app-container.bg-gray-50 .text-gray-500 {
 
 /* 卡片样式全局覆盖 */
 html body .app-container.bg-gray-50 .feed-card {
-    background: rgba(248, 246, 242, 0.95) !important;
-    border: 1px solid rgba(230, 235, 242, 0.9) !important;
+    background: rgba(245, 245, 247, 0.95) !important;
+    border: 1px solid rgba(220, 225, 235, 0.9) !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
@@ -70,8 +69,8 @@ html body .app-container.bg-gray-50 .feed-card:hover {
 }
 
 html body .app-container.bg-gray-50 .card-header {
-    background-color: rgba(240, 242, 247, 0.9) !important;
-    border-bottom: 1px solid rgba(230, 235, 242, 0.9) !important;
+    background-color: rgba(240, 240, 245, 0.9) !important;
+    border-bottom: 1px solid rgba(220, 225, 235, 0.9) !important;
 }
 
 html body .app-container.bg-gray-50 .card-title {
@@ -79,11 +78,11 @@ html body .app-container.bg-gray-50 .card-title {
 }
 
 html body .app-container.bg-gray-50 .card-content {
-    background-color: rgba(240, 242, 247, 0.5) !important;
+    background-color: rgba(240, 240, 245, 0.5) !important;
 }
 
 html body .app-container.bg-gray-50 .item-link:hover {
-    background: rgba(240, 242, 247, 0.8) !important;
+    background: rgba(235, 238, 245, 0.8) !important;
 }
 
 html body .app-container.bg-gray-50 .item-title {
@@ -122,7 +121,7 @@ body:not(.dark) {
 /* 移动端全局优化 */
 @media (max-width: 768px) {
     html body .app-container.bg-gray-50 .feed-card {
-        background: rgba(245, 247, 250, 0.85) !important;
+        background: rgba(240, 242, 247, 0.85) !important;
     }
 
     html body .app-container.bg-gray-50 .header {
@@ -153,6 +152,7 @@ body:not(.dark) {
     }
 
     html body .app-container.bg-gray-50 .feed-card {
+        background: rgba(235, 238, 242, 0.9) !important;
         border-radius: 0.5rem !important;
     }
 
