@@ -111,7 +111,7 @@ const fontSize = computed(() => {
 
 <style scoped>
 .feed-container {
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   width: 100%;
   height: 100vh;
   overflow: hidden;
@@ -121,9 +121,9 @@ const fontSize = computed(() => {
   display: grid;
   margin: 0 auto;
   gap: 10rem;
-  padding: 1rem;
+  padding: 0.5rem;
   width: 98%;
-  height: calc(100vh - 2rem);
+  height: calc(100vh - 1rem);
   overflow: hidden;
 }
 

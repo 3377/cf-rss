@@ -203,7 +203,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   margin-top: 0;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .footer {
@@ -211,6 +211,7 @@ onUnmounted(() => {
   border-top: 1px solid #e5e7eb;
   background-color: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
+  padding-top: 0.25rem;
 }
 
 .dark .footer {
