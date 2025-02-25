@@ -20,7 +20,7 @@ const defaultConfig = {
   },
   display: {
     appTitle: "FY Pages RSS", // 应用标题
-    defaultDarkMode: true, // 默认使用暗色模式
+    defaultDarkMode: true, // 确保默认使用暗色模式
     itemsPerFeed: 15, // 每个卡片显示的条目数
     showItemDate: false, // 默认不显示条目日期
     dateFormat: "yyyy-MM-dd HH:mm",
