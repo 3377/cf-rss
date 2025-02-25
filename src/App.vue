@@ -1,71 +1,79 @@
 <template>
-  <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
-    <div class="header">
-      <div class="text-center mb-4">
-        <h1 class="text-3xl font-bold text-gray-700 header-title">
-          {{ appTitle }}
-        </h1>
-      </div>
+  <div
+    class="app-container min-h-screen transition-colors duration-300"
+    :class="{ 'bg-gray-900': isDark, 'bg-gray-50': !isDark }"
+    :style="{ backgroundColor: isDark ? '#111827' : '#f3f4f6' }"
+  >
+    <header
+      class="sticky top-0 z-40 backdrop-blur-md bg-opacity-90 dark:bg-opacity-90 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm"
+    >
+      <div class="header">
+        <div class="text-center mb-4">
+          <h1 class="text-3xl font-bold text-gray-700 header-title">
+            {{ appTitle }}
+          </h1>
+        </div>
 
-      <div class="flex justify-between items-center">
-        <div class="flex-1"></div>
-        <div
-          class="flex justify-center flex-1 text-base text-gray-600 status-text gap-8"
-        >
-          <div v-if="loading" class="text-gray-600 font-medium status-text">
-            加载中...
+        <div class="flex justify-between items-center">
+          <div class="flex-1"></div>
+          <div
+            class="flex justify-center flex-1 text-base text-gray-600 status-text gap-8"
+          >
+            <div v-if="loading" class="text-gray-600 font-medium status-text">
+              加载中...
+            </div>
+            <template v-else>
+              <div>下次刷新: {{ formatCountdown }}</div>
+              <div>最后更新: {{ formatLastUpdate }}</div>
+            </template>
           </div>
-          <template v-else>
-            <div>下次刷新: {{ formatCountdown }}</div>
-            <div>最后更新: {{ formatLastUpdate }}</div>
-          </template>
-        </div>
-        <div class="flex items-center gap-4 flex-1 justify-end">
-          <button
-            @click="toggleTheme"
-            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
-            :title="isDark ? '切换到亮色模式' : '切换到暗色模式'"
-          >
-            <svg
-              v-if="isDark"
-              class="w-6 h-6 text-gray-200"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div class="flex items-center gap-4 flex-1 justify-end">
+            <button
+              @click="toggleDarkMode"
+              class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+              :title="isDark ? '切换到亮色模式' : '切换到暗色模式'"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-            <svg
-              v-else
-              class="w-6 h-6 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+              <svg
+                v-if="isDark"
+                class="w-6 h-6 text-gray-200"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+              <svg
+                v-else
+                class="w-6 h-6 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                />
+              </svg>
+            </button>
+            <button
+              @click="fetchFeeds"
+              class="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
+              :disabled="loading"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-              />
-            </svg>
-          </button>
-          <button
-            @click="fetchFeeds"
-            class="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
-            :disabled="loading"
-          >
-            <span v-if="loading">刷新中...</span>
-            <span v-else>立即刷新</span>
-          </button>
+              <span v-if="loading">刷新中...</span>
+              <span v-else>立即刷新</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </header>
 
     <!-- 内容区域 -->
     <div class="content-area">
@@ -94,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, watch } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
 import { RSS_CONFIG } from "./config/rss.config";
 
@@ -102,11 +110,7 @@ const feeds = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const countdown = ref(RSS_CONFIG.refresh.interval);
-const isDark = ref(
-  localStorage.getItem("theme") === null
-    ? RSS_CONFIG.display.defaultDarkMode
-    : localStorage.getItem("theme") === "dark"
-);
+const isDark = ref(false);
 const appTitle = ref(RSS_CONFIG.display.appTitle);
 let refreshTimer = null;
 let countdownTimer = null;
@@ -131,19 +135,40 @@ const formatLastUpdate = computed(() => {
   });
 });
 
-const toggleTheme = () => {
+function toggleDarkMode() {
   isDark.value = !isDark.value;
-  localStorage.setItem("theme", isDark.value ? "dark" : "light");
 
-  // 更新根元素和body类名，确保全局样式正确应用
+  // 更新主题状态
   if (isDark.value) {
-    document.documentElement.classList.add("dark");
-    document.body.classList.add("dark");
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('dark');
+    document.documentElement.style.backgroundColor = '#111827';
+    document.body.style.backgroundColor = '#111827';
   } else {
-    document.documentElement.classList.remove("dark");
-    document.body.classList.remove("dark");
+    document.documentElement.classList.remove('dark');
+    document.body.classList.remove('dark');
+    document.documentElement.style.backgroundColor = '#f3f4f6';
+    document.body.style.backgroundColor = '#f3f4f6';
+
+    // 强制应用亮色模式的背景
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) {
+      appContainer.style.backgroundColor = '#f3f4f6';
+    }
+
+    // 触发重新渲染以确保样式更新
+    nextTick(() => {
+      const cards = document.querySelectorAll('.feed-card');
+      cards.forEach(card => {
+        card.style.display = 'none';
+        setTimeout(() => card.style.display = '', 0);
+      });
+    });
   }
-};
+
+  // 保存用户主题偏好
+  localStorage.setItem('darkMode', isDark.value ? '1' : '0');
+}
 
 const fetchFeeds = async () => {
   try {
@@ -178,14 +203,30 @@ const updateCountdown = () => {
   }
 };
 
-onMounted(async () => {
-  // 初始化时设置正确的主题类
+onMounted(() => {
+  // 检查用户之前的主题偏好
+  const savedDarkMode = localStorage.getItem('darkMode');
+  isDark.value = savedDarkMode === '1';
+
+  // 初始化主题
   if (isDark.value) {
-    document.documentElement.classList.add("dark");
-    document.body.classList.add("dark");
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('dark');
+    document.documentElement.style.backgroundColor = '#111827';
+    document.body.style.backgroundColor = '#111827';
   } else {
-    document.documentElement.classList.remove("dark");
-    document.body.classList.remove("dark");
+    document.documentElement.classList.remove('dark');
+    document.body.classList.remove('dark');
+    document.documentElement.style.backgroundColor = '#f3f4f6';
+    document.body.style.backgroundColor = '#f3f4f6';
+
+    // 确保亮色模式样式应用
+    setTimeout(() => {
+      const appContainer = document.querySelector('.app-container');
+      if (appContainer) {
+        appContainer.style.backgroundColor = '#f3f4f6';
+      }
+    }, 0);
   }
 
   await fetchFeeds();

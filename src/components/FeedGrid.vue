@@ -5,28 +5,29 @@
         v-for="feed in feeds"
         :key="feed.url"
         class="feed-card"
-        :style="
-          !isDark
-            ? {
-                background: 'rgba(235, 245, 255, 0.85)',
-                border: '1px solid rgba(210, 230, 250, 0.9)',
-                boxShadow:
-                  '0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
-              }
-            : {}
-        "
+        :style="{
+          background: !isDark
+            ? 'rgba(235, 245, 255, 0.85)'
+            : 'rgba(31, 41, 55, 0.9)',
+          border: !isDark
+            ? '1px solid rgba(210, 230, 250, 0.9)'
+            : '1px solid rgba(55, 65, 81, 0.5)',
+          boxShadow: !isDark
+            ? '0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)'
+            : 'none',
+        }"
       >
         <!-- 标题区域 -->
         <div
           class="card-header"
-          :style="
-            !isDark
-              ? {
-                  backgroundColor: 'rgba(225, 240, 255, 0.9)',
-                  borderBottom: '1px solid rgba(210, 230, 250, 0.9)',
-                }
-              : {}
-          "
+          :style="{
+            backgroundColor: !isDark
+              ? 'rgba(225, 240, 255, 0.9)'
+              : 'rgba(31, 41, 55, 0.7)',
+            borderBottom: !isDark
+              ? '1px solid rgba(210, 230, 250, 0.9)'
+              : '1px solid #374151',
+          }"
         >
           <h2 class="card-title">
             {{ feed.title }}
@@ -36,9 +37,12 @@
         <!-- 内容区域 -->
         <div
           class="card-content"
-          :style="
-            !isDark ? { backgroundColor: 'rgba(230, 245, 255, 0.5)' } : {}
-          "
+          :style="{
+            backgroundColor: !isDark
+              ? 'rgba(230, 245, 255, 0.5)'
+              : 'rgba(31, 41, 55, 1)',
+            paddingBottom: '1rem',
+          }"
         >
           <div v-if="feed.error" class="error-message">
             {{ feed.error }}
@@ -62,12 +66,16 @@
                 class="item-link"
                 @mouseenter="showTooltip($event, item.title, item.pubDate)"
                 @mouseleave="hideTooltip"
+                :style="{
+                  marginBottom: '4px',
+                }"
               >
                 <h3
                   class="item-title"
                   :style="{
                     fontSize: `${fontSize}px`,
                     paddingRight: showItemDate ? '4rem' : '0.5rem',
+                    color: !isDark ? '#2d3748' : '#f3f4f6',
                   }"
                 >
                   {{ item.title }}
@@ -89,6 +97,13 @@
       :style="{
         top: tooltipPosition.top + 'px',
         left: tooltipPosition.left + 'px',
+        backgroundColor: !isDark
+          ? 'rgba(235, 245, 255, 0.95)'
+          : 'rgba(31, 41, 55, 0.95)',
+        color: !isDark ? '#2d3748' : '#f3f4f6',
+        border: !isDark
+          ? '1px solid rgba(210, 230, 250, 0.9)'
+          : '1px solid rgba(55, 65, 81, 0.8)',
       }"
     >
       {{ tooltipText }}

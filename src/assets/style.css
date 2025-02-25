@@ -2,33 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 全局卡片样式覆盖 */
-html body:not(.dark) .feed-card {
+/* 直接覆盖卡片样式 - 无论主题如何设置 */
+.feed-card {
     background: rgba(235, 245, 255, 0.85) !important;
     border: 1px solid rgba(210, 230, 250, 0.9) !important;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
-html body:not(.dark) .card-header {
+.card-header {
     background-color: rgba(225, 240, 255, 0.9) !important;
     border-bottom: 1px solid rgba(210, 230, 250, 0.9) !important;
 }
 
-html body:not(.dark) .card-content {
+.card-content {
     background-color: rgba(230, 245, 255, 0.5) !important;
+    padding-bottom: 1rem !important;
 }
 
-/* 暗色模式覆盖 */
-html body.dark .feed-card {
+/* 暗色模式仅在body.dark或html.dark时生效 */
+body.dark .feed-card,
+html.dark .feed-card {
     background: rgba(31, 41, 55, 0.9) !important;
     border-color: rgba(55, 65, 81, 0.5) !important;
 }
 
-html body.dark .card-header {
+body.dark .card-header,
+html.dark .card-header {
     background-color: rgba(31, 41, 55, 0.7) !important;
     border-color: #374151 !important;
 }
 
-html body.dark .card-content {
+body.dark .card-content,
+html.dark .card-content {
     background-color: rgba(31, 41, 55, 1) !important;
 }
