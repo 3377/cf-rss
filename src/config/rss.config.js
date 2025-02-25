@@ -31,7 +31,7 @@ const defaultConfig = {
       sideMargin: "2%", // 两侧留白
       cardPadding: 16, // 卡片内边距
       fixedLayout: true, // 固定布局
-      gridColumns: 3, // 3列布局
+      gridColumns: 4, // 3列布局
       showLayoutToggle: false, // 隐藏布局切换
       containerWidth: "96vw", // 容器宽度
       containerPadding: "16px", // 容器内边距
