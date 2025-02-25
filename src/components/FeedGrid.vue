@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watchEffect } from "vue";
+import { ref, computed, onMounted, watchEffect, watch } from "vue";
 import { format, parseISO } from "date-fns";
 import { RSS_CONFIG } from "../config/rss.config";
 
@@ -99,16 +99,65 @@ const gridStyle = computed(() => {
   };
 });
 
-// 处理日期格式化，确保返回易读的日期格式
+// 处理日期格式化，添加更健壮的错误处理
 const formatDate = (dateStr) => {
-  if (!dateStr) return "";
+  if (!dateStr) return "未知时间";
 
   try {
-    const date = parseISO(dateStr);
-    return format(date, "yyyy-MM-dd HH:mm:ss");
+    // 检查各种可能的日期格式，处理特殊情况
+    let date;
+
+    // 检查是否为数字时间戳
+    if (typeof dateStr === "number" || /^\d+$/.test(dateStr)) {
+      const timestamp = parseInt(dateStr, 10);
+      date = new Date(timestamp);
+    } else if (typeof dateStr === "string") {
+      // 尝试解析常见的日期字符串格式
+      date = new Date(dateStr);
+
+      // 针对无效但格式特殊的日期，做额外处理
+      if (isNaN(date.getTime())) {
+        // 尝试解析其他格式，例如：YYYY.MM.DD
+        const parts = dateStr.split(/[.-/]/);
+        if (parts.length === 3) {
+          // 尝试几种可能的格式
+          date = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
+        }
+      }
+    } else {
+      // 如果是Date对象，直接使用
+      date = dateStr instanceof Date ? dateStr : new Date();
+    }
+
+    // 最终检查日期是否有效
+    if (isNaN(date.getTime())) {
+      console.log("无效日期值:", dateStr, "类型:", typeof dateStr);
+      return "无效日期";
+    }
+
+    // 使用直接的Date方法格式化
+    try {
+      return date.toLocaleString("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+    } catch (innerError) {
+      // 如果toLocaleString失败，使用备用格式化方法
+      console.error("本地化日期格式化失败:", innerError);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(date.getDate()).padStart(2, "0")} ${String(
+        date.getHours()
+      ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+    }
   } catch (error) {
-    console.error("日期格式化错误:", error);
-    return "";
+    console.error("日期格式化错误:", error, "原始数据:", dateStr);
+    return "日期错误";
   }
 };
 
@@ -123,19 +172,25 @@ const tooltipStyle = ref({
 });
 const showTooltipText = ref(false);
 
+// 修改显示提示框的方法，添加更好的错误处理和调试
 const showTooltip = (event, text, date) => {
   if (!text) return;
 
   tooltipText.value = text;
-  console.log("提示框触发，日期数据:", date); // 调试日志
+  console.log("提示框触发，日期数据:", date, "类型:", typeof date); // 增强的调试日志
 
-  // 格式化并设置日期
-  if (date) {
-    tooltipDate.value = formatDate(date);
-    console.log("格式化后的日期:", tooltipDate.value); // 调试日志
-  } else {
-    tooltipDate.value = "";
-    console.log("未提供日期数据");
+  // 格式化并设置日期，使用更安全的处理方式
+  try {
+    if (date) {
+      tooltipDate.value = formatDate(date);
+      console.log("格式化后的日期:", tooltipDate.value);
+    } else {
+      tooltipDate.value = "未知时间";
+      console.log("未提供日期数据");
+    }
+  } catch (error) {
+    console.error("处理日期时出错:", error);
+    tooltipDate.value = "日期错误";
   }
 
   showTooltipText.value = true;
@@ -184,6 +239,50 @@ onMounted(() => {
       }
     });
   });
+
+  // 添加调试信息，检查feeds数据结构
+  watch(
+    () => props.feeds,
+    (newFeeds) => {
+      if (newFeeds && newFeeds.length > 0) {
+        console.log("Feeds数据结构示例:", {
+          feedCount: newFeeds.length,
+          firstFeed: {
+            title: newFeeds[0].title,
+            itemCount: newFeeds[0].items?.length || 0,
+            firstItemDateSample: newFeeds[0].items?.[0]?.pubDate || "无日期",
+            firstItemDateType: typeof newFeeds[0].items?.[0]?.pubDate,
+          },
+        });
+
+        // 检查所有feed中是否存在日期格式问题
+        newFeeds.forEach((feed, feedIndex) => {
+          if (feed.items && feed.items.length > 0) {
+            feed.items.forEach((item, itemIndex) => {
+              if (item.pubDate) {
+                try {
+                  const date = new Date(item.pubDate);
+                  if (isNaN(date.getTime())) {
+                    console.warn(
+                      `检测到无效日期: feed[${feedIndex}].items[${itemIndex}].pubDate = "${
+                        item.pubDate
+                      }" (${typeof item.pubDate})`
+                    );
+                  }
+                } catch (e) {
+                  console.error(
+                    `日期检查错误: feed[${feedIndex}].items[${itemIndex}].pubDate = "${item.pubDate}"`,
+                    e
+                  );
+                }
+              }
+            });
+          }
+        });
+      }
+    },
+    { immediate: true, deep: true }
+  );
 });
 </script>
 
