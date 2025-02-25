@@ -1,130 +1,61 @@
 <template>
   <div class="feed-container">
-    <div class="feed-grid" :style="gridStyle">
-      <div
-        v-for="feed in feeds"
-        :key="feed.url"
-        class="feed-card"
-        :style="
-          isDark
-            ? {}
-            : {
-                background: 'rgba(200, 225, 245, 1)',
-                border: '1px solid rgba(160, 190, 230, 0.9)',
-                boxShadow:
-                  '0 6px 16px rgba(0, 0, 0, 0.05), 0 3px 6px rgba(0, 0, 0, 0.03)',
-              }
-        "
-      >
-        <!-- 标题区域 -->
-        <div
-          class="card-header"
-          :style="
-            isDark
-              ? {}
-              : {
-                  backgroundColor: 'rgba(180, 210, 240, 1)',
-                  borderBottom: '1px solid rgba(160, 190, 230, 0.9)',
-                }
-          "
-        >
-          <h2 class="card-title">
-            {{ feed.title }}
-          </h2>
+    <div
+      v-if="!feeds || feeds.length === 0"
+      class="flex items-center justify-center h-full"
+    >
+      <div class="text-gray-500 empty-message">暂无数据</div>
+    </div>
+    <div v-else class="feed-grid" :style="gridStyle">
+      <div v-for="feed in feeds" :key="feed.title" class="feed-card">
+        <div class="card-header">
+          <h2 class="card-title">{{ feed.title }}</h2>
         </div>
-
-        <!-- 内容区域 -->
-        <div
-          class="card-content"
-          :style="
-            isDark
-              ? {}
-              : {
-                  backgroundColor: 'rgba(200, 225, 245, 1)',
-                }
-          "
-        >
-          <div v-if="feed.error" class="error-message">
-            {{ feed.error }}
-          </div>
-          <div v-else-if="!feed.items.length" class="empty-message">
-            暂无内容
-          </div>
-          <div v-else class="items-list">
-            <div
-              v-for="item in feed.items.slice(
-                0,
-                config.value?.display?.itemsPerFeed || 15
-              )"
-              :key="item.id"
-              class="feed-item"
-              :style="
-                isDark
-                  ? {}
-                  : {
-                      borderBottom: '1px solid rgba(160, 190, 230, 0.8)',
-                    }
-              "
-            >
-              <a
-                :href="item.link"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="item-link"
-                :style="
-                  isDark
-                    ? {}
-                    : { hover: { background: 'rgba(180, 210, 240, 1)' } }
-                "
-                @mouseenter="showTooltip($event, item.title, item.pubDate)"
-                @mouseleave="hideTooltip"
-              >
-                <h3
-                  class="item-title"
-                  :style="{
-                    fontSize: `${fontSize}px`,
-                    paddingRight: showItemDate ? '4rem' : '0.5rem',
-                    color: isDark ? '#f3f4f6' : '#2c4270',
-                  }"
-                >
-                  {{ item.title }}
-                </h3>
-                <span
-                  v-if="showItemDate"
-                  class="item-date"
-                  :style="
-                    isDark
-                      ? {}
-                      : {
-                          color: '#465a7c',
-                          background: 'rgba(180, 210, 240, 0.95)',
-                        }
-                  "
-                >
-                  {{ formatDate(item.pubDate) }}
-                </span>
-              </a>
+        <div class="card-content">
+          <div class="items-list">
+            <div v-if="feed.error" class="error-message">
+              {{ feed.error }}
             </div>
+            <div
+              v-else-if="!feed.items || feed.items.length === 0"
+              class="empty-message"
+            >
+              暂无数据
+            </div>
+            <template v-else>
+              <div
+                v-for="item in feed.items"
+                :key="item.id || item.link"
+                class="feed-item"
+              >
+                <a
+                  :href="item.link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="item-link"
+                  @mouseover="showTooltip($event, item.title)"
+                  @mouseleave="hideTooltip"
+                >
+                  <div class="item-title">{{ item.title }}</div>
+                  <div v-if="showItemDate" class="item-date">
+                    {{ formatDate(item.pubDate) }}
+                  </div>
+                </a>
+              </div>
+              <!-- 添加额外的填充元素确保内容能滚动 -->
+              <div v-if="feed.items.length > 0" class="h-2"></div>
+            </template>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 标题弹窗 -->
+    <!-- 标题提示框 -->
     <div
-      v-show="tooltipVisible"
+      ref="tooltip"
       class="title-tooltip"
-      :style="{
-        top: tooltipPosition.top + 'px',
-        left: tooltipPosition.left + 'px',
-        backgroundColor: isDark
-          ? 'rgba(31, 41, 55, 0.95)'
-          : 'rgba(180, 210, 240, 0.98)',
-        color: isDark ? '#f3f4f6' : '#2c4270',
-        border: isDark
-          ? '1px solid rgba(55, 65, 81, 0.8)'
-          : '1px solid rgba(160, 190, 230, 0.9)',
-      }"
+      :style="tooltipStyle"
+      v-show="showTooltipText"
     >
       {{ tooltipText }}
     </div>
@@ -132,234 +63,206 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, nextTick } from "vue";
-import { getRSSConfig } from "../config/rss.config";
+import { ref, computed, onMounted, watchEffect } from "vue";
+import { format, parseISO } from "date-fns";
+import { RSS_CONFIG } from "../config/rss.config";
 
 const props = defineProps({
   feeds: {
     type: Array,
     default: () => [],
-    validator: (value) => {
-      return value.every((feed) => {
-        return (
-          feed &&
-          typeof feed.title === "string" &&
-          typeof feed.url === "string" &&
-          Array.isArray(feed.items)
-        );
-      });
-    },
   },
-  isDark: Boolean,
+  isDark: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const config = ref(getRSSConfig(null));
-const showItemDate = ref(config.value?.display?.showItemDate || false);
+// 获取配置
+const showItemDate = ref(RSS_CONFIG.display?.showItemDate || false);
+const dateFormat = ref(RSS_CONFIG.display?.dateFormat || "yyyy-MM-dd HH:mm");
 
-// 标题提示框相关状态
-const tooltipVisible = ref(false);
-const tooltipText = ref("");
-const tooltipPosition = ref({ top: 0, left: 0 });
+// 计算网格样式
+const gridStyle = computed(() => {
+  const layout = RSS_CONFIG.display?.layout || {};
+  const columns = layout.gridColumns || 3;
+  const gap = layout.cardGap || 24;
+  const sideMargin = layout.sideMargin || "2%";
 
-onMounted(() => {
-  if (typeof window !== "undefined" && window.__RSS_CONFIG__) {
-    config.value = window.__RSS_CONFIG__;
-    showItemDate.value = config.value?.display?.showItemDate || false;
-    console.log("Using injected config:", config.value);
-  }
+  return {
+    gridTemplateColumns: `repeat(${columns}, 1fr)`,
+    gap: `${gap}px`,
+    margin: `0 ${sideMargin}`,
+  };
 });
 
-// 显示标题提示框方法
-const showTooltip = (event, text, pubDate) => {
-  // 获取标题元素
-  const titleEl = event.target.querySelector(".item-title");
+// 处理日期格式化
+const formatDate = (dateStr) => {
+  if (!dateStr) return "";
 
-  // 只有当标题内容溢出时才显示提示框
-  if (titleEl && titleEl.offsetWidth < titleEl.scrollWidth) {
-    // 对于溢出的多行标题，添加时间前缀
-    tooltipText.value = formatDate(pubDate) + " " + text;
-
-    // 计算提示框位置（上方）
-    const rect = titleEl.getBoundingClientRect();
-    tooltipPosition.value = {
-      top: rect.top + window.scrollY - 40, // 放在上方
-      left: rect.left + window.scrollX,
-    };
-
-    nextTick(() => {
-      tooltipVisible.value = true;
-    });
-  }
-};
-
-// 隐藏标题提示框方法
-const hideTooltip = () => {
-  tooltipVisible.value = false;
-};
-
-const formatDate = (date) => {
-  if (!date) return "";
   try {
-    return new Date(date).toLocaleString("zh-CN", {
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch (e) {
-    console.error("日期格式化错误:", e);
+    const date = parseISO(dateStr);
+    return format(date, dateFormat.value);
+  } catch (error) {
+    console.error("日期格式化错误:", error);
     return "";
   }
 };
 
-// 修改网格样式计算
-const gridStyle = computed(() => {
-  const layout = config.value?.display?.layout || {};
-  return {
-    gridTemplateColumns: `repeat(${layout.columns || 4}, 1fr)`,
-    gap: `${layout.cardGap || 24}px`,
-    maxWidth: layout.containerWidth || "1920px",
-    padding: layout.containerPadding || "16px",
-    margin: `0 ${layout.sideMargin || "2%"}`,
-  };
+// 标题提示功能
+const tooltip = ref(null);
+const tooltipText = ref("");
+const tooltipStyle = ref({
+  opacity: 0,
+  top: "0px",
+  left: "0px",
 });
+const showTooltipText = ref(false);
 
-const fontSize = computed(() => {
-  const size = config.value?.display?.fontSize;
-  return typeof size === "number" ? size : 16;
+const showTooltip = (event, text) => {
+  if (!text) return;
+
+  tooltipText.value = text;
+  showTooltipText.value = true;
+
+  // 延迟计算位置，确保DOM已更新
+  setTimeout(() => {
+    if (!tooltip.value) return;
+
+    const rect = event.target.getBoundingClientRect();
+    const tooltipRect = tooltip.value.getBoundingClientRect();
+
+    // 计算最佳位置（优先显示在元素下方）
+    let top = rect.bottom + 8;
+    const left = Math.min(
+      Math.max(rect.left, 20),
+      window.innerWidth - tooltipRect.width - 20
+    );
+
+    // 检查是否超出屏幕底部，如果是则显示在元素上方
+    if (top + tooltipRect.height > window.innerHeight - 20) {
+      top = rect.top - tooltipRect.height - 8;
+    }
+
+    tooltipStyle.value = {
+      opacity: 1,
+      top: `${top}px`,
+      left: `${left}px`,
+    };
+  }, 10);
+};
+
+const hideTooltip = () => {
+  showTooltipText.value = false;
+  tooltipStyle.value.opacity = 0;
+};
+
+// 确保卡片内容在组件挂载后可滚动
+onMounted(() => {
+  // 给内容区域添加点击事件，用于在移动设备上触发滚动
+  const contentElements = document.querySelectorAll(".card-content");
+  contentElements.forEach((el) => {
+    el.addEventListener("click", (e) => {
+      // 防止点击链接时触发
+      if (e.target.tagName !== "A" && e.target.parentElement.tagName !== "A") {
+        e.currentTarget.style.overflowY = "auto";
+      }
+    });
+  });
 });
 </script>
 
 <style>
-/* 强制全局样式，确保高优先级 */
+/* 卡片容器样式 */
 .feed-container {
   padding: 0.5rem 1rem;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
-  position: relative;
 }
 
+/* 卡片网格布局 */
 .feed-grid {
   display: grid;
-  margin: 0 auto;
-  gap: 10rem;
   padding: 0.5rem;
   width: 98%;
-  height: calc(100vh - 1rem);
-  overflow: hidden;
+  height: calc(100vh - 10rem);
+  margin: 0 auto;
 }
 
+/* 卡片样式 */
 .feed-card {
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07);
   border-radius: 0.75rem;
+  transition: all 0.3s ease;
 }
 
-/* 亮色模式卡片样式 */
-html body .app-container:not(.dark) .feed-card {
-  background: rgba(200, 225, 245, 1) !important;
-  border: 1px solid rgba(160, 190, 230, 0.9) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05), 0 3px 6px rgba(0, 0, 0, 0.03) !important;
-}
-
-/* 暗色模式卡片样式 - 保持原样 */
-.dark .feed-card {
-  background: rgba(31, 41, 55, 0.9) !important;
-  border-color: rgba(55, 65, 81, 0.5) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-}
-
+/* 卡片头部样式 */
 .card-header {
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
   border-radius: 0.75rem 0.75rem 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-html body .app-container:not(.dark) .card-header {
-  background-color: rgba(180, 210, 240, 1) !important;
-  border-bottom: 1px solid rgba(160, 190, 230, 0.9) !important;
-}
-
-.dark .card-header {
-  border-color: #374151;
-  background-color: rgba(31, 41, 55, 0.7);
-}
-
+/* 卡片标题样式 */
 .card-title {
   font-size: 1.25rem;
   font-weight: bold;
   text-align: center;
 }
 
-html body .app-container:not(.dark) .card-title {
-  color: #2c4270 !important;
-}
-
-.dark .card-title {
-  color: #f3f4f6;
-}
-
+/* 卡片内容区域样式 */
 .card-content {
   flex: 1;
   padding: 0.5rem 0;
   overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  overflow-x: hidden;
+  height: calc(100% - 3.5rem);
+  border-radius: 0 0 0.75rem 0.75rem;
+}
+
+/* 隐藏滚动条 */
+.card-content::-webkit-scrollbar {
+  display: none;
+}
+
+.card-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   scroll-behavior: smooth;
 }
 
-.card-content::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
-
-html body .app-container:not(.dark) .card-content {
-  background-color: rgba(200, 225, 245, 1) !important;
-}
-
-.dark .card-content {
-  background-color: rgba(31, 41, 55, 1);
-}
-
+/* 项目列表样式 */
 .items-list {
   border-top: none;
+  padding-bottom: 0.75rem;
 }
 
-.dark .items-list {
-  border-color: #374151;
-}
-
+/* 项目样式 */
 .feed-item {
-  border-bottom: 1px solid rgba(160, 190, 230, 0.8);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
 }
 
-html body .app-container:not(.dark) .feed-item {
-  border-bottom: 1px solid rgba(160, 190, 230, 0.8) !important;
+/* 最后一个项目不需要底部边框 */
+.feed-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0.5rem;
 }
 
-.dark .feed-item {
-  border-color: #374151;
-}
-
+/* 项目链接样式 */
 .item-link {
   display: block;
   padding: 0.75rem 1rem;
   position: relative;
 }
 
-html body .app-container:not(.dark) .item-link:hover {
-  background: rgba(180, 210, 240, 1) !important;
-}
-
-.dark .item-link:hover {
-  background: rgba(55, 65, 81, 0.7);
-}
-
+/* 项目标题样式 */
 .item-title {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -370,22 +273,7 @@ html body .app-container:not(.dark) .item-link:hover {
   max-width: 100%;
 }
 
-html body .app-container:not(.dark) .item-title {
-  color: #2c4270 !important;
-}
-
-.dark .item-title {
-  color: #f3f4f6;
-}
-
-html body .app-container:not(.dark) .item-link:hover .item-title {
-  color: #2563eb !important;
-}
-
-.dark .item-link:hover .item-title {
-  color: #3b82f6;
-}
-
+/* 项目日期样式 */
 .item-date {
   position: absolute;
   right: 1rem;
@@ -394,49 +282,24 @@ html body .app-container:not(.dark) .item-link:hover .item-title {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   opacity: 1;
   transition: all 0.3s ease;
   white-space: nowrap;
 }
 
-html body .app-container:not(.dark) .item-date {
-  color: #465a7c !important;
-  background: rgba(180, 210, 240, 0.95) !important;
-}
-
-.dark .item-date {
-  background: #1f2937;
-  color: #9ca3af;
-}
-
-html body .app-container:not(.dark) .item-link:hover .item-date {
-  background: rgba(200, 225, 245, 0.95) !important;
-}
-
-.dark .item-link:hover .item-date {
-  background: rgba(55, 65, 81, 0.9);
-}
-
+/* 错误信息样式 */
 .error-message {
   color: #ef4444;
   padding: 1rem;
 }
 
+/* 空数据提示样式 */
 .empty-message {
   text-align: center;
   padding: 1rem;
 }
 
-html body .app-container:not(.dark) .empty-message {
-  color: #465a7c !important;
-}
-
-.dark .empty-message {
-  color: #9ca3af;
-}
-
-/* 标题弹窗样式 */
+/* 标题提示框样式 */
 .title-tooltip {
   position: fixed;
   padding: 0.5rem 0.75rem;
@@ -452,41 +315,22 @@ html body .app-container:not(.dark) .empty-message {
   text-align: left;
 }
 
-html body .app-container:not(.dark) .title-tooltip {
-  background: rgba(180, 210, 240, 0.98) !important;
-  color: #2c4270 !important;
-  border: 1px solid rgba(160, 190, 230, 0.9) !important;
-}
-
-.dark .title-tooltip {
-  background: rgba(31, 41, 55, 0.95);
-  color: #f3f4f6;
-  border-color: rgba(55, 65, 81, 0.8);
-}
-
-/* 移动端全局优化 */
+/* 移动设备适配 */
 @media (max-width: 768px) {
   .feed-grid {
     grid-template-columns: 1fr !important;
     gap: 1rem;
     width: 100%;
     padding: 0.5rem;
-    height: calc(100vh - 7rem);
-    overflow-y: auto;
   }
 
   .feed-card {
-    height: auto;
     min-height: 300px;
-    max-height: 90vh;
     margin-bottom: 1rem;
   }
 
   .card-header {
     padding: 0.75rem;
-    position: sticky;
-    top: 0;
-    z-index: 10;
   }
 
   .card-title {
@@ -496,8 +340,7 @@ html body .app-container:not(.dark) .title-tooltip {
 
   .card-content {
     padding: 0.25rem 0;
-    max-height: none;
-    overflow-y: auto;
+    height: calc(100% - 3rem);
   }
 
   .item-link {
@@ -532,15 +375,7 @@ html body .app-container:not(.dark) .title-tooltip {
   }
 }
 
-/* 适配中等屏幕 */
-@media (min-width: 769px) and (max-width: 1200px) {
-  .feed-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 1.5rem;
-  }
-}
-
-/* 优化小型移动设备 */
+/* 适配较小屏幕设备 */
 @media (max-width: 480px) {
   .feed-container {
     padding: 0.25rem 0.5rem;
@@ -549,7 +384,6 @@ html body .app-container:not(.dark) .title-tooltip {
   .feed-grid {
     gap: 0.75rem;
     padding: 0.25rem;
-    height: calc(100vh - 6.5rem);
   }
 
   .feed-card {

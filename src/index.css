@@ -30,6 +30,11 @@
     /* 更高饱和度的蓝色背景 */
     border: 1px solid rgba(160, 190, 230, 0.9) !important;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05), 0 3px 6px rgba(0, 0, 0, 0.03) !important;
+    border-radius: 0.75rem !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
 }
 
 /* 亮色模式下的卡片头部样式 */
@@ -37,12 +42,40 @@
     background-color: rgba(180, 210, 240, 1) !important;
     /* 稍微深一点的蓝色头部 */
     border-bottom: 1px solid rgba(160, 190, 230, 0.9) !important;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 /* 亮色模式下的卡片内容区域样式 */
 .app-container:not(.dark) .card-content {
     background-color: rgba(200, 225, 245, 1) !important;
     /* 与卡片背景一致的蓝色 */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+    max-height: calc(100% - 3.5rem);
+    /* 限制最大高度，确保可以滚动 */
+    height: auto;
+    overflow-y: auto !important;
+    /* 强制启用垂直滚动 */
+    border-radius: 0 0 0.75rem 0.75rem;
+    /* 确保内容区域底部圆角 */
+}
+
+.card-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* 确保内容填充卡片但不溢出 */
+.items-list {
+    padding-bottom: 0.75rem !important;
+}
+
+.feed-item:last-child {
+    border-bottom: none !important;
+    margin-bottom: 0.5rem !important;
 }
 
 /* 亮色模式下的卡片项目样式 */
@@ -165,17 +198,6 @@
 .dark ::-webkit-scrollbar-button:single-button:hover {
     background-color: rgba(75, 85, 101, 0.9);
     border: 1px solid rgba(95, 105, 121, 0.8);
-}
-
-/* 确保内容区域滚动但不显示滚动条 */
-.card-content {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-behavior: smooth;
-}
-
-.card-content::-webkit-scrollbar {
-    display: none;
 }
 
 /* 整体页面滚动箭头 */

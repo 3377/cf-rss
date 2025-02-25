@@ -482,4 +482,54 @@ button {
     --text-secondary: #465a7c;
   }
 }
+
+/* 添加箭头圆角样式 */
+::-webkit-scrollbar-button {
+  border-radius: 12px !important;
+  background-color: rgba(200, 225, 245, 0.9);
+  border: 1px solid rgba(160, 190, 230, 0.8);
+  transition: all 0.2s ease;
+}
+
+.dark ::-webkit-scrollbar-button {
+  background-color: rgba(55, 65, 81, 0.8);
+  border: 1px solid rgba(75, 85, 101, 0.7);
+}
+
+::-webkit-scrollbar-button:hover {
+  background-color: rgba(180, 210, 240, 1);
+}
+
+.dark ::-webkit-scrollbar-button:hover {
+  background-color: rgba(75, 85, 101, 0.9);
+}
+
+/* 确保内容区域滚动时不显示滚动条 */
+.content-area::-webkit-scrollbar {
+  display: none;
+}
+
+.content-area {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* 确保页面中的所有卡片底部有圆角 */
+.feed-card {
+  border-radius: 0.75rem !important;
+  overflow: hidden !important;
+}
+
+/* 确保卡片内容区域有底部圆角 */
+.card-content {
+  border-radius: 0 0 0.75rem 0.75rem !important;
+}
+
+/* 移动优化 */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar-button {
+    width: 20px;
+    height: 20px;
+  }
+}
 </style>
