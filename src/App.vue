@@ -140,34 +140,34 @@ function toggleDarkMode() {
 
   // 更新主题状态
   if (isDark.value) {
-    document.documentElement.classList.add('dark');
-    document.body.classList.add('dark');
-    document.documentElement.style.backgroundColor = '#111827';
-    document.body.style.backgroundColor = '#111827';
+    document.documentElement.classList.add("dark");
+    document.body.classList.add("dark");
+    document.documentElement.style.backgroundColor = "#111827";
+    document.body.style.backgroundColor = "#111827";
   } else {
-    document.documentElement.classList.remove('dark');
-    document.body.classList.remove('dark');
-    document.documentElement.style.backgroundColor = '#f3f4f6';
-    document.body.style.backgroundColor = '#f3f4f6';
+    document.documentElement.classList.remove("dark");
+    document.body.classList.remove("dark");
+    document.documentElement.style.backgroundColor = "#f3f4f6";
+    document.body.style.backgroundColor = "#f3f4f6";
 
     // 强制应用亮色模式的背景
-    const appContainer = document.querySelector('.app-container');
+    const appContainer = document.querySelector(".app-container");
     if (appContainer) {
-      appContainer.style.backgroundColor = '#f3f4f6';
+      appContainer.style.backgroundColor = "#f3f4f6";
     }
 
     // 触发重新渲染以确保样式更新
     nextTick(() => {
-      const cards = document.querySelectorAll('.feed-card');
-      cards.forEach(card => {
-        card.style.display = 'none';
-        setTimeout(() => card.style.display = '', 0);
+      const cards = document.querySelectorAll(".feed-card");
+      cards.forEach((card) => {
+        card.style.display = "none";
+        setTimeout(() => (card.style.display = ""), 0);
       });
     });
   }
 
   // 保存用户主题偏好
-  localStorage.setItem('darkMode', isDark.value ? '1' : '0');
+  localStorage.setItem("darkMode", isDark.value ? "1" : "0");
 }
 
 const fetchFeeds = async () => {
@@ -196,44 +196,28 @@ const fetchFeeds = async () => {
   }
 };
 
-const updateCountdown = () => {
-  countdown.value--;
-  if (countdown.value <= 0) {
-    countdown.value = RSS_CONFIG.refresh.interval;
-  }
-};
-
 onMounted(() => {
-  // 检查用户之前的主题偏好
-  const savedDarkMode = localStorage.getItem('darkMode');
-  isDark.value = savedDarkMode === '1';
-
-  // 初始化主题
+  // 初始化时设置正确的主题类
   if (isDark.value) {
-    document.documentElement.classList.add('dark');
-    document.body.classList.add('dark');
-    document.documentElement.style.backgroundColor = '#111827';
-    document.body.style.backgroundColor = '#111827';
+    document.documentElement.classList.add("dark");
+    document.body.classList.add("dark");
   } else {
-    document.documentElement.classList.remove('dark');
-    document.body.classList.remove('dark');
-    document.documentElement.style.backgroundColor = '#f3f4f6';
-    document.body.style.backgroundColor = '#f3f4f6';
-
-    // 确保亮色模式样式应用
-    setTimeout(() => {
-      const appContainer = document.querySelector('.app-container');
-      if (appContainer) {
-        appContainer.style.backgroundColor = '#f3f4f6';
-      }
-    }, 0);
+    document.documentElement.classList.remove("dark");
+    document.body.classList.remove("dark");
   }
 
-  await fetchFeeds();
-  // 设置定时刷新
-  refreshTimer = setInterval(fetchFeeds, RSS_CONFIG.refresh.interval * 1000);
-  // 设置倒计时更新
-  countdownTimer = setInterval(updateCountdown, 1000);
+  // 使用promise而非await
+  fetchFeeds().then(() => {
+    // 设置定时刷新
+    refreshTimer = setInterval(fetchFeeds, RSS_CONFIG.refresh.interval * 1000);
+    // 设置倒计时
+    countdownTimer = setInterval(() => {
+      countdown.value--;
+      if (countdown.value <= 0) {
+        countdown.value = RSS_CONFIG.refresh.interval;
+      }
+    }, 1000);
+  });
 });
 
 onUnmounted(() => {
