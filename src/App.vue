@@ -215,18 +215,12 @@ onUnmounted(() => {
 /* 亮色模式样式 - 更高优先级 */
 html body .app-container.bg-gray-50 {
   background-color: #f0f4fa !important;
-  background-image: linear-gradient(
-      to right,
-      rgba(220, 230, 240, 0.5) 1px,
-      transparent 1px
-    ),
-    linear-gradient(to bottom, rgba(220, 230, 240, 0.5) 1px, transparent 1px),
-    linear-gradient(
-      to bottom,
-      rgba(242, 244, 248, 0.8),
-      rgba(242, 244, 248, 0.85)
-    ) !important;
-  background-size: 20px 20px, 20px 20px, 100% 100% !important;
+  background-image: linear-gradient(45deg, #e6ecf6 25%, transparent 25%),
+    linear-gradient(-45deg, #e6ecf6 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e6ecf6 75%),
+    linear-gradient(-45deg, transparent 75%, #e6ecf6 75%) !important;
+  background-size: 10px 10px !important;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0 !important;
 }
 
 .header {
