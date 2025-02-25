@@ -214,13 +214,19 @@ onUnmounted(() => {
 
 /* 亮色模式样式 - 更高优先级 */
 html body .app-container.bg-gray-50 {
-  background-color: #f2f4f8 !important;
+  background-color: #f0f4fa !important;
   background-image: linear-gradient(
+      to right,
+      rgba(220, 230, 240, 0.5) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(220, 230, 240, 0.5) 1px, transparent 1px),
+    linear-gradient(
       to bottom,
       rgba(242, 244, 248, 0.8),
       rgba(242, 244, 248, 0.85)
-    ),
-    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjE1Ii8+CiAgICA8L3BhdHRlcm4+KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
+    ) !important;
+  background-size: 20px 20px, 20px 20px, 100% 100% !important;
 }
 
 .header {
@@ -232,9 +238,9 @@ html body .app-container.bg-gray-50 {
 }
 
 html body .app-container.bg-gray-50 .header {
-  background-color: rgba(242, 244, 248, 0.8) !important;
+  background-color: rgba(235, 242, 250, 0.9) !important;
   backdrop-filter: blur(8px) !important;
-  border-bottom: 1px solid rgba(230, 235, 242, 0.5) !important;
+  border-bottom: 1px solid rgba(200, 215, 235, 0.6) !important;
 }
 
 .dark .header {
@@ -248,18 +254,18 @@ html body .app-container.bg-gray-50 .header-title {
 }
 
 html body .app-container.bg-gray-50 button:not(.bg-green-500) {
-  background-color: rgba(230, 240, 250, 0.5) !important;
-  border: 1px solid rgba(200, 215, 235, 0.5) !important;
+  background-color: rgba(220, 230, 245, 0.6) !important;
+  border: 1px solid rgba(180, 200, 230, 0.6) !important;
 }
 
 html body .app-container.bg-gray-50 button.bg-green-500 {
-  background-color: #5cbc7d !important;
-  box-shadow: 0 2px 4px rgba(92, 188, 125, 0.12) !important;
+  background-color: #4caf7d !important;
+  box-shadow: 0 2px 4px rgba(76, 175, 125, 0.15) !important;
 }
 
 html body .app-container.bg-gray-50 button.bg-green-500:hover {
-  background-color: #52a871 !important;
-  box-shadow: 0 3px 6px rgba(92, 188, 125, 0.15) !important;
+  background-color: #3d9c6e !important;
+  box-shadow: 0 3px 6px rgba(76, 175, 125, 0.2) !important;
 }
 
 .content-area {
@@ -272,8 +278,8 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 }
 
 html body .app-container.bg-gray-50 .content-area {
-  background-color: rgba(242, 244, 248, 0.35) !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.01) !important;
+  background-color: rgba(240, 245, 252, 0.4) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
 
 .dark .content-area {
@@ -289,8 +295,8 @@ html body .app-container.bg-gray-50 .content-area {
 }
 
 html body .app-container.bg-gray-50 .footer {
-  background-color: rgba(242, 244, 248, 0.75) !important;
-  border-top: 1px solid rgba(230, 235, 242, 0.5) !important;
+  background-color: rgba(235, 242, 250, 0.9) !important;
+  border-top: 1px solid rgba(200, 215, 235, 0.6) !important;
 }
 
 .dark .footer {
@@ -308,7 +314,7 @@ body {
 }
 
 body {
-  background-color: #f2f4f8;
+  background-color: #f0f4fa;
   color: #445163;
 }
 
@@ -357,30 +363,31 @@ button {
 
 /* 应用CSS变量到卡片 */
 .app-container:not(.dark) .feed-card {
-  background: var(--card-bg, rgba(210, 230, 250, 1)) !important;
-  border: 1px solid var(--card-border, rgba(180, 205, 240, 0.85)) !important;
+  background: var(--card-bg, rgba(200, 225, 245, 1)) !important;
+  border: 1px solid var(--card-border, rgba(160, 190, 230, 0.9)) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05), 0 3px 6px rgba(0, 0, 0, 0.03) !important;
 }
 
 .app-container:not(.dark) .card-header {
-  background: var(--card-header-bg, rgba(200, 225, 248, 1)) !important;
-  border-bottom: 1px solid var(--card-border, rgba(180, 205, 240, 0.85)) !important;
+  background: var(--card-header-bg, rgba(180, 210, 240, 1)) !important;
+  border-bottom: 1px solid var(--card-border, rgba(160, 190, 230, 0.9)) !important;
 }
 
 .app-container:not(.dark) .card-content {
-  background: var(--card-content-bg, rgba(210, 230, 250, 1)) !important;
+  background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
 }
 
 .app-container:not(.dark) .card-title {
-  color: var(--text-primary, #3a5075) !important;
+  color: var(--text-primary, #2c4270) !important;
 }
 
 .app-container:not(.dark) .item-title {
-  color: var(--text-primary, #3a5075) !important;
+  color: var(--text-primary, #2c4270) !important;
 }
 
 .app-container:not(.dark) .item-date {
-  color: var(--text-secondary, #566a8c) !important;
-  background: var(--card-bg, rgba(210, 230, 250, 1)) !important;
+  color: var(--text-secondary, #465a7c) !important;
+  background: var(--card-bg, rgba(180, 210, 240, 0.95)) !important;
 }
 
 /* 移动端优化样式 */
@@ -473,12 +480,12 @@ button {
 @media (prefers-color-scheme: light) {
   :root {
     color-scheme: light;
-    --app-background: #f2f4f8;
-    --card-background: rgba(210, 230, 250, 1);
-    --card-border: rgba(180, 205, 240, 0.85);
-    --card-header: rgba(200, 225, 248, 1);
-    --text-primary: #3a5075;
-    --text-secondary: #566a8c;
+    --app-background: #f0f4fa;
+    --card-background: rgba(200, 225, 245, 1);
+    --card-border: rgba(160, 190, 230, 0.9);
+    --card-header: rgba(180, 210, 240, 1);
+    --text-primary: #2c4270;
+    --text-secondary: #465a7c;
   }
 }
 </style>

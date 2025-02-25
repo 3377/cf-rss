@@ -9,9 +9,10 @@
           isDark
             ? {}
             : {
-                background: 'rgba(220, 235, 250, 0.98)',
-                border: '1px solid rgba(200, 215, 235, 0.85)',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+                background: 'rgba(200, 225, 245, 1)',
+                border: '1px solid rgba(160, 190, 230, 0.9)',
+                boxShadow:
+                  '0 6px 16px rgba(0, 0, 0, 0.05), 0 3px 6px rgba(0, 0, 0, 0.03)',
               }
         "
       >
@@ -22,8 +23,8 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(210, 230, 248, 0.98)',
-                  borderBottom: '1px solid rgba(200, 215, 235, 0.8)',
+                  backgroundColor: 'rgba(180, 210, 240, 1)',
+                  borderBottom: '1px solid rgba(160, 190, 230, 0.9)',
                 }
           "
         >
@@ -39,7 +40,7 @@
             isDark
               ? {}
               : {
-                  backgroundColor: 'rgba(220, 235, 250, 0.98)',
+                  backgroundColor: 'rgba(200, 225, 245, 1)',
                 }
           "
         >
@@ -61,7 +62,7 @@
                 isDark
                   ? {}
                   : {
-                      borderBottom: '1px solid rgba(200, 215, 235, 0.5)',
+                      borderBottom: '1px solid rgba(160, 190, 230, 0.8)',
                     }
               "
             >
@@ -73,7 +74,7 @@
                 :style="
                   isDark
                     ? {}
-                    : { hover: { background: 'rgba(210, 230, 245, 0.95)' } }
+                    : { hover: { background: 'rgba(180, 210, 240, 1)' } }
                 "
                 @mouseenter="showTooltip($event, item.title, item.pubDate)"
                 @mouseleave="hideTooltip"
@@ -83,7 +84,7 @@
                   :style="{
                     fontSize: `${fontSize}px`,
                     paddingRight: showItemDate ? '4rem' : '0.5rem',
-                    color: isDark ? '#f3f4f6' : '#3a5075',
+                    color: isDark ? '#f3f4f6' : '#2c4270',
                   }"
                 >
                   {{ item.title }}
@@ -95,8 +96,8 @@
                     isDark
                       ? {}
                       : {
-                          color: '#566a8c',
-                          background: 'rgba(210, 230, 245, 0.9)',
+                          color: '#465a7c',
+                          background: 'rgba(180, 210, 240, 0.95)',
                         }
                   "
                 >
@@ -118,11 +119,11 @@
         left: tooltipPosition.left + 'px',
         backgroundColor: isDark
           ? 'rgba(31, 41, 55, 0.95)'
-          : 'rgba(210, 230, 245, 0.98)',
-        color: isDark ? '#f3f4f6' : '#3a5075',
+          : 'rgba(180, 210, 240, 0.98)',
+        color: isDark ? '#f3f4f6' : '#2c4270',
         border: isDark
           ? '1px solid rgba(55, 65, 81, 0.8)'
-          : '1px solid rgba(200, 215, 235, 0.8)',
+          : '1px solid rgba(160, 190, 230, 0.9)',
       }"
     >
       {{ tooltipText }}
