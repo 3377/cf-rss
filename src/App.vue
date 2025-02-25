@@ -94,7 +94,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
 import { RSS_CONFIG } from "./config/rss.config";
 
@@ -134,6 +134,13 @@ const formatLastUpdate = computed(() => {
 const toggleTheme = () => {
   isDark.value = !isDark.value;
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
+
+  // 更新根元素类名，确保全局样式正确应用
+  if (isDark.value) {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
 };
 
 const fetchFeeds = async () => {
@@ -170,6 +177,13 @@ const updateCountdown = () => {
 };
 
 onMounted(async () => {
+  // 初始化时设置正确的主题类
+  if (isDark.value) {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+
   await fetchFeeds();
   // 设置定时刷新
   refreshTimer = setInterval(fetchFeeds, RSS_CONFIG.refresh.interval * 1000);

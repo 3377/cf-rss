@@ -188,6 +188,8 @@ const fontSize = computed(() => {
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.07);
   border-radius: 0.75rem;
+  background: rgba(242, 243, 245, 0.75);
+  border: 1px solid rgba(220, 225, 235, 0.8);
 }
 
 html body .app-container:not(.dark) .feed-card {
@@ -197,13 +199,15 @@ html body .app-container:not(.dark) .feed-card {
 }
 
 .dark .feed-card {
-  background: rgba(31, 41, 55, 0.9);
-  border-color: rgba(55, 65, 81, 0.5);
+  background: rgba(31, 41, 55, 0.9) !important;
+  border-color: rgba(55, 65, 81, 0.5) !important;
 }
 
 .card-header {
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
+  background-color: rgba(238, 240, 245, 0.9);
+  border-bottom: 1px solid rgba(220, 225, 235, 0.9);
 }
 
 html body .app-container:not(.dark) .card-header {
@@ -234,6 +238,7 @@ html body .app-container:not(.dark) .card-title {
   flex: 1;
   padding: 0.5rem 0;
   overflow-y: auto;
+  background-color: rgba(238, 240, 245, 0.5);
 }
 
 html body .app-container:not(.dark) .card-content {
