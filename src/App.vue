@@ -1,5 +1,10 @@
 <template>
-  <div :class="['app-container', isDark ? 'dark bg-gray-900' : 'bg-gray-50']">
+  <div
+    :class="[
+      'app-container',
+      isDark ? 'dark bg-gray-900' : 'light-mode bg-gray-50',
+    ]"
+  >
     <div class="header">
       <div class="text-center mb-4">
         <h1 class="text-3xl font-bold text-gray-700 header-title">
@@ -57,7 +62,7 @@
           </button>
           <button
             @click="fetchFeeds"
-            class="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
+            class="refresh-btn px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
             :disabled="loading"
           >
             <span v-if="loading">刷新中...</span>
@@ -93,8 +98,169 @@
   </div>
 </template>
 
+<style>
+/* 直接插入样式到<head>标签以确保最高优先级 */
+html.light-theme,
+body.light-theme {
+  background-color: #f0f2f5 !important;
+  color: #4b5563 !important;
+}
+
+.app-container {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.light-mode {
+  background: #f0f2f5 !important;
+  background-image: linear-gradient(
+      to bottom,
+      rgba(240, 242, 245, 0.8),
+      rgba(240, 242, 245, 0.8)
+    ),
+    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+") !important;
+}
+
+.header {
+  padding: 0.75rem 1rem 0.25rem;
+  flex-shrink: 0;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.light-mode .header {
+  background-color: rgba(235, 238, 242, 0.85) !important;
+  backdrop-filter: blur(5px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+}
+
+.dark .header {
+  border-color: #374151;
+  background-color: rgba(17, 24, 39, 0.6);
+}
+
+.light-mode .header-title {
+  color: #3e4555 !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.light-mode button:not(.refresh-btn) {
+  background-color: rgba(235, 238, 242, 0.5) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+}
+
+.light-mode .refresh-btn {
+  background-color: #4caf50 !important;
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
+}
+
+.light-mode .refresh-btn:hover {
+  background-color: #43a047 !important;
+  box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3) !important;
+}
+
+.content-area {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.light-mode .content-area {
+  background-color: rgba(235, 238, 242, 0.4) !important;
+}
+
+.dark .content-area {
+  background-color: rgba(17, 24, 39, 0.3);
+}
+
+.footer {
+  flex-shrink: 0;
+  border-top: 1px solid #e5e7eb;
+  backdrop-filter: blur(8px);
+  padding-top: 0.25rem;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.light-mode .footer {
+  background-color: rgba(235, 238, 242, 0.85) !important;
+  border-top: 1px solid rgba(226, 232, 240, 0.8) !important;
+}
+
+.dark .footer {
+  border-color: #374151;
+  background-color: rgba(17, 24, 39, 0.6);
+}
+
+/* 移除全局滚动条 */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+}
+
+body {
+  background-color: #f0f2f5;
+  color: #4b5563;
+}
+
+.dark body,
+.dark html {
+  background-color: #111827;
+}
+
+#app {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dark {
+  color: #f3f4f6;
+}
+
+.dark .header-title {
+  color: #f3f4f6 !important;
+}
+
+.dark .status-text {
+  color: #f3f4f6 !important;
+}
+
+.dark .footer-text {
+  color: #f3f4f6 !important;
+}
+
+.light-mode .text-gray-700 {
+  color: #4b5563 !important;
+}
+
+.light-mode .text-gray-600 {
+  color: #5a6171 !important;
+}
+
+.light-mode .text-gray-500 {
+  color: #666f7f !important;
+}
+
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* 添加全局样式钩子 */
+.light-mode-styles-applied {
+  display: none;
+}
+</style>
+
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
 import { RSS_CONFIG } from "./config/rss.config";
 
@@ -110,6 +276,19 @@ const isDark = ref(
 const appTitle = ref(RSS_CONFIG.display.appTitle);
 let refreshTimer = null;
 let countdownTimer = null;
+
+// 监听主题变化并强制应用样式
+watch(isDark, (newVal) => {
+  nextTick(() => {
+    if (!newVal) {
+      document.documentElement.classList.add("light-theme");
+      document.body.classList.add("light-theme");
+    } else {
+      document.documentElement.classList.remove("light-theme");
+      document.body.classList.remove("light-theme");
+    }
+  });
+});
 
 const formatCountdown = computed(() => {
   const minutes = Math.floor(countdown.value / 60);
@@ -169,12 +348,36 @@ const updateCountdown = () => {
   }
 };
 
+// 应用亮色模式样式函数
+const applyLightModeStyles = () => {
+  if (!isDark.value) {
+    // 确保亮色模式样式被应用
+    document.documentElement.classList.add("light-theme");
+    document.body.classList.add("light-theme");
+
+    // 强制插入内联样式
+    const styleTag = document.createElement("style");
+    styleTag.id = "light-mode-inline-styles";
+    styleTag.innerHTML = `
+      body, html { background-color: #f0f2f5 !important; }
+      .bg-gray-50 { background-color: #f0f2f5 !important; }
+    `;
+    document.head.appendChild(styleTag);
+  }
+};
+
 onMounted(async () => {
   await fetchFeeds();
   // 设置定时刷新
   refreshTimer = setInterval(fetchFeeds, RSS_CONFIG.refresh.interval * 1000);
   // 设置倒计时更新
   countdownTimer = setInterval(updateCountdown, 1000);
+
+  // 强制应用亮色模式样式
+  applyLightModeStyles();
+
+  // 100ms后再次尝试应用样式，以防DOM没有完全加载
+  setTimeout(applyLightModeStyles, 100);
 });
 
 onUnmounted(() => {
@@ -184,165 +387,11 @@ onUnmounted(() => {
   if (countdownTimer) {
     clearInterval(countdownTimer);
   }
+
+  // 清理内联样式
+  const inlineStyles = document.getElementById("light-mode-inline-styles");
+  if (inlineStyles) {
+    inlineStyles.remove();
+  }
 });
 </script>
-
-<style>
-.app-container {
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.bg-gray-50 {
-  background: #f0f2f5;
-  background-image: linear-gradient(
-      to bottom,
-      rgba(240, 242, 245, 0.8),
-      rgba(240, 242, 245, 0.8)
-    ),
-    url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2U1ZTdlYiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjIiLz4KICAgIDwvcGF0dGVybj4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIgLz4KPC9zdmc+");
-}
-
-.header {
-  padding: 0.75rem 1rem 0.25rem;
-  flex-shrink: 0;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.bg-gray-50 .header {
-  background-color: rgba(235, 238, 242, 0.85);
-  backdrop-filter: blur(5px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.dark .header {
-  border-color: #374151;
-  background-color: rgba(17, 24, 39, 0.6);
-}
-
-.bg-gray-50 .header-title {
-  color: #3e4555;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
-.bg-gray-50 button:not(.bg-green-500) {
-  background-color: rgba(235, 238, 242, 0.5);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.bg-gray-50 button.bg-green-500 {
-  background-color: #4caf50 !important;
-  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
-}
-
-.bg-gray-50 button.bg-green-500:hover {
-  background-color: #43a047 !important;
-  box-shadow: 0 3px 6px rgba(76, 175, 80, 0.3);
-}
-
-.content-area {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  margin-top: 0;
-  margin-bottom: 0.75rem;
-}
-
-.bg-gray-50 .content-area {
-  background-color: rgba(235, 238, 242, 0.4);
-}
-
-.dark .content-area {
-  background-color: rgba(17, 24, 39, 0.3);
-}
-
-.footer {
-  flex-shrink: 0;
-  border-top: 1px solid #e5e7eb;
-  backdrop-filter: blur(8px);
-  padding-top: 0.25rem;
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
-}
-
-.bg-gray-50 .footer {
-  background-color: rgba(235, 238, 242, 0.85);
-}
-
-.dark .footer {
-  border-color: #374151;
-  background-color: rgba(17, 24, 39, 0.6);
-}
-
-/* 移除全局滚动条 */
-html,
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  height: 100vh;
-}
-
-body {
-  background-color: #f0f2f5;
-  color: #4b5563;
-}
-
-.dark body,
-.dark html {
-  background-color: #111827;
-}
-
-#app {
-  height: 100vh;
-  overflow: hidden;
-}
-
-.dark {
-  color: #f3f4f6;
-}
-
-.dark .header-title {
-  color: #f3f4f6 !important;
-}
-
-.dark .status-text {
-  color: #f3f4f6 !important;
-}
-
-.dark .footer-text {
-  color: #f3f4f6 !important;
-}
-
-.text-gray-700 {
-  color: #4b5563 !important;
-}
-
-.bg-gray-50 .text-gray-600 {
-  color: #5a6171 !important;
-}
-
-.bg-gray-50 .text-gray-500 {
-  color: #666f7f !important;
-}
-
-button {
-  transition: all 0.2s ease-in-out;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color-scheme: light;
-    --app-background: #f0f2f5;
-    --card-background: rgba(240, 244, 248, 0.75);
-    --card-border: rgba(226, 232, 240, 0.8);
-    --card-header: rgba(236, 240, 244, 0.9);
-    --text-primary: #3e4555;
-    --text-secondary: #5a6171;
-  }
-}
-</style>

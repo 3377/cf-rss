@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, nextTick } from "vue";
+import { computed, ref, onMounted, nextTick, watch } from "vue";
 import { getRSSConfig } from "../config/rss.config";
 
 const props = defineProps({
@@ -92,6 +92,25 @@ const props = defineProps({
 const config = ref(getRSSConfig(null));
 const showItemDate = ref(config.value?.display?.showItemDate || false);
 
+// 监听暗色模式变化
+watch(
+  () => props.isDark,
+  (isDark) => {
+    // 确保DOM已更新
+    nextTick(() => {
+      const container = document.querySelector(".feed-container");
+      if (container) {
+        if (!isDark) {
+          container.classList.add("light-mode");
+        } else {
+          container.classList.remove("light-mode");
+        }
+      }
+    });
+  },
+  { immediate: true }
+);
+
 // 标题提示框相关状态
 const tooltipVisible = ref(false);
 const tooltipText = ref("");
@@ -102,6 +121,14 @@ onMounted(() => {
     config.value = window.__RSS_CONFIG__;
     showItemDate.value = config.value?.display?.showItemDate || false;
     console.log("Using injected config:", config.value);
+  }
+
+  // 确保应用亮色模式样式
+  if (!props.isDark) {
+    const container = document.querySelector(".feed-container");
+    if (container) {
+      container.classList.add("light-mode");
+    }
   }
 });
 
@@ -179,6 +206,7 @@ const fontSize = computed(() => {
   overflow: hidden;
 }
 
+/* 基础卡片样式 */
 .feed-card {
   display: flex;
   flex-direction: column;
@@ -190,11 +218,15 @@ const fontSize = computed(() => {
   border-radius: 0.75rem;
 }
 
-:not(.dark) .feed-card {
-  background: rgba(240, 244, 248, 0.75);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+/* 亮色模式卡片 */
+.light-mode .feed-card,
+.app-container:not(.dark) .feed-card {
+  background: rgba(240, 244, 248, 0.75) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04) !important;
 }
 
+/* 暗色模式卡片 */
 .dark .feed-card {
   background: rgba(31, 41, 55, 0.9);
   border-color: rgba(55, 65, 81, 0.5);
@@ -205,9 +237,11 @@ const fontSize = computed(() => {
   border-bottom: 1px solid #e5e7eb;
 }
 
-:not(.dark) .card-header {
-  background-color: rgba(236, 240, 244, 0.9);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+/* 亮色模式卡片头部 */
+.light-mode .card-header,
+.app-container:not(.dark) .card-header {
+  background-color: rgba(236, 240, 244, 0.9) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
 }
 
 .dark .card-header {
@@ -221,8 +255,10 @@ const fontSize = computed(() => {
   text-align: center;
 }
 
-:not(.dark) .card-title {
-  color: #3e4555;
+/* 亮色模式标题 */
+.light-mode .card-title,
+.app-container:not(.dark) .card-title {
+  color: #3e4555 !important;
 }
 
 .dark .card-title {
@@ -235,8 +271,10 @@ const fontSize = computed(() => {
   overflow-y: auto;
 }
 
-:not(.dark) .card-content {
-  background-color: rgba(236, 240, 244, 0.5);
+/* 亮色模式内容区 */
+.light-mode .card-content,
+.app-container:not(.dark) .card-content {
+  background-color: rgba(236, 240, 244, 0.5) !important;
 }
 
 .dark .card-content {
@@ -251,8 +289,10 @@ const fontSize = computed(() => {
   border-color: #374151;
 }
 
-.feed-item {
-  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+/* 亮色模式列表项分隔线 */
+.light-mode .feed-item,
+.app-container:not(.dark) .feed-item {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
 }
 
 .dark .feed-item {
@@ -265,8 +305,10 @@ const fontSize = computed(() => {
   position: relative;
 }
 
-:not(.dark) .item-link:hover {
-  background: rgba(240, 244, 248, 0.8);
+/* 亮色模式悬停效果 */
+.light-mode .item-link:hover,
+.app-container:not(.dark) .item-link:hover {
+  background: rgba(240, 244, 248, 0.8) !important;
 }
 
 .dark .item-link:hover {
@@ -283,16 +325,20 @@ const fontSize = computed(() => {
   max-width: 100%;
 }
 
-:not(.dark) .item-title {
-  color: #4a5568;
+/* 亮色模式标题文字 */
+.light-mode .item-title,
+.app-container:not(.dark) .item-title {
+  color: #4a5568 !important;
 }
 
 .dark .item-title {
   color: #f3f4f6;
 }
 
-:not(.dark) .item-link:hover .item-title {
-  color: #4c6ef5;
+/* 亮色模式悬停标题 */
+.light-mode .item-link:hover .item-title,
+.app-container:not(.dark) .item-link:hover .item-title {
+  color: #4c6ef5 !important;
 }
 
 .dark .item-link:hover .item-title {
@@ -313,13 +359,17 @@ const fontSize = computed(() => {
   white-space: nowrap;
 }
 
-:not(.dark) .item-date {
-  color: #5a6171;
-  background: rgba(240, 244, 248, 0.9);
+/* 亮色模式日期样式 */
+.light-mode .item-date,
+.app-container:not(.dark) .item-date {
+  color: #5a6171 !important;
+  background: rgba(240, 244, 248, 0.9) !important;
 }
 
-:not(.dark) .item-link:hover .item-date {
-  background: rgba(236, 240, 244, 0.95);
+/* 亮色模式悬停日期 */
+.light-mode .item-link:hover .item-date,
+.app-container:not(.dark) .item-link:hover .item-date {
+  background: rgba(236, 240, 244, 0.95) !important;
 }
 
 .dark .item-date {
@@ -341,8 +391,10 @@ const fontSize = computed(() => {
   padding: 1rem;
 }
 
-:not(.dark) .empty-message {
-  color: #5a6171;
+/* 亮色模式空内容提示 */
+.light-mode .empty-message,
+.app-container:not(.dark) .empty-message {
+  color: #5a6171 !important;
 }
 
 .dark .empty-message {
@@ -365,10 +417,12 @@ const fontSize = computed(() => {
   text-align: left;
 }
 
-:not(.dark) .title-tooltip {
-  background: rgba(240, 244, 248, 0.95);
-  color: #3e4555;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+/* 亮色模式提示框 */
+.light-mode .title-tooltip,
+.app-container:not(.dark) .title-tooltip {
+  background: rgba(240, 244, 248, 0.95) !important;
+  color: #3e4555 !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
 }
 
 .dark .title-tooltip {
