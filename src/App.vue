@@ -35,6 +35,22 @@
           </template>
         </div>
         <div class="flex items-center gap-4 flex-1 justify-end">
+          <!-- 字体选择下拉菜单 -->
+          <div class="font-selector">
+            <select
+              v-model="selectedFont"
+              @change="changeFont"
+              class="px-2 py-1.5 text-sm rounded border focus:outline-none"
+              :class="
+                isDark
+                  ? 'bg-gray-700 text-gray-200 border-gray-600'
+                  : 'bg-white text-gray-700 border-gray-300'
+              "
+            >
+              <option value="DingTalk JinBuTi">钉钉进步体</option>
+              <option value="Yozai">悠哉字体</option>
+            </select>
+          </div>
           <button
             @click="toggleTheme"
             class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
@@ -108,7 +124,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
 import { getRSSConfig, RSS_CONFIG } from "./config/rss.config";
 
@@ -124,6 +140,45 @@ const isDark = ref(
 const appTitle = ref(RSS_CONFIG.display?.appTitle || "CF RSS");
 let refreshTimer = null;
 let countdownTimer = null;
+
+// 添加字体选择相关状态
+const selectedFont = ref(
+  localStorage.getItem("selectedFont") || "DingTalk JinBuTi"
+);
+const fontLoaded = ref({
+  "DingTalk JinBuTi": false,
+  Yozai: false,
+});
+
+// 加载字体
+const loadFont = (fontName) => {
+  if (fontLoaded.value[fontName]) return;
+
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+
+  if (fontName === "DingTalk JinBuTi") {
+    link.href =
+      "https://cdn.jsdelivr.net/npm/cn-fontsource-ding-talk-jin-bu-ti-regular/font.css";
+  } else if (fontName === "Yozai") {
+    link.href = "https://cdn.jsdelivr.net/npm/cn-fontsource-yozai/font.css";
+  }
+
+  document.head.appendChild(link);
+  fontLoaded.value[fontName] = true;
+};
+
+// 切换字体
+const changeFont = () => {
+  loadFont(selectedFont.value);
+  localStorage.setItem("selectedFont", selectedFont.value);
+  document.documentElement.style.fontFamily = `Roboto, "${selectedFont.value}", sans-serif`;
+};
+
+// 监视字体变化
+watch(selectedFont, () => {
+  changeFont();
+});
 
 const formatCountdown = computed(() => {
   const minutes = Math.floor(countdown.value / 60);
@@ -184,6 +239,10 @@ const updateCountdown = () => {
 };
 
 onMounted(async () => {
+  // 初始化加载选定的字体
+  loadFont(selectedFont.value);
+  changeFont();
+
   await fetchFeeds();
   // 设置定时刷新
   refreshTimer = setInterval(
@@ -421,6 +480,17 @@ button {
     width: 1.25rem;
     height: 1.25rem;
   }
+
+  /* 字体选择器移动端优化 */
+  .font-selector {
+    margin-right: 0.25rem;
+  }
+
+  .font-selector select {
+    padding: 0.35rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    max-width: 85px;
+  }
 }
 
 /* 小型移动设备优化 */
@@ -460,6 +530,14 @@ button {
   .flex.items-center.gap-4.flex-1.justify-end {
     justify-content: center;
     margin-top: 0.2rem;
+    gap: 0.5rem !important;
+  }
+
+  /* 更紧凑的字体选择器 */
+  .font-selector select {
+    padding: 0.25rem 0.35rem !important;
+    font-size: 0.7rem !important;
+    max-width: 75px;
   }
 
   .footer-text {
@@ -563,5 +641,50 @@ button {
 /* 提示框内容居中 */
 .tooltip-content {
   text-align: center !important;
+}
+
+/* 字体选择器样式 */
+.font-selector {
+  margin-right: 0.5rem;
+}
+
+.font-selector select {
+  transition: all 0.2s ease;
+  border-radius: 0.375rem;
+}
+
+html body .app-container.bg-gray-50 .font-selector select {
+  background-color: rgba(220, 230, 245, 0.8) !important;
+  border: 1px solid rgba(180, 200, 230, 0.6) !important;
+  color: #3a5075 !important;
+}
+
+html body .app-container.bg-gray-50 .font-selector select:hover {
+  background-color: rgba(210, 225, 245, 1) !important;
+  border: 1px solid rgba(160, 190, 230, 0.8) !important;
+}
+
+.dark .font-selector select {
+  background-color: rgba(31, 41, 55, 0.8) !important;
+  border-color: rgba(55, 65, 81, 0.6) !important;
+  color: #e5e7eb !important;
+}
+
+.dark .font-selector select:hover {
+  background-color: rgba(55, 65, 81, 0.9) !important;
+  border-color: rgba(75, 85, 101, 0.8) !important;
+}
+
+/* 加载字体 */
+@font-face {
+  font-display: swap;
+}
+
+/* 针对移动设备优化字体选择器 */
+@media (max-width: 768px) {
+  .font-selector select {
+    padding: 0.35rem 0.5rem !important;
+    font-size: 0.8rem !important;
+  }
 }
 </style>
