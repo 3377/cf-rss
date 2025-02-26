@@ -163,6 +163,7 @@ import {
 } from "vue";
 import { format, parseISO } from "date-fns";
 import { RSS_CONFIG } from "../config/rss.config";
+import { zhCN } from "date-fns/locale";
 
 const props = defineProps({
   feeds: {
@@ -172,6 +173,22 @@ const props = defineProps({
   isDark: {
     type: Boolean,
     default: false,
+  },
+  itemsPerFeed: {
+    type: Number,
+    default: 15,
+  },
+  fontSize: {
+    type: Number,
+    default: 16,
+  },
+  showItemDate: {
+    type: Boolean,
+    default: false,
+  },
+  dateFormat: {
+    type: String,
+    default: "yyyy-MM-dd HH:mm",
   },
 });
 

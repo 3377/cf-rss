@@ -82,8 +82,9 @@
                   : 'bg-white text-gray-700 border-gray-300'
               "
             >
-              <option value="DingTalk JinBuTi">钉钉进步体</option>
-              <option value="Yozai">悠哉字体</option>
+              <option value="system-ui">系统默认</option>
+              <option value="serif">宋体</option>
+              <option value="sans-serif">黑体</option>
             </select>
           </div>
 
@@ -129,23 +130,22 @@ import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
 import { getRSSConfig, RSS_CONFIG } from "./config/rss.config";
 
+const config = getRSSConfig(import.meta.env);
+const appTitle = ref(config.appTitle);
+const isDark = ref(config.defaultDarkMode);
+const selectedFont = ref("system-ui");
 const feeds = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const countdown = ref(RSS_CONFIG.refresh?.interval || 300);
-const isDark = ref(
-  localStorage.getItem("theme") === null
-    ? RSS_CONFIG.display?.defaultDarkMode
-    : localStorage.getItem("theme") === "dark"
-);
-const appTitle = ref(RSS_CONFIG.display?.appTitle || "CF RSS");
+const itemsPerFeed = ref(config.itemsPerFeed);
+const fontSize = ref(config.fontSize);
+const showItemDate = ref(config.showItemDate);
+const dateFormat = ref(config.dateFormat);
 let refreshTimer = null;
 let countdownTimer = null;
 
 // 添加字体选择相关状态
-const selectedFont = ref(
-  localStorage.getItem("selectedFont") || "DingTalk JinBuTi"
-);
 const fontLoaded = ref({
   "DingTalk JinBuTi": false,
   Yozai: false,
@@ -251,6 +251,7 @@ const formatLastUpdate = computed(() => {
 const toggleTheme = () => {
   isDark.value = !isDark.value;
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
+  document.documentElement.classList.toggle("dark", isDark.value);
 };
 
 const fetchFeeds = async () => {
@@ -288,7 +289,7 @@ const updateCountdown = () => {
 
 onMounted(async () => {
   // 初始化加载选定的字体并强制应用
-  const savedFont = localStorage.getItem("selectedFont") || "DingTalk JinBuTi";
+  const savedFont = localStorage.getItem("selectedFont") || "system-ui";
   selectedFont.value = savedFont;
   loadFont(savedFont);
 
@@ -300,6 +301,9 @@ onMounted(async () => {
   );
   // 设置倒计时更新
   countdownTimer = setInterval(updateCountdown, 1000);
+
+  // 设置初始暗色模式
+  document.documentElement.classList.toggle("dark", isDark.value);
 });
 
 onUnmounted(() => {
@@ -538,7 +542,8 @@ button {
   .font-selector select {
     padding: 0.35rem 0.5rem !important;
     font-size: 0.75rem !important;
-    max-width: 85px;
+    min-width: 95px;
+    max-width: 95px;
   }
 
   /* 移动端内容区域样式优化 */
@@ -765,5 +770,49 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
 .app-container.font-yozai .card-title,
 .app-container.font-yozai .item-title {
   font-family: "Yozai", Roboto, sans-serif !important;
+}
+
+/* 字体选择器移动端优化 */
+.font-selector {
+  margin-right: 0.25rem;
+}
+
+.font-selector select {
+  padding: 0.35rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  min-width: 95px;
+  max-width: 95px;
+}
+
+/* 更紧凑的字体选择器 */
+@media screen and (max-width: 480px) {
+  .font-selector select {
+    padding: 0.25rem 0.35rem !important;
+    font-size: 0.7rem !important;
+    min-width: 110px;
+    max-width: 110px;
+  }
+}
+
+/* 字体选择器移动端优化 */
+.font-selector {
+  margin-right: 0.25rem;
+}
+
+.font-selector select {
+  padding: 0.35rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  min-width: 110px;
+  max-width: 110px;
+}
+
+/* 更紧凑的字体选择器 */
+@media screen and (max-width: 480px) {
+  .font-selector select {
+    padding: 0.25rem 0.35rem !important;
+    font-size: 0.7rem !important;
+    min-width: 110px;
+    max-width: 110px;
+  }
 }
 </style>

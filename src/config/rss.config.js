@@ -1,13 +1,13 @@
 // 默认配置
-const defaultConfig = {
+const DEFAULT_CONFIG = {
   feeds: [
     {
       title: "V2EX",
-      url: "https://www.v2ex.com/index.xml",
+      url: "https://www.v2ex.com/feed/tab/tech.xml",
     },
     {
       title: "NodeSeek",
-      url: "https://rss.nodeseek.com",
+      url: "https://www.nodeseek.com/feed",
     },
     {
       title: "Linux DO",
@@ -15,33 +15,19 @@ const defaultConfig = {
     },
   ],
   refresh: {
-    interval: 60, // 默认刷新间隔为60秒
-    cache: 0,
+    interval: 300, // 刷新间隔(秒)
+    cache: 300, // 缓存时间(秒)
   },
   display: {
-    appTitle: "FY Pages RSS", // 应用标题
-    defaultDarkMode: true, // 确保默认使用暗色模式
-    itemsPerFeed: 15, // 每个卡片显示的条目数
-    showItemDate: false, // 默认不显示条目日期
+    appTitle: "RSS Reader",
+    defaultDarkMode: true,
+    showItemDate: true,
     dateFormat: "yyyy-MM-dd HH:mm",
-    fontSize: 16, // 条目字体大小
-    layout: {
-      maxHeight: "98vh", // 控制整体高度在视口范围内
-      cardGap: 24, // 调整卡片间距
-      sideMargin: "2%", // 两侧留白
-      cardPadding: 16, // 卡片内边距
-      fixedLayout: true, // 固定布局
-      gridColumns: 4, // 3列布局
-      showLayoutToggle: false, // 隐藏布局切换
-      containerWidth: "96vw", // 容器宽度
-      containerPadding: "16px", // 容器内边距
-    },
-    tooltip: {
-      // 提示框预览内容的最大字数
-      maxPreviewLength: 100,
-      // 提示框宽度（像素或百分比）
-      width: "500px",
-    },
+    fontSize: 16,
+    itemsPerFeed: 15,
+    cardGap: 24,
+    cardPadding: 16,
+    layoutSideMargin: "2%",
   },
 };
 
@@ -49,71 +35,87 @@ const defaultConfig = {
 export function getRSSConfig(env) {
   console.log("Getting RSS config with env:", env); // 调试日志
 
-  // 创建新的配置对象，避免修改默认配置
-  const config = JSON.parse(JSON.stringify(defaultConfig));
+  const config = { ...DEFAULT_CONFIG };
 
   try {
-    // 如果没有环境变量，直接返回默认配置
-    if (!env) {
-      console.log("No env provided, using default config");
-      return config;
-    }
-
-    // 处理 RSS feeds
+    // 从环境变量更新配置
     if (env.RSS_FEEDS) {
       try {
-        const feedsStr = env.RSS_FEEDS.trim();
-        console.log("RSS_FEEDS string:", feedsStr);
-
-        const parsedFeeds = JSON.parse(feedsStr);
-        if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
-          config.feeds = parsedFeeds;
-          console.log("Successfully parsed RSS feeds:", parsedFeeds);
-        } else {
-          console.warn("Parsed RSS_FEEDS is not a valid array");
-        }
-      } catch (parseError) {
-        console.error("Error parsing RSS_FEEDS:", parseError);
+        config.feeds = JSON.parse(env.RSS_FEEDS);
+      } catch (e) {
+        console.error("RSS_FEEDS环境变量解析失败:", e);
       }
     }
 
-    // 处理刷新配置
     if (env.REFRESH_INTERVAL) {
-      config.refresh.interval = parseInt(env.REFRESH_INTERVAL);
-    }
-    if (env.CACHE_DURATION) {
-      config.refresh.cache = parseInt(env.CACHE_DURATION);
+      config.refresh.interval =
+        parseInt(env.REFRESH_INTERVAL, 10) || config.refresh.interval;
     }
 
-    // 处理显示配置
+    if (env.CACHE_DURATION) {
+      config.refresh.cache =
+        parseInt(env.CACHE_DURATION, 10) || config.refresh.cache;
+    }
+
     if (env.APP_TITLE) {
       config.display.appTitle = env.APP_TITLE;
     }
-    if (env.DEFAULT_DARK_MODE !== undefined) {
+
+    if (env.DEFAULT_DARK_MODE) {
       config.display.defaultDarkMode = env.DEFAULT_DARK_MODE === "true";
     }
-    if (env.SHOW_ITEM_DATE !== undefined) {
+
+    if (env.SHOW_ITEM_DATE) {
       config.display.showItemDate = env.SHOW_ITEM_DATE === "true";
     }
+
     if (env.DATE_FORMAT) {
       config.display.dateFormat = env.DATE_FORMAT;
     }
+
     if (env.FONT_SIZE) {
-      config.display.fontSize = parseInt(env.FONT_SIZE);
+      config.display.fontSize =
+        parseInt(env.FONT_SIZE, 10) || config.display.fontSize;
     }
+
     if (env.ITEMS_PER_FEED) {
-      config.display.itemsPerFeed = parseInt(env.ITEMS_PER_FEED);
+      config.display.itemsPerFeed =
+        parseInt(env.ITEMS_PER_FEED, 10) || config.display.itemsPerFeed;
+    }
+
+    if (env.CARD_GAP) {
+      config.display.cardGap =
+        parseInt(env.CARD_GAP, 10) || config.display.cardGap;
+    }
+
+    if (env.CARD_PADDING) {
+      config.display.cardPadding =
+        parseInt(env.CARD_PADDING, 10) || config.display.cardPadding;
+    }
+
+    if (env.LAYOUT_SIDE_MARGIN) {
+      config.display.layoutSideMargin = env.LAYOUT_SIDE_MARGIN;
     }
 
     // 处理布局配置
-    if (env.LAYOUT_SIDE_MARGIN) {
-      config.display.layout.sideMargin = env.LAYOUT_SIDE_MARGIN;
+    if (env.LAYOUT_MAX_HEIGHT) {
+      config.display.layout.maxHeight = env.LAYOUT_MAX_HEIGHT;
     }
-    if (env.CARD_GAP) {
-      config.display.layout.cardGap = parseInt(env.CARD_GAP);
+    if (env.LAYOUT_FIXED_LAYOUT) {
+      config.display.layout.fixedLayout = env.LAYOUT_FIXED_LAYOUT === "true";
     }
-    if (env.CARD_PADDING) {
-      config.display.layout.cardPadding = parseInt(env.CARD_PADDING);
+    if (env.LAYOUT_GRID_COLUMNS) {
+      config.display.layout.gridColumns = parseInt(env.LAYOUT_GRID_COLUMNS);
+    }
+    if (env.LAYOUT_SHOW_LAYOUT_TOGGLE) {
+      config.display.layout.showLayoutToggle =
+        env.LAYOUT_SHOW_LAYOUT_TOGGLE === "true";
+    }
+    if (env.LAYOUT_CONTAINER_WIDTH) {
+      config.display.layout.containerWidth = env.LAYOUT_CONTAINER_WIDTH;
+    }
+    if (env.LAYOUT_CONTAINER_PADDING) {
+      config.display.layout.containerPadding = env.LAYOUT_CONTAINER_PADDING;
     }
 
     // 处理提示框配置
@@ -139,3 +141,5 @@ export const RSS_CONFIG = getRSSConfig(
     ? window.__RSS_CONFIG__
     : null
 );
+
+export default DEFAULT_CONFIG;
