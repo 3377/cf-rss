@@ -7,77 +7,60 @@
       <div class="text-gray-500 empty-message">暂无数据</div>
     </div>
     <div v-else>
-      <!-- 移动端视图：滑动卡片 -->
+      <!-- 移动视图容器 -->
       <div
         v-if="isMobile"
-        class="feed-grid-mobile"
-        ref="swipeContainer"
-        :style="{ height: calcMobileCardHeight }"
-        @touchstart="handleTouchStart"
-        @touchmove="handleTouchMove"
-        @touchend="handleTouchEnd"
+        class="mobile-view-container"
+        ref="mobileViewContainer"
       >
-        <!-- 滑动指示器 -->
-        <div class="swipe-tip">← 左右滑动切换 →</div>
-
-        <div class="mobile-cards-container" ref="mobileCardsContainer">
+        <div
+          class="mobile-cards-container"
+          ref="swipeContainer"
+          :style="{ transform: `translateX(${-currentCardIndex * 100}%)` }"
+        >
+          <!-- 移动端卡片 -->
           <div
-            v-for="(feed, index) in feeds"
-            :key="feed.title"
+            v-for="(feed, gIndex) in feeds"
+            :key="gIndex"
             class="mobile-card"
-            :class="{ active: index === currentCardIndex }"
-            :style="{
-              transform: `translateX(${(index - currentCardIndex) * 100}%)`,
-            }"
           >
-            <!-- 标题区域 - 可滑动区域的一部分 -->
             <div class="card-header">
-              <h2 class="card-title">{{ feed.title }}</h2>
+              <div class="card-header-inner">
+                <div class="arrow-btn left-arrow" @click="prevCard">
+                  <i class="arrow-icon">&#9664;</i>
+                </div>
+                <h3 class="card-title">{{ feed.title }}</h3>
+                <div class="arrow-btn right-arrow" @click="nextCard">
+                  <i class="arrow-icon">&#9654;</i>
+                </div>
+              </div>
             </div>
-
-            <!-- 内容区域 - 允许垂直滚动 -->
+            <!-- 移动卡片内容 -->
             <div class="mobile-card-content">
-              <div class="items-list">
-                <div v-if="feed.error" class="error-message">
-                  {{ feed.error }}
+              <!-- 单个Feed项目 -->
+              <div
+                v-for="item in feed.items"
+                :key="item.link || item.id"
+                class="mobile-feed-item"
+                @click="openLink(item.link)"
+              >
+                <div class="item-title" v-html="item.title"></div>
+                <div class="item-meta">
+                  <span class="item-date">{{
+                    formatDate(item.pubDate || item.isoDate)
+                  }}</span>
                 </div>
-                <div
-                  v-else-if="!feed.items || feed.items.length === 0"
-                  class="empty-message"
-                >
-                  暂无数据
-                </div>
-                <template v-else>
-                  <div
-                    v-for="item in feed.items"
-                    :key="item.id || item.link"
-                    class="feed-link-item-mobile"
-                  >
-                    <a
-                      :href="item.link"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="feed-link-mobile"
-                    >
-                      <div class="item-title">{{ item.title }}</div>
-                      <div v-if="showItemDate" class="item-date">
-                        {{ formatDate(item.pubDate) }}
-                      </div>
-                    </a>
-                  </div>
-                </template>
               </div>
             </div>
           </div>
         </div>
-
         <!-- 滑动指示器 -->
         <div class="swipe-indicator" v-if="feeds.length > 1">
           <div
-            v-for="(feed, index) in feeds"
-            :key="'indicator-' + index"
+            v-for="(_, index) in feeds"
+            :key="index"
             class="indicator-dot"
-            :class="{ active: index === currentCardIndex }"
+            :class="{ active: currentCardIndex === index }"
           ></div>
         </div>
       </div>
@@ -153,22 +136,15 @@
 </template>
 
 <script setup>
-import {
-  ref,
-  computed,
-  onMounted,
-  watchEffect,
-  watch,
-  onUnmounted,
-  nextTick,
-} from "vue";
+import { ref, computed, onMounted, nextTick, onBeforeUnmount } from "vue";
 import { format, parseISO } from "date-fns";
 import { RSS_CONFIG } from "../config/rss.config";
 
+// 组件属性定义
 const props = defineProps({
   feeds: {
     type: Array,
-    default: () => [],
+    required: true,
   },
   isDark: {
     type: Boolean,
@@ -180,25 +156,38 @@ const props = defineProps({
 const showItemDate = ref(RSS_CONFIG.display?.showItemDate || false);
 const dateFormat = ref(RSS_CONFIG.display?.dateFormat || "yyyy-MM-dd HH:mm");
 
-// 移动端检测和滑动相关状态
-const isMobile = ref(false);
+// 响应式状态
 const currentCardIndex = ref(0);
+const isMobile = ref(false);
+const mobileViewContainer = ref(null);
 const swipeContainer = ref(null);
 const mobileCardsContainer = ref(null);
-let startX = 0;
-let startY = 0;
+
+// 触摸相关变量
+let startX = null;
+let startY = null;
+let touchDeltaX = 0;
+let touchDeltaY = 0;
+let touchStartTime = 0;
+let isScrolling = null;
 let resizeObserver = null;
 
 // 移动端导航方法
 const nextCard = () => {
   if (currentCardIndex.value < props.feeds.length - 1) {
     currentCardIndex.value++;
+  } else {
+    // 循环到第一张卡片
+    currentCardIndex.value = 0;
   }
 };
 
 const prevCard = () => {
   if (currentCardIndex.value > 0) {
     currentCardIndex.value--;
+  } else {
+    // 循环到最后一张卡片
+    currentCardIndex.value = props.feeds.length - 1;
   }
 };
 
@@ -207,75 +196,145 @@ const checkMobile = () => {
   isMobile.value = window.innerWidth <= 768;
 };
 
-// 简单直接的触摸开始事件
-const handleTouchStart = (e) => {
-  // 只记录水平位置，不关心垂直滚动
-  startX = e.touches[0].clientX;
-  console.log("触摸开始", startX);
-};
+// 初始化触摸事件
+const initTouchEvents = () => {
+  if (!isMobile.value || !swipeContainer.value) return;
 
-// 触摸移动事件 - 保持为空函数
-const handleTouchMove = (e) => {
-  // 不进行任何处理
-};
+  // 先移除可能存在的事件监听
+  swipeContainer.value.removeEventListener("touchstart", handleTouchStart);
+  swipeContainer.value.removeEventListener("touchmove", handleTouchMove);
+  swipeContainer.value.removeEventListener("touchend", handleTouchEnd);
 
-// 触摸结束事件 - 直接判断是否滑动足够距离
-const handleTouchEnd = (e) => {
-  // 获取结束位置
-  const endX = e.changedTouches[0].clientX;
-
-  // 计算水平移动距离
-  const diffX = startX - endX;
-  console.log("触摸结束，水平移动", diffX);
-
-  // 简单判断：如果移动足够距离，则切换卡片
-  if (Math.abs(diffX) > 50) {
-    if (diffX > 0 && currentCardIndex.value < props.feeds.length - 1) {
-      // 向左滑动 -> 下一页
-      nextCard();
-      console.log("向左滑动，切换到下一卡片");
-    } else if (diffX < 0 && currentCardIndex.value > 0) {
-      // 向右滑动 -> 上一页
-      prevCard();
-      console.log("向右滑动，切换到上一卡片");
-    }
-  }
-};
-
-// 初始化滑动功能
-const initSwipe = () => {
-  const container = document.querySelector(".feed-grid-mobile");
-  if (!container) {
-    console.error("找不到滑动容器");
-    return;
-  }
-
-  console.log("初始化滑动事件", container);
-
-  // 先移除可能已存在的监听器
-  container.removeEventListener("touchstart", handleTouchStart);
-  container.removeEventListener("touchmove", handleTouchMove);
-  container.removeEventListener("touchend", handleTouchEnd);
-
-  // 添加新的监听器
-  container.addEventListener("touchstart", handleTouchStart, { passive: true });
-  container.addEventListener("touchmove", handleTouchMove, { passive: true });
-  container.addEventListener("touchend", handleTouchEnd, { passive: true });
-
-  // 给内容区域单独绑定滚动处理
-  const contentElements = document.querySelectorAll(".mobile-card-content");
-  contentElements.forEach((el) => {
-    if (el) {
-      el.style.overflow = "auto";
-      el.style.webkitOverflowScrolling = "touch";
-    }
+  // 添加新的事件监听
+  swipeContainer.value.addEventListener("touchstart", handleTouchStart, {
+    passive: false,
+  });
+  swipeContainer.value.addEventListener("touchmove", handleTouchMove, {
+    passive: false,
+  });
+  swipeContainer.value.addEventListener("touchend", handleTouchEnd, {
+    passive: false,
   });
 };
 
-// 组件挂载时只进行设备检查
+// 触摸开始事件
+const handleTouchStart = (e) => {
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+  touchStartTime = new Date().getTime();
+  isScrolling = null;
+  touchDeltaX = 0;
+  touchDeltaY = 0;
+};
+
+// 触摸移动事件
+const handleTouchMove = (e) => {
+  if (startX === null) return;
+
+  const touchCurrentX = e.touches[0].clientX;
+  const touchCurrentY = e.touches[0].clientY;
+  touchDeltaX = touchCurrentX - startX;
+  touchDeltaY = touchCurrentY - startY;
+
+  // 判断主要滑动方向
+  if (isScrolling === null) {
+    isScrolling = Math.abs(touchDeltaY) > Math.abs(touchDeltaX);
+  }
+
+  // 如果是水平滑动，阻止默认行为，避免页面滚动
+  if (!isScrolling) {
+    e.preventDefault();
+
+    // 更新卡片容器的变换，添加一些阻尼效果
+    const containerWidth = swipeContainer.value.offsetWidth;
+    const resistance = 0.4; // 当尝试滑过边界时的阻力
+    let translateX = -currentCardIndex.value * 100;
+
+    // 计算位移百分比，考虑边界情况
+    if (
+      (currentCardIndex.value === 0 && touchDeltaX > 0) ||
+      (currentCardIndex.value === props.feeds.length - 1 && touchDeltaX < 0)
+    ) {
+      // 在边界处添加阻尼效果
+      translateX += (touchDeltaX / containerWidth) * 100 * resistance;
+    } else {
+      // 正常滑动
+      translateX += (touchDeltaX / containerWidth) * 100;
+    }
+
+    swipeContainer.value.style.transform = `translateX(${translateX}%)`;
+    swipeContainer.value.style.transition = "none";
+  }
+};
+
+// 触摸结束事件
+const handleTouchEnd = (e) => {
+  if (startX === null || isScrolling) return;
+
+  // 恢复过渡动画
+  swipeContainer.value.style.transition = "transform 0.3s ease";
+
+  const touchEndTime = new Date().getTime();
+  const touchTime = touchEndTime - touchStartTime;
+
+  // 计算滑动速度和距离百分比
+  const containerWidth = swipeContainer.value.offsetWidth;
+  const touchPercent = (touchDeltaX / containerWidth) * 100;
+  const touchSpeed = Math.abs(touchDeltaX) / touchTime;
+
+  // 降低滑动阈值，增加灵敏度
+  // 如果滑动速度快或滑动距离大，则切换卡片
+  if (
+    (Math.abs(touchPercent) > 10 || touchSpeed > 0.15) &&
+    Math.abs(touchDeltaX) > 10
+  ) {
+    if (touchDeltaX > 0) {
+      prevCard();
+    } else {
+      nextCard();
+    }
+  } else {
+    // 恢复到当前卡片
+    swipeContainer.value.style.transform = `translateX(${
+      -currentCardIndex.value * 100
+    }%)`;
+  }
+
+  // 重置触摸相关变量
+  startX = null;
+  startY = null;
+  touchDeltaX = 0;
+  touchDeltaY = 0;
+  isScrolling = null;
+};
+
+// 监听组件挂载
 onMounted(() => {
-  checkMobile();
-  window.addEventListener("resize", checkMobile);
+  // 初始化移动端触摸事件
+  nextTick(() => {
+    initTouchEvents();
+  });
+
+  // 监听窗口大小变化
+  window.addEventListener("resize", handleResize);
+  handleResize();
+
+  // 使用ResizeObserver监控移动端容器大小变化
+  if (window.ResizeObserver) {
+    resizeObserver = new ResizeObserver(() => {
+      if (isMobile.value) {
+        nextTick(() => {
+          initTouchEvents();
+        });
+      }
+    });
+
+    nextTick(() => {
+      if (swipeContainer.value) {
+        resizeObserver.observe(swipeContainer.value);
+      }
+    });
+  }
 
   // iOS设备特殊处理
   nextTick(() => {
@@ -290,10 +349,34 @@ onMounted(() => {
   });
 });
 
-// 组件卸载时清理资源
-onUnmounted(() => {
-  window.removeEventListener("resize", checkMobile);
+// 组件卸载前清理
+onBeforeUnmount(() => {
+  // 移除事件监听器
+  window.removeEventListener("resize", handleResize);
+
+  // 移除触摸事件监听器
+  if (swipeContainer.value) {
+    swipeContainer.value.removeEventListener("touchstart", handleTouchStart);
+    swipeContainer.value.removeEventListener("touchmove", handleTouchMove);
+    swipeContainer.value.removeEventListener("touchend", handleTouchEnd);
+  }
+
+  // 清理ResizeObserver
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
 });
+
+// 窗口大小变化处理
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 768;
+
+  nextTick(() => {
+    if (isMobile.value) {
+      initTouchEvents();
+    }
+  });
+};
 
 // 计算网格样式
 const gridStyle = computed(() => {
@@ -992,6 +1075,14 @@ html body .app-container:not(.dark) .tooltip-date {
   padding: 5px 0;
 }
 
+.card-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* 卡片标题 */
 .card-title {
   font-weight: bold;
   margin: 0;
@@ -1005,6 +1096,40 @@ html body .app-container:not(.dark) .tooltip-date {
   line-height: 1.4;
   margin-top: -5px;
   color: var(--el-text-color-primary);
+  flex: 1;
+  text-align: center;
+  padding: 0 8px;
+}
+
+/* 箭头按钮样式 */
+.arrow-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.arrow-btn:hover {
+  opacity: 1;
+}
+
+.arrow-icon {
+  font-style: normal;
+  color: var(--el-color-primary);
+  font-size: 14px;
+}
+
+.left-arrow {
+  margin-right: 4px;
+}
+
+.right-arrow {
+  margin-left: 4px;
 }
 
 /* 移动卡片内容区域 */
@@ -1166,5 +1291,65 @@ html body .app-container:not(.dark) .tooltip-date {
   width: 12px;
   height: 12px;
   background-color: var(--el-color-primary);
+}
+
+/* 移动视图样式 */
+.mobile-view-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-cards-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.mobile-card {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-card-content {
+  flex: 1;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 5px;
+  scrollbar-width: none; /* Firefox */
+}
+
+.mobile-card-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+/* 移动端Feed项目样式 */
+.mobile-feed-item {
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  padding: 10px 0;
+  cursor: pointer;
+}
+
+.mobile-feed-item:last-child {
+  border-bottom: none;
+}
+
+.mobile-feed-item .item-title {
+  font-size: 14px;
+  margin-bottom: 5px;
+  line-height: 1.4;
+  color: var(--el-text-color-primary);
+}
+
+.mobile-feed-item .item-meta {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 </style>
