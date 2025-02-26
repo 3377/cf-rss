@@ -21,7 +21,7 @@
         </h1>
       </div>
 
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center mobile-header">
         <div class="flex-1"></div>
         <div
           class="flex justify-center flex-1 text-base text-gray-600 status-text gap-8"
@@ -75,7 +75,7 @@
             <select
               v-model="selectedFont"
               @change="changeFont"
-              class="px-2 py-1.5 text-sm rounded border focus:outline-none"
+              class="px-2 py-1.5 text-sm rounded border focus:outline-none mobile-font-selector"
               :class="
                 isDark
                   ? 'bg-gray-700 text-gray-200 border-gray-600'
@@ -109,8 +109,11 @@
 
     <!-- 底部版权信息 -->
     <footer class="footer">
-      <div class="text-center text-sm text-gray-500 footer-text py-2">
-        <span>© {{ new Date().getFullYear() }} </span>
+      <div
+        class="text-center text-sm text-gray-500 footer-text py-2 mobile-footer"
+      >
+        <span>© {{ new Date().getFullYear() }}</span>
+        <span class="mx-1">·</span>
         <a
           href="https://github.com/3377/cf-rss"
           target="_blank"
@@ -118,7 +121,8 @@
           class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
           >RSS Reader</a
         >
-        <span>Powered by Drfy & hstz.com. </span>
+        <span class="mx-1">·</span>
+        <span>Powered by Drfy & hstz.com</span>
       </div>
     </footer>
   </div>
@@ -765,5 +769,27 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
 .app-container.font-yozai .card-title,
 .app-container.font-yozai .item-title {
   font-family: "Yozai", Roboto, sans-serif !important;
+}
+
+@media screen and (max-width: 768px) {
+  .mobile-footer {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0.25rem 0;
+  }
+  .mobile-footer .mx-1 {
+    margin: 0 0.25rem;
+  }
+  .header-title {
+    margin-bottom: 0.5rem;
+  }
+  .mobile-header {
+    margin-bottom: 0.75rem;
+  }
+  .mobile-font-selector {
+    min-width: 120px;
+    width: auto;
+  }
 }
 </style>
