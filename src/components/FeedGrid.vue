@@ -163,7 +163,6 @@ import {
 } from "vue";
 import { format, parseISO } from "date-fns";
 import { RSS_CONFIG } from "../config/rss.config";
-import { zhCN } from "date-fns/locale";
 
 const props = defineProps({
   feeds: {
@@ -173,22 +172,6 @@ const props = defineProps({
   isDark: {
     type: Boolean,
     default: false,
-  },
-  itemsPerFeed: {
-    type: Number,
-    default: 15,
-  },
-  fontSize: {
-    type: Number,
-    default: 16,
-  },
-  showItemDate: {
-    type: Boolean,
-    default: false,
-  },
-  dateFormat: {
-    type: String,
-    default: "yyyy-MM-dd HH:mm",
   },
 });
 
@@ -1135,20 +1118,11 @@ html body .app-container:not(.dark) .tooltip-date {
 
 /* 滚动指示器 - 内容底部渐变提示 */
 .mobile-card-content::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 20px;
-  background: linear-gradient(transparent, var(--el-bg-color, white));
-  pointer-events: none;
-  opacity: 0.8;
-  z-index: 10;
+  display: none;
 }
 
 .dark .mobile-card-content::after {
-  background: linear-gradient(transparent, var(--el-fill-color-darker, #333));
+  display: none;
 }
 
 /* 滑动提示文本 */
