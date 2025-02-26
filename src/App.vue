@@ -15,7 +15,7 @@
     "
   >
     <div class="header">
-      <div class="text-center mb-4">
+      <div class="text-center mb-4 mobile-title-container">
         <h1 class="text-3xl font-bold text-gray-700 header-title">
           {{ appTitle }}
         </h1>
@@ -112,8 +112,7 @@
       <div
         class="text-center text-sm text-gray-500 footer-text py-2 mobile-footer"
       >
-        <span>© {{ new Date().getFullYear() }}</span>
-        <span class="mx-1">·</span>
+        <span>© {{ new Date().getFullYear() }} </span>
         <a
           href="https://github.com/3377/cf-rss"
           target="_blank"
@@ -121,8 +120,7 @@
           class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
           >RSS Reader</a
         >
-        <span class="mx-1">·</span>
-        <span>Powered by Drfy & hstz.com</span>
+        <span> Powered by Drfy & hstz.com</span>
       </div>
     </footer>
   </div>
@@ -772,24 +770,27 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
 }
 
 @media screen and (max-width: 768px) {
-  .mobile-footer {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0.25rem 0;
-  }
-  .mobile-footer .mx-1 {
-    margin: 0 0.25rem;
-  }
-  .header-title {
-    margin-bottom: 0.5rem;
-  }
-  .mobile-header {
-    margin-bottom: 0.75rem;
+  .mobile-title-container {
+    margin-bottom: 0.25rem;
   }
   .mobile-font-selector {
-    min-width: 120px;
+    min-width: 90px;
     width: auto;
+  }
+  .status-text {
+    margin-top: 0;
+    font-size: 0.875rem;
+  }
+  .mobile-status {
+    margin-bottom: 0.5rem;
+  }
+  .mobile-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    padding: 0.25rem 0;
   }
 }
 </style>
