@@ -117,9 +117,8 @@
           rel="noopener noreferrer"
           class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
           >RSS Reader</a
-        >.
+        >
         <span>Powered by Drfy & hstz.com. </span>
-        <span>All rights reserved.</span>
       </div>
     </footer>
   </div>

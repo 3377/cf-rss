@@ -165,12 +165,10 @@ const currentCardIndex = ref(0);
 const swipeContainer = ref(null);
 const mobileCardsContainer = ref(null);
 let touchStartX = 0;
-let touchEndX = 0;
 let touchStartY = 0;
-let touchEndY = 0;
-let touchStartTime = 0;
-let isScrolling = false;
-let isHorizontalSwipe = false;
+let touchMoveX = 0;
+let touchMoveY = 0;
+let startTime = 0;
 let resizeObserver = null;
 
 // 移动端导航方法
@@ -186,160 +184,130 @@ const prevCard = () => {
   }
 };
 
-// 检测设备类型
-const checkMobile = () => {
-  isMobile.value = window.innerWidth <= 768;
-};
-
-// 处理触摸事件
+// 新的触摸事件处理函数 - 更简单且兼容性更好
 const handleTouchStart = (e) => {
-  if (!isMobile.value) return;
-
-  try {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchStartTime = Date.now();
-    isScrolling = false;
-    isHorizontalSwipe = false;
-  } catch (error) {
-    console.error("触摸事件处理错误:", error);
-  }
+  // 记录初始触摸位置和时间
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  startTime = Date.now();
 };
 
 const handleTouchMove = (e) => {
-  if (!isMobile.value) return;
+  // 更新当前触摸位置
+  touchMoveX = e.touches[0].clientX;
+  touchMoveY = e.touches[0].clientY;
 
-  try {
-    touchEndX = e.touches[0].clientX;
-    touchEndY = e.touches[0].clientY;
+  // 计算水平和垂直位移
+  const diffX = touchStartX - touchMoveX;
+  const diffY = touchStartY - touchMoveY;
 
-    // 确定滑动方向
-    const deltaX = Math.abs(touchEndX - touchStartX);
-    const deltaY = Math.abs(touchEndY - touchStartY);
-
-    // 如果垂直滑动明显大于水平滑动，标记为垂直滚动
-    if (!isHorizontalSwipe && deltaY > deltaX && deltaY > 10) {
-      isScrolling = true;
-      return;
-    }
-
-    // 如果水平滑动明显大于垂直滑动，标记为水平滑动
-    if (!isScrolling && deltaX > deltaY && deltaX > 10) {
-      isHorizontalSwipe = true;
-
-      // 阻止页面滚动
-      if (e.cancelable) {
-        e.preventDefault();
-      }
-
-      // 计算滑动距离百分比
-      const swipeDist = touchEndX - touchStartX;
-      const maxDist = window.innerWidth * 0.5; // 最大滑动距离为屏幕宽度的一半
-      const percentage =
-        Math.min(Math.abs(swipeDist) / maxDist, 1) * (swipeDist < 0 ? -1 : 1);
-
-      // 如果滑动距离足够大，应用动态位移
-      if (Math.abs(percentage) > 0.05) {
-        const cards = document.querySelectorAll(".mobile-card");
-        cards.forEach((card, index) => {
-          card.style.transform = `translateX(calc(${
-            (index - currentCardIndex.value) * 100
-          }% + ${percentage * 50}px))`;
-        });
-      }
-    }
-  } catch (error) {
-    console.error("触摸移动处理错误:", error);
+  // 如果水平滑动距离大于垂直滑动，且水平位移足够大
+  // 则阻止默认行为，避免页面滚动干扰卡片切换
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+    e.preventDefault();
   }
 };
 
 const handleTouchEnd = (e) => {
   if (!isMobile.value) return;
 
-  try {
-    // 计算滑动速度和距离
-    const touchTime = Date.now() - touchStartTime;
-    const swipeDistance = touchEndX - touchStartX;
-    const swipeSpeed = Math.abs(swipeDistance) / touchTime;
+  // 计算最终触摸位置
+  const touchEndX =
+    touchMoveX ||
+    (e.changedTouches ? e.changedTouches[0].clientX : touchStartX);
+  const touchEndY =
+    touchMoveY ||
+    (e.changedTouches ? e.changedTouches[0].clientY : touchStartY);
 
-    // 只有在水平滑动且不是内容滚动的情况下才处理翻页
-    if (isHorizontalSwipe && !isScrolling) {
-      // 滑动阈值：较慢滑动需要更长距离，快速滑动只需短距离
-      const swipeThreshold = swipeSpeed > 0.5 ? 30 : 80;
+  // 计算水平和垂直位移
+  const diffX = touchStartX - touchEndX;
+  const diffY = touchStartY - touchEndY;
 
-      if (
-        swipeDistance < -swipeThreshold &&
-        currentCardIndex.value < props.feeds.length - 1
-      ) {
-        // 向左滑动，下一页
-        nextCard();
-      } else if (swipeDistance > swipeThreshold && currentCardIndex.value > 0) {
-        // 向右滑动，上一页
-        prevCard();
-      }
+  // 计算滑动时间
+  const timeSpent = Date.now() - startTime;
+
+  // 计算滑动速度
+  const horizontalSpeed = Math.abs(diffX) / timeSpent;
+
+  // 滑动阈值：速度快的滑动只需较小距离，慢滑动需较大距离
+  const swipeThreshold = horizontalSpeed > 0.3 ? 30 : 80;
+
+  // 如果水平位移大于垂直位移（说明是横向滑动意图）
+  // 并且水平位移大于阈值
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
+    if (diffX > 0 && currentCardIndex.value < props.feeds.length - 1) {
+      // 向左滑动 -> 下一页
+      nextCard();
+    } else if (diffX < 0 && currentCardIndex.value > 0) {
+      // 向右滑动 -> 上一页
+      prevCard();
     }
-
-    // 无论如何，重置所有卡片位置
-    setTimeout(() => {
-      const cards = document.querySelectorAll(".mobile-card");
-      cards.forEach((card, index) => {
-        card.style.transform = `translateX(${
-          (index - currentCardIndex.value) * 100
-        }%)`;
-      });
-    }, 50);
-
-    // 重置状态
-    touchStartX = 0;
-    touchEndX = 0;
-    touchStartY = 0;
-    touchEndY = 0;
-    isScrolling = false;
-    isHorizontalSwipe = false;
-  } catch (error) {
-    console.error("触摸结束处理错误:", error);
   }
+
+  // 重置触摸数据
+  touchStartX = 0;
+  touchStartY = 0;
+  touchMoveX = 0;
+  touchMoveY = 0;
 };
 
-// 监听窗口大小变化
+// 检测设备类型
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 768;
+};
+
+// 添加iOS专用的滑动支持
 onMounted(() => {
   checkMobile();
   window.addEventListener("resize", checkMobile);
 
-  // 添加触摸事件监听 - 使用更可靠的初始化方法
-  const addTouchEvents = () => {
-    if (swipeContainer.value) {
-      swipeContainer.value.removeEventListener("touchstart", handleTouchStart);
-      swipeContainer.value.removeEventListener("touchmove", handleTouchMove);
-      swipeContainer.value.removeEventListener("touchend", handleTouchEnd);
+  // 添加触摸事件
+  const attachTouchEvents = () => {
+    const container = swipeContainer.value;
+    if (!container) return;
 
-      swipeContainer.value.addEventListener("touchstart", handleTouchStart, {
-        passive: true,
-      });
-      swipeContainer.value.addEventListener("touchmove", handleTouchMove, {
-        passive: false,
-      });
-      swipeContainer.value.addEventListener("touchend", handleTouchEnd, {
-        passive: true,
-      });
+    // 移除现有事件监听，避免重复
+    container.removeEventListener("touchstart", handleTouchStart);
+    container.removeEventListener("touchmove", handleTouchMove);
+    container.removeEventListener("touchend", handleTouchEnd);
 
-      console.log("移动端触摸事件已初始化");
-    }
+    // 添加新的事件监听
+    container.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+    container.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    });
+    container.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    console.log("移动端触摸事件已重新绑定");
   };
 
-  // 初始设置和窗口大小变化时添加事件
-  addTouchEvents();
-  window.addEventListener("resize", addTouchEvents);
+  // 初始化和窗口调整时重新绑定事件
+  attachTouchEvents();
+  window.addEventListener("resize", attachTouchEvents);
 
-  // 使用ResizeObserver监听容器大小变化
-  resizeObserver = new ResizeObserver(() => {
-    checkMobile();
-    addTouchEvents();
-  });
+  // 使用ResizeObserver监听容器变化
+  if (window.ResizeObserver) {
+    resizeObserver = new ResizeObserver(() => {
+      checkMobile();
+      attachTouchEvents();
+    });
 
-  if (swipeContainer.value) {
-    resizeObserver.observe(swipeContainer.value);
+    if (swipeContainer.value) {
+      resizeObserver.observe(swipeContainer.value);
+    }
   }
+
+  // 专门针对iOS设备的处理 - 确保可滚动区域真正可滚动
+  const mobileCardContents = document.querySelectorAll(".mobile-card-content");
+  mobileCardContents.forEach((content) => {
+    if (content) {
+      // 在iOS上显式设置overflow
+      content.style.webkitOverflowScrolling = "touch";
+      content.style.overflowY = "auto";
+    }
+  });
 });
 
 onUnmounted(() => {
@@ -640,20 +608,231 @@ onMounted(() => {
 /* 卡片网格布局 */
 .feed-grid {
   display: grid;
-  padding: 0.5rem;
-  width: 98%;
-  height: calc(100vh - 10rem);
-  margin: 0 auto;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  padding: 0px;
 }
 
 /* 卡片样式 */
 .feed-card {
+  position: relative;
+  padding: 16px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   height: 100%;
+  cursor: pointer;
+  gap: 0.5rem;
+  transition: all 0.3s;
+  user-select: none;
+  border-radius: 8px;
+  background: var(--el-bg-color);
+}
+
+.dark .feed-card {
+  background: var(--el-fill-color-darker);
+}
+
+.feed-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feed-title {
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
   overflow: hidden;
-  border-radius: 0.75rem;
-  transition: all 0.3s ease;
+  text-overflow: ellipsis;
+}
+
+.feed-title-mobile {
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  padding: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
+.feed-links {
+  overflow-y: auto;
+  max-height: 300px;
+  margin-top: auto;
+  flex: 1;
+}
+
+.feed-links::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.feed-links::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.dark .feed-links::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.feed-link-item {
+  padding: 6px 0;
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.feed-link {
+  display: block;
+  color: var(--el-text-color-primary);
+  text-decoration: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.95rem;
+}
+
+.feed-link:hover {
+  color: var(--el-color-primary);
+}
+
+.feed-link:visited {
+  color: var(--el-text-color-secondary);
+}
+
+.link-tooltip {
+  padding: 10px 10px;
+  line-height: 1.6;
+  text-align: left;
+  max-width: 400px;
+  transition: all 0.2s;
+  overflow-y: auto;
+  max-height: 200px;
+}
+
+.swipe-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.dark .indicator-dot {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.indicator-dot.active {
+  width: 12px;
+  height: 12px;
+  background-color: var(--el-color-primary);
+}
+
+.dark .indicator-dot.active {
+  background-color: var(--el-color-primary);
+}
+
+/* Mobile Styles */
+@media screen and (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-cards-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .mobile-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease-out;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .mobile-card-content {
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 5px 10px 5px;
+    position: relative;
+    height: 100%;
+    /* iOS特定修复 */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  /* 隐藏滚动条但允许滚动 */
+  .mobile-card-content::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+
+  /* 滚动指示器 - 内容底部渐变提示 */
+  .mobile-card-content::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(transparent, var(--el-bg-color, white));
+    pointer-events: none;
+    opacity: 0.8;
+  }
+
+  .dark .mobile-card-content::after {
+    background: linear-gradient(transparent, var(--el-fill-color-darker, #333));
+  }
+
+  .feed-link-item-mobile {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .dark .feed-link-item-mobile {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .feed-link-mobile {
+    display: block;
+    color: var(--el-text-color-primary);
+    text-decoration: none;
+    overflow: hidden;
+    white-space: normal;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
 }
 
 /* 卡片头部样式 */
@@ -816,41 +995,6 @@ html body .app-container:not(.dark) .tooltip-date {
   touch-action: pan-x;
   display: flex;
   flex-direction: column;
-}
-
-/* 滑动指示器样式 */
-.swipe-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.25rem 0 0;
-  margin-bottom: 0.5rem;
-  gap: 0.5rem;
-}
-
-.indicator-dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background-color: rgba(229, 231, 235, 0.6);
-  transition: all 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.dark .indicator-dot {
-  background-color: rgba(75, 85, 99, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.indicator-dot.active {
-  background-color: #3b82f6;
-  width: 0.75rem;
-  height: 0.75rem;
-  transform: scale(1.1);
-}
-
-.dark .indicator-dot.active {
-  background-color: #60a5fa;
 }
 
 /* 移动端卡片内容滚动样式 */
