@@ -183,6 +183,7 @@ const tooltipStyle = ref({
   opacity: 0,
   top: "0px",
   left: "0px",
+  width: tooltipConfig.value.width,
   maxWidth: tooltipConfig.value.width,
 });
 const showTooltipText = ref(false);
@@ -191,6 +192,10 @@ const showTooltipText = ref(false);
 const getContentPreview = (content) => {
   if (!content) return "暂无内容预览";
 
+  // 添加调试日志
+  console.log("Content preview raw data:", content);
+  console.log("Content type:", typeof content);
+
   // 检查内容类型，并执行适当的处理
   let plainText = "";
 
@@ -198,18 +203,38 @@ const getContentPreview = (content) => {
     if (typeof content === "string") {
       // 移除HTML标签
       plainText = content.replace(/<[^>]*>?/gm, "");
+
+      // 解码HTML实体
+      plainText = plainText
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&amp;/g, "&")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+
+      // 去除多余空格
+      plainText = plainText.replace(/\s+/g, " ").trim();
     } else if (typeof content === "object") {
       // 如果是对象（可能是JSON格式的内容），尝试提取文本
-      plainText = JSON.stringify(content);
+      try {
+        if (content.textContent) {
+          plainText = content.textContent;
+        } else if (content._cdata) {
+          plainText = content._cdata;
+        } else {
+          plainText = JSON.stringify(content);
+        }
+      } catch (err) {
+        plainText = "内容格式无法解析";
+      }
     } else {
       // 其他类型转为字符串
       plainText = String(content);
     }
 
     // 调试输出
-    console.log("原始内容类型:", typeof content);
     console.log(
-      "内容预览结果:",
+      "处理后的内容:",
       plainText.substring(0, 50) + (plainText.length > 50 ? "..." : "")
     );
   } catch (error) {
@@ -230,7 +255,7 @@ const getContentPreview = (content) => {
   return plainText.substring(0, tooltipConfig.value.maxPreviewLength) + "...";
 };
 
-// 修改显示提示框的方法，删除标题显示，仅显示内容预览
+// 修改显示提示框的方法
 const showTooltip = (event, date, content) => {
   // 设置内容预览
   tooltipContent.value = getContentPreview(content);
@@ -272,7 +297,8 @@ const showTooltip = (event, date, content) => {
       opacity: 1,
       top: `${top}px`,
       left: `${left}px`,
-      maxWidth: tooltipConfig.value.width, // 应用宽度设置
+      width: tooltipConfig.value.width,
+      maxWidth: tooltipConfig.value.width,
     };
   }, 10);
 };
@@ -468,6 +494,7 @@ onMounted(() => {
   border-radius: 0.375rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 90%;
+  width: auto !important; /* 添加 !important 确保内联样式优先级 */
   z-index: 100;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -510,6 +537,7 @@ html body .app-container:not(.dark) .tooltip-date {
   word-break: break-word;
   white-space: pre-line;
   text-indent: 1em;
+  padding: 0.25rem 0;
 }
 
 /* 移动设备适配 */

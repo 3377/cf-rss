@@ -22,6 +22,26 @@ async function fetchRSSFeed(url) {
     const itemRegex = /<(item|entry)[\s\S]*?<\/\1>/g;
     const matches = text.match(itemRegex) || [];
 
+    // 提取标签内容的通用方法
+    const getTagContent = (xml, tag) => {
+      const patterns = [
+        // 普通标签内容
+        new RegExp(`<${tag}[^>]*>([^<]+)</${tag}>`, "i"),
+        // 带CDATA的内容
+        new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([^\\]]+)\\]\\]></${tag}>`, "i"),
+        // 带属性的标签
+        new RegExp(`<${tag}[^>]*?\\s*/?>(.*?)</${tag}>`, "i"),
+      ];
+
+      for (const pattern of patterns) {
+        const match = xml.match(pattern);
+        if (match && match[1]) {
+          return match[1].trim();
+        }
+      }
+      return "";
+    };
+
     matches.forEach((itemStr, index) => {
       // 通用标题匹配
       const title = itemStr.match(
@@ -45,11 +65,21 @@ async function fetchRSSFeed(url) {
         /<(pubDate|published|updated|date)[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/\1>/i;
       const pubDate = itemStr.match(dateRegex);
 
+      // 获取内容描述
+      const description = getTagContent(itemStr, "description");
+      const content =
+        getTagContent(itemStr, "content") ||
+        getTagContent(itemStr, "content:encoded");
+      const summary = getTagContent(itemStr, "summary");
+
       items.push({
         id: index,
         title: title ? title[1].trim() : "",
         link: link ? link[1].trim() : "",
         pubDate: pubDate ? pubDate[2].trim() : new Date().toISOString(),
+        description: description,
+        content: content,
+        summary: summary,
       });
     });
 

@@ -129,6 +129,14 @@ export async function onRequest(context) {
               pubDate = new Date().toISOString();
             }
 
+            // 获取内容描述
+            const description = getTagContent(itemContent, "description") || "";
+            const content =
+              getTagContent(itemContent, "content") ||
+              getTagContent(itemContent, "content:encoded") ||
+              "";
+            const summary = getTagContent(itemContent, "summary") || "";
+
             if (title && link) {
               items.push({
                 id: items.length,
@@ -140,6 +148,9 @@ export async function onRequest(context) {
                   .replace(/&#39;/g, "'"),
                 link: link,
                 pubDate: pubDate,
+                description: description,
+                content: content,
+                summary: summary,
               });
             }
           }
@@ -155,10 +166,14 @@ export async function onRequest(context) {
               const titleRegex = /<title[^>]*>([^<]+)<\/title>/g;
               const linkRegex = /<link[^>]*>([^<]+)<\/link>/g;
               const dateRegex = /<pubDate[^>]*>([^<]+)<\/pubDate>/g;
+              const descRegex = /<description[^>]*>([^<]+)<\/description>/g;
 
               const titles = [...channel.matchAll(titleRegex)].map((m) => m[1]);
               const links = [...channel.matchAll(linkRegex)].map((m) => m[1]);
               const dates = [...channel.matchAll(dateRegex)].map((m) => m[1]);
+              const descriptions = [...channel.matchAll(descRegex)].map(
+                (m) => m[1]
+              );
 
               // 跳过第一个（通常是feed标题）
               for (
@@ -173,12 +188,31 @@ export async function onRequest(context) {
                   pubDate: dates[i]
                     ? new Date(dates[i]).toISOString()
                     : new Date().toISOString(),
+                  description: descriptions[i] || "暂无描述",
+                  content: "",
+                  summary: "",
                 });
               }
             }
           }
 
           console.log(`Final items count for ${source.title}: ${items.length}`);
+
+          // 添加调试日志，输出内容结构样本
+          if (items.length > 0) {
+            console.log(`${source.title} 内容样本:`, {
+              title: items[0].title,
+              description: items[0].description
+                ? `${items[0].description.substring(0, 50)}...`
+                : "无",
+              content: items[0].content
+                ? `${items[0].content.substring(0, 50)}...`
+                : "无",
+              summary: items[0].summary
+                ? `${items[0].summary.substring(0, 50)}...`
+                : "无",
+            });
+          }
 
           return {
             title: source.title,
