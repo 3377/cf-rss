@@ -9,26 +9,14 @@
     <div v-else>
       <!-- 移动端视图：滑动卡片 -->
       <div v-if="isMobile" class="swipe-container" ref="swipeContainer">
-        <div class="mobile-nav" v-if="feeds.length > 1">
-          <button
-            @click="prevCard"
-            class="mobile-nav-btn"
-            :disabled="currentCardIndex === 0"
-            :class="{ 'opacity-50': currentCardIndex === 0 }"
-          >
-            &#9664;
-          </button>
-          <div class="mobile-indicator">
-            {{ currentCardIndex + 1 }} / {{ feeds.length }}
-          </div>
-          <button
-            @click="nextCard"
-            class="mobile-nav-btn"
-            :disabled="currentCardIndex >= feeds.length - 1"
-            :class="{ 'opacity-50': currentCardIndex >= feeds.length - 1 }"
-          >
-            &#9654;
-          </button>
+        <!-- 滑动指示器 -->
+        <div class="swipe-indicator" v-if="feeds.length > 1">
+          <div
+            v-for="(feed, index) in feeds"
+            :key="'indicator-' + index"
+            class="indicator-dot"
+            :class="{ active: index === currentCardIndex }"
+          ></div>
         </div>
 
         <div class="mobile-cards-container" ref="mobileCardsContainer">
@@ -44,7 +32,7 @@
             <div class="card-header">
               <h2 class="card-title">{{ feed.title }}</h2>
             </div>
-            <div class="card-content">
+            <div class="card-content mobile-card-content">
               <div class="items-list">
                 <div v-if="feed.error" class="error-message">
                   {{ feed.error }}
@@ -178,6 +166,11 @@ const swipeContainer = ref(null);
 const mobileCardsContainer = ref(null);
 let touchStartX = 0;
 let touchEndX = 0;
+let touchStartY = 0;
+let touchEndY = 0;
+let touchStartTime = 0;
+let isScrolling = false;
+let isHorizontalSwipe = false;
 let resizeObserver = null;
 
 // 移动端导航方法
@@ -204,6 +197,10 @@ const handleTouchStart = (e) => {
 
   try {
     touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+    isScrolling = false;
+    isHorizontalSwipe = false;
   } catch (error) {
     console.error("触摸事件处理错误:", error);
   }
@@ -214,42 +211,72 @@ const handleTouchMove = (e) => {
 
   try {
     touchEndX = e.touches[0].clientX;
+    touchEndY = e.touches[0].clientY;
 
-    // 计算滑动距离百分比
-    const swipeDist = touchEndX - touchStartX;
-    const maxDist = window.innerWidth * 0.5; // 最大滑动距离为屏幕宽度的一半
-    const percentage =
-      Math.min(Math.abs(swipeDist) / maxDist, 1) * (swipeDist < 0 ? -1 : 1);
+    // 确定滑动方向
+    const deltaX = Math.abs(touchEndX - touchStartX);
+    const deltaY = Math.abs(touchEndY - touchStartY);
 
-    // 如果滑动距离足够大，应用动态位移
-    if (Math.abs(percentage) > 0.05) {
-      const cards = document.querySelectorAll(".mobile-card");
-      cards.forEach((card, index) => {
-        const baseTransform = `translateX(${
-          (index - currentCardIndex.value) * 100
-        }%)`;
-        const dynamicTransform = `translateX(calc(${
-          (index - currentCardIndex.value) * 100
-        }% + ${percentage * 30}px))`;
-        card.style.transform = dynamicTransform;
-      });
+    // 如果垂直滑动明显大于水平滑动，标记为垂直滚动
+    if (!isHorizontalSwipe && deltaY > deltaX && deltaY > 10) {
+      isScrolling = true;
+      return;
+    }
+
+    // 如果水平滑动明显大于垂直滑动，标记为水平滑动
+    if (!isScrolling && deltaX > deltaY && deltaX > 10) {
+      isHorizontalSwipe = true;
+
+      // 阻止页面滚动
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+
+      // 计算滑动距离百分比
+      const swipeDist = touchEndX - touchStartX;
+      const maxDist = window.innerWidth * 0.5; // 最大滑动距离为屏幕宽度的一半
+      const percentage =
+        Math.min(Math.abs(swipeDist) / maxDist, 1) * (swipeDist < 0 ? -1 : 1);
+
+      // 如果滑动距离足够大，应用动态位移
+      if (Math.abs(percentage) > 0.05) {
+        const cards = document.querySelectorAll(".mobile-card");
+        cards.forEach((card, index) => {
+          card.style.transform = `translateX(calc(${
+            (index - currentCardIndex.value) * 100
+          }% + ${percentage * 50}px))`;
+        });
+      }
     }
   } catch (error) {
     console.error("触摸移动处理错误:", error);
   }
 };
 
-const handleTouchEnd = () => {
+const handleTouchEnd = (e) => {
   if (!isMobile.value) return;
 
   try {
-    const swipeThreshold = 50;
-    if (touchStartX - touchEndX > swipeThreshold) {
-      // 向左滑动
-      nextCard();
-    } else if (touchEndX - touchStartX > swipeThreshold) {
-      // 向右滑动
-      prevCard();
+    // 计算滑动速度和距离
+    const touchTime = Date.now() - touchStartTime;
+    const swipeDistance = touchEndX - touchStartX;
+    const swipeSpeed = Math.abs(swipeDistance) / touchTime;
+
+    // 只有在水平滑动且不是内容滚动的情况下才处理翻页
+    if (isHorizontalSwipe && !isScrolling) {
+      // 滑动阈值：较慢滑动需要更长距离，快速滑动只需短距离
+      const swipeThreshold = swipeSpeed > 0.5 ? 30 : 80;
+
+      if (
+        swipeDistance < -swipeThreshold &&
+        currentCardIndex.value < props.feeds.length - 1
+      ) {
+        // 向左滑动，下一页
+        nextCard();
+      } else if (swipeDistance > swipeThreshold && currentCardIndex.value > 0) {
+        // 向右滑动，上一页
+        prevCard();
+      }
     }
 
     // 无论如何，重置所有卡片位置
@@ -262,8 +289,13 @@ const handleTouchEnd = () => {
       });
     }, 50);
 
+    // 重置状态
     touchStartX = 0;
     touchEndX = 0;
+    touchStartY = 0;
+    touchEndY = 0;
+    isScrolling = false;
+    isHorizontalSwipe = false;
   } catch (error) {
     console.error("触摸结束处理错误:", error);
   }
@@ -274,22 +306,35 @@ onMounted(() => {
   checkMobile();
   window.addEventListener("resize", checkMobile);
 
-  // 添加触摸事件监听
-  if (swipeContainer.value) {
-    swipeContainer.value.addEventListener("touchstart", handleTouchStart, {
-      passive: true,
-    });
-    swipeContainer.value.addEventListener("touchmove", handleTouchMove, {
-      passive: true,
-    });
-    swipeContainer.value.addEventListener("touchend", handleTouchEnd, {
-      passive: true,
-    });
-  }
+  // 添加触摸事件监听 - 使用更可靠的初始化方法
+  const addTouchEvents = () => {
+    if (swipeContainer.value) {
+      swipeContainer.value.removeEventListener("touchstart", handleTouchStart);
+      swipeContainer.value.removeEventListener("touchmove", handleTouchMove);
+      swipeContainer.value.removeEventListener("touchend", handleTouchEnd);
+
+      swipeContainer.value.addEventListener("touchstart", handleTouchStart, {
+        passive: true,
+      });
+      swipeContainer.value.addEventListener("touchmove", handleTouchMove, {
+        passive: false,
+      });
+      swipeContainer.value.addEventListener("touchend", handleTouchEnd, {
+        passive: true,
+      });
+
+      console.log("移动端触摸事件已初始化");
+    }
+  };
+
+  // 初始设置和窗口大小变化时添加事件
+  addTouchEvents();
+  window.addEventListener("resize", addTouchEvents);
 
   // 使用ResizeObserver监听容器大小变化
   resizeObserver = new ResizeObserver(() => {
     checkMobile();
+    addTouchEvents();
   });
 
   if (swipeContainer.value) {
@@ -773,35 +818,65 @@ html body .app-container:not(.dark) .tooltip-date {
   flex-direction: column;
 }
 
-.mobile-nav {
+/* 滑动指示器样式 */
+.swipe-indicator {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 0.5rem 1rem;
+  padding: 0.25rem 0 0;
   margin-bottom: 0.5rem;
+  gap: 0.5rem;
 }
 
-.mobile-nav-btn {
-  background: transparent;
-  border: none;
-  font-size: 1.25rem;
-  color: #4b5563;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  transition: all 0.2s ease;
+.indicator-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: rgba(229, 231, 235, 0.6);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.dark .mobile-nav-btn {
-  color: #e5e7eb;
+.dark .indicator-dot {
+  background-color: rgba(75, 85, 99, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.mobile-indicator {
-  font-size: 0.875rem;
-  color: #6b7280;
+.indicator-dot.active {
+  background-color: #3b82f6;
+  width: 0.75rem;
+  height: 0.75rem;
+  transform: scale(1.1);
 }
 
-.dark .mobile-indicator {
-  color: #9ca3af;
+.dark .indicator-dot.active {
+  background-color: #60a5fa;
+}
+
+/* 移动端卡片内容滚动样式 */
+.mobile-card-content {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
+  position: relative;
+  padding: 0.5rem 0 0.25rem;
+  box-sizing: border-box;
+}
+
+.mobile-card-content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.mobile-card-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-card .items-list {
+  padding-bottom: 1rem;
+  height: auto;
 }
 
 .mobile-cards-container {
@@ -818,6 +893,46 @@ html body .app-container:not(.dark) .tooltip-date {
   width: 100%;
   height: 100%;
   transition: transform 0.3s ease;
+}
+
+/* 允许移动端卡片标题不被截断，支持两行显示 */
+@media (max-width: 768px) {
+  .item-title {
+    white-space: normal;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .feed-item {
+    padding: 0.1rem 0;
+  }
+
+  .item-link {
+    padding: 0.6rem 0.75rem;
+    min-height: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+/* 添加内容滚动提示 */
+.mobile-card-content::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 20px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.05), transparent);
+  pointer-events: none;
+}
+
+.dark .mobile-card-content::after {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.05), transparent);
 }
 
 /* 移动设备适配 */
@@ -878,14 +993,6 @@ html body .app-container:not(.dark) .tooltip-date {
 
   .swipe-container {
     height: calc(100vh - 11rem); /* 更小的高度，让底部更靠近版权 */
-  }
-
-  .mobile-nav {
-    padding: 0.25rem 0.5rem;
-  }
-
-  .mobile-nav-btn {
-    font-size: 1rem;
   }
 
   .card-header {
