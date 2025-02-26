@@ -581,39 +581,28 @@ const calcMobileCardHeight = computed(() => {
 <style>
 /* 卡片容器样式 */
 .feed-container {
-  padding: 0.5rem 1rem;
-  width: 100%;
-  height: calc(100vh - 180px);
+  height: calc(100vh - 80px);
   overflow: auto;
-  display: flex;
-  flex-direction: column;
+  padding: 1rem;
 }
 
 /* 卡片网格布局 */
 .feed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
-  padding: 0.5rem;
-  min-height: min-content;
+  gap: 1rem;
+  padding-bottom: 1rem;
 }
 
 /* 卡片样式 */
 .feed-card {
-  position: relative;
-  padding: 16px;
+  background: var(--card-bg);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-height: 300px;
   max-height: 500px;
-  cursor: pointer;
-  gap: 0.5rem;
-  transition: all 0.3s;
-  user-select: none;
-  border-radius: 8px;
-  background: var(--card-bg, #fff);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -654,9 +643,9 @@ const calcMobileCardHeight = computed(() => {
 }
 
 .feed-links {
-  overflow-y: auto;
   height: 100%;
-  padding-right: 4px;
+  overflow-y: auto;
+  padding: 0.5rem 0;
 }
 
 .feed-links::-webkit-scrollbar {
@@ -857,17 +846,12 @@ const calcMobileCardHeight = computed(() => {
 /* 卡片内容区域样式 */
 .card-content {
   flex: 1;
-  padding: 0.5rem 0;
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  border-radius: 0 0 0.75rem 0.75rem;
-  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  padding: 1rem;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  scroll-behavior: smooth;
 }
 
-/* 隐藏滚动条 */
 .card-content::-webkit-scrollbar {
   display: none;
 }
@@ -1077,74 +1061,27 @@ html body .app-container:not(.dark) .tooltip-date {
 /* 移动设备适配 */
 @media (max-width: 768px) {
   .feed-container {
-    padding: 0.25rem 0.5rem;
-    height: calc(100vh - 9rem);
+    height: auto;
+    padding: 0.5rem;
   }
 
   .feed-grid {
-    display: block;
-    padding: 0;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 
   .feed-card {
-    margin-bottom: 1rem;
-    height: auto;
-    box-shadow: none;
     min-height: auto;
     max-height: none;
   }
 
-  .card-header {
-    padding: 0.75rem;
-    background: transparent;
-    border-bottom-color: rgba(226, 232, 240, 0.4);
-  }
-
-  .dark .card-header {
-    border-bottom-color: rgba(75, 85, 105, 0.1);
-  }
-
-  .card-title {
-    font-size: 1.1rem;
-    line-height: 1.4;
-    color: var(--text-primary, #2d3748);
-  }
-
-  .dark .card-title {
-    color: var(--el-text-color-primary);
-  }
-
   .card-content {
-    padding: 0.25rem 0;
-    height: auto;
-    overflow: visible;
+    overflow-y: visible;
   }
 
   .feed-links {
     height: auto;
-    overflow: visible;
-  }
-
-  .feed-link {
-    padding: 0.6rem 0;
-    font-size: 0.9rem;
-    white-space: normal;
-    line-height: 1.5;
-  }
-
-  .feed-link-item {
-    border-bottom-color: rgba(226, 232, 240, 0.3);
-  }
-
-  .dark .feed-link-item {
-    border-bottom-color: rgba(75, 85, 105, 0.1);
-  }
-
-  .item-date {
-    font-size: 0.75rem;
-    opacity: 0.7;
-    margin-top: 0.25rem;
-    display: block;
+    overflow-y: visible;
   }
 }
 
