@@ -6,113 +6,98 @@
     >
       <div class="text-gray-500 empty-message">暂无数据</div>
     </div>
-    <div v-else>
-      <!-- 移动视图容器 -->
+
+    <!-- 移动视图容器 -->
+    <div
+      v-else-if="isMobile"
+      class="mobile-view-container"
+      ref="mobileViewContainer"
+    >
       <div
-        v-if="isMobile"
-        class="mobile-view-container"
-        ref="mobileViewContainer"
+        class="mobile-cards-container"
+        ref="swipeContainer"
+        :style="{ transform: `translateX(${-currentCardIndex * 100}%)` }"
       >
-        <div
-          class="mobile-cards-container"
-          ref="swipeContainer"
-          :style="{ transform: `translateX(${-currentCardIndex * 100}%)` }"
-        >
-          <!-- 移动端卡片 -->
-          <div
-            v-for="(feed, gIndex) in feeds"
-            :key="gIndex"
-            class="mobile-card"
-          >
-            <div class="card-header">
-              <div class="card-header-inner">
-                <div class="arrow-btn left-arrow" @click="prevCard">
-                  <i class="arrow-icon">&#9664;</i>
-                </div>
-                <h3 class="card-title">{{ feed.title }}</h3>
-                <div class="arrow-btn right-arrow" @click="nextCard">
-                  <i class="arrow-icon">&#9654;</i>
-                </div>
+        <!-- 移动端卡片 -->
+        <div v-for="(feed, gIndex) in feeds" :key="gIndex" class="mobile-card">
+          <div class="card-header">
+            <div class="card-header-inner">
+              <div class="arrow-btn left-arrow" @click="prevCard">
+                <i class="arrow-icon">&#9664;</i>
               </div>
-            </div>
-            <!-- 移动卡片内容 -->
-            <div class="mobile-card-content">
-              <!-- 单个Feed项目 -->
-              <div
-                v-for="item in feed.items"
-                :key="item.link || item.id"
-                class="mobile-feed-item"
-                @click="openLink(item.link)"
-              >
-                <div class="item-title" v-html="item.title"></div>
-                <div class="item-meta">
-                  <span class="item-date">{{
-                    formatDate(item.pubDate || item.isoDate)
-                  }}</span>
-                </div>
+              <h3 class="card-title">{{ feed.title }}</h3>
+              <div class="arrow-btn right-arrow" @click="nextCard">
+                <i class="arrow-icon">&#9654;</i>
               </div>
             </div>
           </div>
-        </div>
-        <!-- 滑动指示器 -->
-        <div class="swipe-indicator" v-if="feeds.length > 1">
-          <div
-            v-for="(_, index) in feeds"
-            :key="index"
-            class="indicator-dot"
-            :class="{ active: currentCardIndex === index }"
-          ></div>
+          <!-- 移动卡片内容 -->
+          <div class="mobile-card-content">
+            <!-- 单个Feed项目 -->
+            <div
+              v-for="item in feed.items"
+              :key="item.link || item.id"
+              class="mobile-feed-item"
+              @click="openLink(item.link)"
+            >
+              <div class="item-title" v-html="item.title"></div>
+              <div class="item-meta">
+                <span class="item-date">{{
+                  formatDate(item.pubDate || item.isoDate)
+                }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <!-- 滑动指示器 -->
+      <div class="swipe-indicator" v-if="feeds.length > 1">
+        <div
+          v-for="(_, index) in feeds"
+          :key="index"
+          class="indicator-dot"
+          :class="{ active: currentCardIndex === index }"
+        ></div>
+      </div>
+    </div>
 
-      <!-- 桌面端视图：网格卡片 -->
-      <div v-else class="feed-grid" :style="gridStyle">
-        <div v-for="feed in feeds" :key="feed.title" class="feed-card">
-          <div class="card-header">
-            <h2 class="card-title">{{ feed.title }}</h2>
+    <!-- 桌面端视图：网格卡片 -->
+    <div v-else class="feed-grid" :style="gridStyle">
+      <div v-for="feed in feeds" :key="feed.title" class="feed-card">
+        <div class="card-header">
+          <h2 class="feed-title">{{ feed.title }}</h2>
+        </div>
+        <div class="feed-links">
+          <div v-if="feed.error" class="error-message">
+            {{ feed.error }}
           </div>
-          <div class="card-content">
-            <div class="items-list">
-              <div v-if="feed.error" class="error-message">
-                {{ feed.error }}
-              </div>
-              <div
-                v-else-if="!feed.items || feed.items.length === 0"
-                class="empty-message"
+          <div
+            v-else-if="!feed.items || feed.items.length === 0"
+            class="empty-message"
+          >
+            暂无数据
+          </div>
+          <template v-else>
+            <div
+              v-for="item in feed.items"
+              :key="item.id || item.link"
+              class="feed-link-item"
+            >
+              <a
+                :href="item.link"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="feed-link"
+                @mouseover="showPreview($event, item)"
+                @mouseout="hidePreview"
               >
-                暂无数据
-              </div>
-              <template v-else>
-                <div
-                  v-for="item in feed.items"
-                  :key="item.id || item.link"
-                  class="feed-item"
-                >
-                  <a
-                    :href="item.link"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="item-link"
-                    @mouseover="
-                      !isMobile &&
-                        showTooltip(
-                          $event,
-                          item.pubDate,
-                          item.description || item.content || item.summary
-                        )
-                    "
-                    @mouseleave="!isMobile && hideTooltip"
-                  >
-                    <div class="item-title">{{ item.title }}</div>
-                    <div v-if="showItemDate" class="item-date">
-                      {{ formatDate(item.pubDate) }}
-                    </div>
-                  </a>
-                </div>
-                <div v-if="feed.items.length > 0" class="h-2"></div>
-              </template>
+                {{ item.title }}
+                <span v-if="showItemDate" class="item-date">
+                  {{ formatDate(item.pubDate || item.isoDate) }}
+                </span>
+              </a>
             </div>
-          </div>
+          </template>
         </div>
       </div>
     </div>
@@ -540,58 +525,59 @@ const getContentPreview = (content) => {
   return plainText.substring(0, tooltipConfig.value.maxPreviewLength) + "...";
 };
 
-// 修改显示提示框的方法
-const showTooltip = (event, date, content) => {
+// 打开链接
+const openLink = (url) => {
+  if (!url) return;
+  window.open(url, "_blank", "noopener,noreferrer");
+};
+
+// 显示内容预览
+const showPreview = (event, item) => {
   // 如果是移动设备，则不显示提示框
   if (isMobile.value) return;
 
   // 设置内容预览
-  tooltipContent.value = getContentPreview(content);
+  tooltipContent.value = getContentPreview(
+    item.description || item.content || item.summary
+  );
 
   // 格式化并设置日期，使用更安全的处理方式
   try {
-    if (date) {
-      tooltipDate.value = formatDate(date);
+    if (item.pubDate || item.isoDate) {
+      tooltipDate.value = formatDate(item.pubDate || item.isoDate);
     } else {
       tooltipDate.value = "未知时间";
     }
-  } catch (error) {
-    console.error("处理日期时出错:", error);
-    tooltipDate.value = "日期错误";
+  } catch (e) {
+    tooltipDate.value = "日期格式错误";
   }
 
+  // 定位和显示提示框
   showTooltipText.value = true;
 
-  // 延迟计算位置，确保DOM已更新
-  setTimeout(() => {
+  nextTick(() => {
     if (!tooltip.value) return;
 
     const rect = event.target.getBoundingClientRect();
     const tooltipRect = tooltip.value.getBoundingClientRect();
 
-    // 计算最佳位置（优先显示在元素下方）
-    let top = rect.bottom + 8;
+    // 定位在元素正上方，并在溢出窗口时调整
     const left = Math.min(
-      Math.max(rect.left, 20),
-      window.innerWidth - tooltipRect.width - 20
+      Math.max(rect.left, 10),
+      window.innerWidth - tooltipRect.width - 10
     );
 
-    // 检查是否超出屏幕底部，如果是则显示在元素上方
-    if (top + tooltipRect.height > window.innerHeight - 20) {
-      top = rect.top - tooltipRect.height - 8;
-    }
-
+    // 设置样式
     tooltipStyle.value = {
-      opacity: 1,
-      top: `${top}px`,
+      top: `${rect.top - tooltipRect.height - 10}px`,
       left: `${left}px`,
-      width: tooltipConfig.value.width,
-      maxWidth: tooltipConfig.value.width,
+      opacity: 1,
     };
-  }, 10);
+  });
 };
 
-const hideTooltip = () => {
+// 隐藏内容预览
+const hidePreview = () => {
   showTooltipText.value = false;
   tooltipStyle.value.opacity = 0;
 };
@@ -675,13 +661,12 @@ const calcMobileCardHeight = computed(() => {
   padding: 0px;
 }
 
-/* 卡片样式 */
+/* 桌面卡片样式 */
 .feed-card {
   position: relative;
   padding: 16px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   height: 100%;
   cursor: pointer;
   gap: 0.5rem;
@@ -700,6 +685,7 @@ const calcMobileCardHeight = computed(() => {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* 桌面端标题 */
 .feed-title {
   font-weight: bold;
   margin: 0;
@@ -709,23 +695,12 @@ const calcMobileCardHeight = computed(() => {
   -webkit-line-clamp: 1;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.feed-title-mobile {
-  font-weight: bold;
-  margin: 0 0 8px 0;
-  padding: 0;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
   font-size: 1.2rem;
   line-height: 1.4;
-  margin-top: -5px; /* 减少顶部间距 */
-  color: var(--el-text-color-primary); /* 确保标题颜色正确 */
+  color: var(--el-text-color-primary);
 }
 
+/* 链接列表 */
 .feed-links {
   overflow-y: auto;
   max-height: 300px;
@@ -1316,6 +1291,76 @@ html body .app-container:not(.dark) .tooltip-date {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  position: relative; /* 确保卡片定位正确 */
+}
+
+/* 删除重复的移动卡片容器样式 */
+.feed-grid-mobile,
+.mobile-cards-container:not(.mobile-cards-container:first-of-type) {
+  display: none !important;
+}
+
+.card-header {
+  margin-bottom: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.card-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* 卡片标题 */
+.card-title {
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  margin-top: -5px;
+  color: var(--el-text-color-primary);
+  flex: 1;
+  text-align: center;
+  padding: 0 8px;
+}
+
+/* 箭头按钮样式 */
+.arrow-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
+
+.arrow-btn:hover {
+  opacity: 1;
+}
+
+.arrow-icon {
+  font-style: normal;
+  color: var(--el-color-primary);
+  font-size: 14px;
+}
+
+.left-arrow {
+  margin-right: 4px;
+}
+
+.right-arrow {
+  margin-left: 4px;
 }
 
 .mobile-card-content {
