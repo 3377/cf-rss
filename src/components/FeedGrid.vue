@@ -33,7 +33,14 @@
                   target="_blank"
                   rel="noopener noreferrer"
                   class="item-link"
-                  @mouseover="showTooltip($event, item.title, item.pubDate)"
+                  @mouseover="
+                    showTooltip(
+                      $event,
+                      item.title,
+                      item.pubDate,
+                      item.description || item.content
+                    )
+                  "
                   @mouseleave="hideTooltip"
                 >
                   <div class="item-title">{{ item.title }}</div>
@@ -50,17 +57,22 @@
       </div>
     </div>
 
-    <!-- 标题提示框 -->
+    <!-- 内容预览提示框 -->
     <div
       ref="tooltip"
       class="title-tooltip"
       :style="tooltipStyle"
       v-show="showTooltipText"
     >
-      <div v-if="tooltipDate" class="tooltip-date">
-        发帖时间：{{ tooltipDate }}
+      <div class="tooltip-header">
+        <div v-if="tooltipDate" class="tooltip-date">
+          发帖时间：{{ tooltipDate }}
+        </div>
+        <div class="tooltip-title">{{ tooltipTitle }}</div>
       </div>
-      <div class="tooltip-content">{{ tooltipText }}</div>
+      <div v-if="tooltipContent" class="tooltip-content">
+        {{ tooltipContent }}
+      </div>
     </div>
   </div>
 </template>
@@ -161,32 +173,58 @@ const formatDate = (dateStr) => {
   }
 };
 
-// 标题提示功能
+// 获取提示框配置
+const tooltipConfig = ref({
+  maxPreviewLength: RSS_CONFIG.display?.tooltip?.maxPreviewLength || 100,
+  width: RSS_CONFIG.display?.tooltip?.width || "360px",
+});
+
+// 修改标题提示功能
 const tooltip = ref(null);
-const tooltipText = ref("");
+const tooltipTitle = ref("");
+const tooltipContent = ref("");
 const tooltipDate = ref("");
 const tooltipStyle = ref({
   opacity: 0,
   top: "0px",
   left: "0px",
+  maxWidth: tooltipConfig.value.width,
 });
 const showTooltipText = ref(false);
 
-// 修改显示提示框的方法，添加更好的错误处理和调试
-const showTooltip = (event, text, date) => {
-  if (!text) return;
+// 获取内容预览
+const getContentPreview = (content) => {
+  if (!content) return "暂无内容预览";
 
-  tooltipText.value = text;
-  console.log("提示框触发，日期数据:", date, "类型:", typeof date); // 增强的调试日志
+  // 移除HTML标签
+  const plainText = content.replace(/<[^>]*>?/gm, "");
+
+  // 检查移除HTML后是否还有内容
+  if (!plainText.trim()) {
+    return "暂无文本内容预览";
+  }
+
+  // 限制字数
+  if (plainText.length <= tooltipConfig.value.maxPreviewLength) {
+    return plainText;
+  }
+
+  return plainText.substring(0, tooltipConfig.value.maxPreviewLength) + "...";
+};
+
+// 修改显示提示框的方法，添加内容预览
+const showTooltip = (event, title, date, content) => {
+  if (!title) return;
+
+  tooltipTitle.value = title;
+  tooltipContent.value = getContentPreview(content);
 
   // 格式化并设置日期，使用更安全的处理方式
   try {
     if (date) {
       tooltipDate.value = formatDate(date);
-      console.log("格式化后的日期:", tooltipDate.value);
     } else {
       tooltipDate.value = "未知时间";
-      console.log("未提供日期数据");
     }
   } catch (error) {
     console.error("处理日期时出错:", error);
@@ -218,6 +256,7 @@ const showTooltip = (event, text, date) => {
       opacity: 1,
       top: `${top}px`,
       left: `${left}px`,
+      maxWidth: tooltipConfig.value.width, // 应用宽度设置
     };
   }, 10);
 };
@@ -426,6 +465,20 @@ onMounted(() => {
   pointer-events: none;
   backdrop-filter: blur(5px);
   transition: opacity 0.2s ease;
+  text-align: left; /* 改为左对齐更适合阅读 */
+  overflow: hidden;
+}
+
+.tooltip-header {
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.tooltip-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
   text-align: center;
 }
 
@@ -453,7 +506,14 @@ html body .app-container:not(.dark) .tooltip-date {
 }
 
 .tooltip-content {
-  text-align: center;
+  line-height: 1.5;
+  font-size: 0.85rem;
+  max-height: 200px;
+  overflow-y: auto;
+  text-align: left;
+  word-break: break-word;
+  white-space: pre-line;
+  text-indent: 1em;
 }
 
 /* 移动设备适配 */

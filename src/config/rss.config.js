@@ -36,6 +36,12 @@ const defaultConfig = {
       containerWidth: "96vw", // 容器宽度
       containerPadding: "16px", // 容器内边距
     },
+    tooltip: {
+      // 提示框预览内容的最大字数
+      maxPreviewLength: 100,
+      // 提示框宽度（像素或百分比）
+      width: "360px",
+    },
   },
 };
 
@@ -109,6 +115,16 @@ export function getRSSConfig(env) {
     if (env.CARD_PADDING) {
       config.display.layout.cardPadding = parseInt(env.CARD_PADDING);
     }
+
+    // 处理提示框配置
+    if (env.TOOLTIP_MAX_PREVIEW_LENGTH) {
+      config.display.tooltip.maxPreviewLength = parseInt(
+        env.TOOLTIP_MAX_PREVIEW_LENGTH
+      );
+    }
+    if (env.TOOLTIP_WIDTH) {
+      config.display.tooltip.width = env.TOOLTIP_WIDTH;
+    }
   } catch (error) {
     console.error("Error in getRSSConfig:", error);
   }
@@ -117,7 +133,7 @@ export function getRSSConfig(env) {
   return config;
 }
 
-// 修改默认导出逻辑
+// 通过环境变量读取配置，如果没有则使用默认值
 export const RSS_CONFIG = getRSSConfig(
   typeof window !== "undefined" && window.__RSS_CONFIG__
     ? window.__RSS_CONFIG__
