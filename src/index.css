@@ -48,7 +48,7 @@ body {
 /* 全局亮色模式样式 */
 .app-container.bg-gray-50 {
     background-color: #f0f4fa !important;
-    background-image:
+    background-image: 
         linear-gradient(45deg, #e8eef8 25%, transparent 25%),
         linear-gradient(-45deg, #e8eef8 25%, transparent 25%),
         linear-gradient(45deg, transparent 75%, #e8eef8 75%),
@@ -155,10 +155,9 @@ body {
 
 /* 亮色模式下的提示工具样式 */
 .app-container:not(.dark) .title-tooltip {
-    background-color: rgba(230, 242, 255, 0.95) !important;
-    border: 1px solid rgba(190, 220, 255, 1) !important;
-    color: rgba(20, 40, 80, 1) !important;
-    width: var(--tooltip-width, 360px) !important;
+    background-color: rgba(180, 210, 240, 0.98) !important;
+    color: #2c4270 !important;
+    border: 1px solid rgba(160, 190, 230, 0.9) !important;
 }
 
 /* 保留原有的暗色模式样式 */
@@ -215,10 +214,9 @@ body {
 }
 
 .dark .title-tooltip {
-    background-color: rgba(35, 42, 50, 0.9) !important;
-    border: 1px solid rgba(60, 70, 90, 1) !important;
-    color: rgba(220, 230, 240, 1) !important;
-    width: var(--tooltip-width, 360px) !important;
+    background: rgba(31, 41, 55, 0.95) !important;
+    color: #f3f4f6 !important;
+    border-color: rgba(55, 65, 81, 0.8) !important;
 }
 
 /* 添加全局页面滚动箭头样式 */
@@ -299,12 +297,6 @@ body {
         width: 20px;
         height: 20px;
     }
-
-    .title-tooltip {
-        max-width: 95vw !important;
-        width: 95vw !important;
-        left: 2.5vw !important;
-    }
 }
 
 /* 提示框日期样式 */
@@ -322,85 +314,4 @@ body {
 /* 亮色模式下的提示框日期样式 */
 .app-container:not(.dark) .tooltip-date {
     color: #2563eb !important;
-}
-
-/* 性能优化 - 添加硬件加速，防止卡顿 */
-.title-tooltip {
-    transform: translateZ(0);
-    will-change: opacity, transform;
-    width: var(--tooltip-width, 360px) !important;
-}
-
-@layer components {
-
-    /* 提示框样式修改 */
-    .tooltip {
-        position: fixed !important;
-        z-index: 1000 !important;
-        padding: 10px 14px !important;
-        border-radius: 6px !important;
-        transition: opacity 0.3s ease !important;
-        /* 更平滑的动画 */
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
-        pointer-events: auto !important;
-        /* 允许鼠标交互 */
-        width: var(--tooltip-width, 360px) !important;
-        max-width: 90vw !important;
-        overflow: hidden !important;
-    }
-
-    /* 亮色模式提示框 */
-    .app-container:not(.dark) .tooltip {
-        background-color: rgba(250, 252, 255, 0.95) !important;
-        border: 1px solid rgba(180, 210, 240, 1) !important;
-        color: #333 !important;
-    }
-
-    /* 暗色模式提示框 */
-    .app-container.dark .tooltip {
-        background-color: rgba(40, 44, 52, 0.95) !important;
-        border: 1px solid rgba(60, 70, 80, 1) !important;
-        color: #eee !important;
-    }
-
-    /* 提示框文本样式 */
-    .tooltip-content {
-        font-size: 0.92rem !important;
-        line-height: 1.5 !important;
-        max-height: 200px !important;
-        /* 增加最大高度 */
-        overflow-y: auto !important;
-        margin-top: 6px !important;
-        white-space: pre-wrap !important;
-        word-break: break-word !important;
-    }
-
-    /* 提示框日期样式 */
-    .tooltip-date {
-        font-size: 0.85rem !important;
-        opacity: 0.9 !important;
-        padding-bottom: 6px !important;
-        border-bottom: 1px dashed rgba(128, 128, 128, 0.3) !important;
-        margin-bottom: 6px !important;
-        color: var(--text-color-secondary) !important;
-    }
-}
-
-/* 性能优化 */
-* {
-    will-change: auto;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.001ms !important;
-        transition-duration: 0.001ms !important;
-    }
-}
-
-/* 减少对GPU的压力 */
-.feed-card,
-.tooltip {
-    backface-visibility: hidden;
-    transform: translateZ(0);
 }

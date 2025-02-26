@@ -37,13 +37,7 @@
                     showTooltip(
                       $event,
                       item.pubDate,
-                      item.description ||
-                        item.content ||
-                        item.summary ||
-                        item.contentSnippet ||
-                        item.contentEncoded ||
-                        item.encoded ||
-                        (item.content && item.content.encoded)
+                      item.description || item.content || item.summary
                     )
                   "
                   @mouseleave="hideTooltip"
@@ -65,23 +59,22 @@
     <!-- 内容预览提示框 -->
     <div
       ref="tooltip"
-      class="tooltip"
+      class="title-tooltip"
       :style="tooltipStyle"
       v-show="showTooltipText"
-      @mouseover="tooltipHovered = true"
-      @mouseleave="
-        tooltipHovered = false;
-        hideTooltip();
-      "
     >
-      <div class="tooltip-date">发帖时间：{{ tooltipDate }}</div>
-      <div class="tooltip-content">{{ tooltipContent }}</div>
+      <div v-if="tooltipDate" class="tooltip-date">
+        发帖时间：{{ tooltipDate }}
+      </div>
+      <div v-if="tooltipContent" class="tooltip-content">
+        {{ tooltipContent }}
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watchEffect, watch, nextTick } from "vue";
+import { ref, computed, onMounted, watchEffect, watch } from "vue";
 import { format, parseISO } from "date-fns";
 import { RSS_CONFIG } from "../config/rss.config";
 
@@ -190,165 +183,87 @@ const tooltipStyle = ref({
   opacity: 0,
   top: "0px",
   left: "0px",
-  width: tooltipConfig.value.width,
+  maxWidth: tooltipConfig.value.width,
 });
 const showTooltipText = ref(false);
-const tooltipHovered = ref(false);
 
-// 改进getContentPreview函数
+// 获取内容预览
 const getContentPreview = (content) => {
-  if (!content) {
-    return "暂无内容预览";
-  }
+  if (!content) return "暂无内容预览";
+
+  // 检查内容类型，并执行适当的处理
+  let plainText = "";
 
   try {
-    let plainText = "";
-
-    // 直接处理字符串内容
     if (typeof content === "string") {
-      // 处理CDATA格式
-      if (content.includes("CDATA[")) {
-        const match = content.match(/CDATA\[(.*?)(?:\]\]|$)/s);
-        if (match && match[1]) {
-          plainText = match[1].trim();
-        } else {
-          plainText = content;
-        }
-      }
-      // 处理<content>标签包裹的内容
-      else if (content.includes("<content") || content.includes("</content>")) {
-        const contentMatch = content.match(/<content[^>]*>(.*?)<\/content>/s);
-        if (contentMatch && contentMatch[1]) {
-          plainText = contentMatch[1].trim();
-        } else {
-          plainText = content;
-        }
-      }
-      // 处理<description>标签包裹的内容
-      else if (
-        content.includes("<description") ||
-        content.includes("</description>")
-      ) {
-        const descMatch = content.match(
-          /<description[^>]*>(.*?)<\/description>/s
-        );
-        if (descMatch && descMatch[1]) {
-          plainText = descMatch[1].trim();
-        } else {
-          plainText = content;
-        }
-      } else {
-        plainText = content;
-      }
-    }
-    // 处理对象类型内容
-    else if (content && typeof content === "object") {
-      // 尝试提取更多字段
-      if (content.content) {
-        // 优先使用content字段
-        plainText =
-          typeof content.content === "string"
-            ? content.content
-            : content.content._ ||
-              content.content.$ ||
-              JSON.stringify(content.content);
-      } else if (content.description) {
-        // 其次尝试description字段
-        plainText =
-          typeof content.description === "string"
-            ? content.description
-            : content.description._ ||
-              content.description.$ ||
-              JSON.stringify(content.description);
-      } else if (typeof content._ === "string") {
-        // 一些RSS使用_字段
-        plainText = content._;
-      } else if (typeof content.$ === "string") {
-        // 一些RSS使用$字段
-        plainText = content.$;
-      } else {
-        // 转换为字符串
-        plainText = JSON.stringify(content);
-      }
-    }
-    // 其他类型转为字符串
-    else {
-      plainText = String(content || "");
+      // 移除HTML标签
+      plainText = content.replace(/<[^>]*>?/gm, "");
+    } else if (typeof content === "object") {
+      // 如果是对象（可能是JSON格式的内容），尝试提取文本
+      plainText = JSON.stringify(content);
+    } else {
+      // 其他类型转为字符串
+      plainText = String(content);
     }
 
-    // 移除HTML标签
-    plainText = plainText.replace(/<[^>]*>?/gm, "");
-
-    // 处理XML实体
-    plainText = plainText
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&amp;/g, "&")
-      .replace(/&quot;/g, '"')
-      .replace(/&apos;/g, "'")
-      .trim();
-
-    // 添加调试输出
+    // 调试输出
+    console.log("原始内容类型:", typeof content);
     console.log(
-      "提取的内容：",
+      "内容预览结果:",
       plainText.substring(0, 50) + (plainText.length > 50 ? "..." : "")
     );
-
-    if (!plainText.trim()) {
-      return "暂无文本内容预览";
-    }
-
-    // 限制字数
-    if (plainText.length <= tooltipConfig.value.maxPreviewLength) {
-      return plainText;
-    }
-
-    return plainText.substring(0, tooltipConfig.value.maxPreviewLength) + "...";
   } catch (error) {
     console.error("内容处理错误:", error);
-    return "暂无内容预览";
+    return "内容处理错误";
   }
+
+  // 检查移除HTML后是否还有内容
+  if (!plainText.trim()) {
+    return "暂无文本内容预览";
+  }
+
+  // 限制字数
+  if (plainText.length <= tooltipConfig.value.maxPreviewLength) {
+    return plainText;
+  }
+
+  return plainText.substring(0, tooltipConfig.value.maxPreviewLength) + "...";
 };
 
-// 修改提示框的方法 - 性能优化版
+// 修改显示提示框的方法，删除标题显示，仅显示内容预览
 const showTooltip = (event, date, content) => {
-  // 如果内容已提取过，使用缓存
-  const cacheKey =
-    date + (typeof content === "string" ? content.substring(0, 20) : "");
-  let cachedContent = tooltipCache.get(cacheKey);
+  // 设置内容预览
+  tooltipContent.value = getContentPreview(content);
 
-  if (cachedContent) {
-    tooltipContent.value = cachedContent.content;
-    tooltipDate.value = cachedContent.date;
-  } else {
-    // 首次处理内容
-    tooltipContent.value = getContentPreview(content);
-    tooltipDate.value = date ? formatDate(date) : "未知时间";
-
-    // 缓存处理结果
-    tooltipCache.set(cacheKey, {
-      content: tooltipContent.value,
-      date: tooltipDate.value,
-    });
+  // 格式化并设置日期，使用更安全的处理方式
+  try {
+    if (date) {
+      tooltipDate.value = formatDate(date);
+    } else {
+      tooltipDate.value = "未知时间";
+    }
+  } catch (error) {
+    console.error("处理日期时出错:", error);
+    tooltipDate.value = "日期错误";
   }
 
   showTooltipText.value = true;
 
-  // 延迟计算位置
-  nextTick(() => {
+  // 延迟计算位置，确保DOM已更新
+  setTimeout(() => {
     if (!tooltip.value) return;
 
     const rect = event.target.getBoundingClientRect();
     const tooltipRect = tooltip.value.getBoundingClientRect();
 
-    // 计算位置
+    // 计算最佳位置（优先显示在元素下方）
     let top = rect.bottom + 8;
     const left = Math.min(
       Math.max(rect.left, 20),
       window.innerWidth - tooltipRect.width - 20
     );
 
-    // 检查是否超出屏幕底部
+    // 检查是否超出屏幕底部，如果是则显示在元素上方
     if (top + tooltipRect.height > window.innerHeight - 20) {
       top = rect.top - tooltipRect.height - 8;
     }
@@ -357,26 +272,14 @@ const showTooltip = (event, date, content) => {
       opacity: 1,
       top: `${top}px`,
       left: `${left}px`,
-      width: tooltipConfig.value.width,
+      maxWidth: tooltipConfig.value.width, // 应用宽度设置
     };
-  });
+  }, 10);
 };
 
-// 添加内容缓存机制
-const tooltipCache = new Map();
-
-// 修改hideTooltip函数
 const hideTooltip = () => {
-  // 如果鼠标正在提示框上，不隐藏
-  if (tooltipHovered.value) return;
-
+  showTooltipText.value = false;
   tooltipStyle.value.opacity = 0;
-  setTimeout(() => {
-    if (!tooltipHovered.value) {
-      // 再次检查鼠标是否在提示框上
-      showTooltipText.value = false;
-    }
-  }, 300); // 延长时间到300ms
 };
 
 // 确保卡片内容在组件挂载后可滚动
@@ -397,42 +300,32 @@ onMounted(() => {
     () => props.feeds,
     (newFeeds) => {
       if (newFeeds && newFeeds.length > 0) {
-        console.log("Feeds数据结构示例:");
-
-        // 检查所有feed中的内容字段
-        newFeeds.forEach((feed, feedIndex) => {
-          console.log(`Feed #${feedIndex + 1}: ${feed.title}`);
-
-          if (feed.items && feed.items.length > 0) {
-            // 获取第一项作为示例
-            const sampleItem = feed.items[0];
-            console.log(`  示例项目: ${sampleItem.title || "无标题"}`);
-
-            // 详细分析内容结构
-            console.log("  内容结构详细分析:");
-            console.log(
-              "  - 完整项目结构:",
-              analyzeContentStructure(sampleItem)
-            );
-
-            // 分析特定字段
-            const importantFields = [
-              "description",
-              "content",
-              "summary",
-              "contentSnippet",
-              "contentEncoded",
-              "encoded",
-            ];
-            importantFields.forEach((field) => {
-              if (sampleItem[field] !== undefined) {
-                console.log(
-                  `  - ${field}字段分析:`,
-                  analyzeContentStructure(sampleItem[field])
-                );
-              }
-            });
-          }
+        console.log("Feeds数据结构示例:", {
+          feedCount: newFeeds.length,
+          firstFeed: {
+            title: newFeeds[0].title,
+            itemCount: newFeeds[0].items?.length || 0,
+            firstItemSample: newFeeds[0].items?.[0]
+              ? {
+                  title: newFeeds[0].items[0].title,
+                  pubDate: newFeeds[0].items[0].pubDate,
+                  hasDescription: !!newFeeds[0].items[0].description,
+                  hasContent: !!newFeeds[0].items[0].content,
+                  hasSummary: !!newFeeds[0].items[0].summary,
+                  descriptionPreview: newFeeds[0].items[0].description
+                    ? newFeeds[0].items[0].description.substring(0, 50) + "..."
+                    : "N/A",
+                  contentPreview: newFeeds[0].items[0].content
+                    ? typeof newFeeds[0].items[0].content === "string"
+                      ? newFeeds[0].items[0].content.substring(0, 50) + "..."
+                      : "非字符串内容"
+                    : "N/A",
+                  summaryPreview: newFeeds[0].items[0].summary
+                    ? newFeeds[0].items[0].summary.substring(0, 50) + "..."
+                    : "N/A",
+                }
+              : "No items",
+          },
         });
       }
     },
@@ -575,7 +468,6 @@ onMounted(() => {
   border-radius: 0.375rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 90%;
-  width: v-bind("tooltipConfig.width"); /* 使用v-bind绑定宽度 */
   z-index: 100;
   font-size: 0.875rem;
   line-height: 1.25rem;

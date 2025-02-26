@@ -126,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, watch, watchEffect } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
 import { getRSSConfig, RSS_CONFIG } from "./config/rss.config";
 
@@ -301,15 +301,6 @@ onMounted(async () => {
   );
   // 设置倒计时更新
   countdownTimer = setInterval(updateCountdown, 1000);
-
-  // 应用提示框宽度配置
-  if (RSS_CONFIG.display?.tooltip?.width) {
-    document.documentElement.style.setProperty(
-      "--tooltip-width",
-      RSS_CONFIG.display.tooltip.width
-    );
-    console.log(`已设置提示框宽度: ${RSS_CONFIG.display.tooltip.width}`);
-  }
 });
 
 onUnmounted(() => {
@@ -319,69 +310,6 @@ onUnmounted(() => {
   if (countdownTimer) {
     clearInterval(countdownTimer);
   }
-});
-
-// 在应用CSS变量的地方添加提示框宽度变量
-const applyTheme = (isDark) => {
-  const root = document.documentElement;
-
-  // 设置颜色主题
-  if (isDark) {
-    document.querySelector(".app-container").classList.add("dark");
-    root.style.setProperty("--bg-color", "#252b30");
-    root.style.setProperty("--text-color", "#e0e0e0");
-    root.style.setProperty("--text-color-secondary", "#9ea3b0");
-    root.style.setProperty("--border-color", "#373d47");
-    root.style.setProperty("--header-bg", "#1e2329");
-    root.style.setProperty("--card-bg", "#2a303a");
-    root.style.setProperty("--card-header-bg", "#262d38");
-    root.style.setProperty("--card-content-bg", "#2a303a");
-    root.style.setProperty("--hover-bg", "#323a47");
-  } else {
-    document.querySelector(".app-container").classList.remove("dark");
-    root.style.setProperty("--bg-color", "#f0f4fa");
-    root.style.setProperty("--text-color", "#333333");
-    root.style.setProperty("--text-color-secondary", "#666666");
-    root.style.setProperty("--border-color", "#e0e8f5");
-    root.style.setProperty("--header-bg", "rgba(235, 242, 250, 0.9)");
-    root.style.setProperty("--card-bg", "rgba(200, 225, 245, 1)");
-    root.style.setProperty("--card-header-bg", "rgba(190, 220, 245, 1)");
-    root.style.setProperty("--card-content-bg", "rgba(200, 225, 245, 1)");
-    root.style.setProperty("--hover-bg", "rgba(210, 235, 255, 1)");
-  }
-
-  // 设置提示框宽度 - 从配置获取
-  let tooltipWidth = RSS_CONFIG.tooltip?.width || "360px";
-  // 确保值包含单位
-  if (!isNaN(tooltipWidth) && !tooltipWidth.toString().match(/[a-z%]/i)) {
-    tooltipWidth += "px";
-  }
-  // 应用宽度样式变量
-  root.style.setProperty("--tooltip-width", tooltipWidth + " !important");
-};
-
-// 确保在组件挂载时应用提示框配置
-onMounted(() => {
-  // 应用主题
-  applyTheme(isDark.value);
-
-  // 初始化字体
-  if (fontLoaded.value.length === 0) {
-    // 预加载默认字体
-    applyFont("default");
-  }
-
-  // 监听主题变化
-  watch(isDark, (newVal) => {
-    applyTheme(newVal);
-  });
-
-  // 监听配置变化，重新应用主题和提示框配置
-  watchEffect(() => {
-    if (RSS_CONFIG && RSS_CONFIG.tooltip) {
-      applyTheme(isDark.value);
-    }
-  });
 });
 </script>
 
@@ -829,11 +757,5 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
 .app-container.font-yozai .card-title,
 .app-container.font-yozai .item-title {
   font-family: "Yozai", Roboto, sans-serif !important;
-}
-
-/* 提示框性能优化相关样式 */
-.app-container {
-  /* 全局变量，用于控制提示框宽度 */
-  --tooltip-width: v-bind('RSS_CONFIG.display?.tooltip?.width || "360px"');
 }
 </style>
