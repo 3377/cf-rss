@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watchEffect, watch } from "vue";
+import { ref, computed, onMounted, watchEffect, watch, nextTick } from "vue";
 import { format, parseISO } from "date-fns";
 import { RSS_CONFIG } from "../config/rss.config";
 
@@ -189,244 +189,66 @@ const tooltipStyle = ref({
   opacity: 0,
   top: "0px",
   left: "0px",
-  maxWidth: tooltipConfig.value.width,
+  width: tooltipConfig.value.width,
 });
 const showTooltipText = ref(false);
 
-// 辅助函数：更详细地分析内容结构
-const analyzeContentStructure = (content, depth = 0, path = "") => {
-  if (depth > 3) return "嵌套过深"; // 限制递归深度
-
-  if (typeof content === "string") {
-    // 返回字符串前50个字符
-    return content.length > 50 ? content.substring(0, 50) + "..." : content;
-  } else if (content === null) {
-    return "null";
-  } else if (typeof content === "object") {
-    if (Array.isArray(content)) {
-      return content.length > 0
-        ? `数组[${content.length}]: [${analyzeContentStructure(
-            content[0],
-            depth + 1,
-            path + "[0]"
-          )}]`
-        : "空数组";
-    } else {
-      // 分析对象的关键字段
-      const keys = Object.keys(content);
-      if (keys.length === 0) return "空对象";
-
-      // 优先分析可能包含内容的字段
-      const contentFields = [
-        "content",
-        "description",
-        "encoded",
-        "contentEncoded",
-        "text",
-        "_",
-        "$",
-      ];
-      const foundFields = {};
-
-      // 先检查重要字段
-      contentFields.forEach((field) => {
-        if (content[field] !== undefined) {
-          foundFields[field] = analyzeContentStructure(
-            content[field],
-            depth + 1,
-            path + "." + field
-          );
-        }
-      });
-
-      // 然后添加其他字段信息
-      if (Object.keys(foundFields).length === 0) {
-        // 如果没有找到内容字段，则添加前3个字段的信息
-        keys.slice(0, 3).forEach((key) => {
-          foundFields[key] = analyzeContentStructure(
-            content[key],
-            depth + 1,
-            path + "." + key
-          );
-        });
-
-        if (keys.length > 3) {
-          foundFields["..."] = `还有${keys.length - 3}个字段`;
-        }
-      }
-
-      // 转换为字符串表示
-      return Object.entries(foundFields)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join(", ");
-    }
-  } else {
-    // 基本类型
-    return String(content);
-  }
-};
-
-// 获取内容预览
+// 简化内容预览获取，专注于实用性和性能
 const getContentPreview = (content) => {
   if (!content) {
-    console.log("未提供内容数据");
     return "暂无内容预览";
   }
 
-  // 检查内容类型，并执行适当的处理
-  let plainText = "";
-
   try {
-    console.log("原始内容类型:", typeof content);
-    console.log(
-      "原始内容预览:",
-      typeof content === "string"
-        ? content.substring(0, 100)
-        : JSON.stringify(content).substring(0, 100)
-    );
+    let plainText = "";
 
+    // 直接处理字符串内容
     if (typeof content === "string") {
-      // 处理CDATA标签 - 许多RSS源使用这种格式
-      if (content.includes("CDATA")) {
-        const cdataRegex = /\<!\[CDATA\[([\s\S]*?)\]\]/;
-        const cdataMatch = content.match(cdataRegex);
-        if (cdataMatch && cdataMatch[1]) {
-          plainText = cdataMatch[1];
-          console.log("从CDATA提取的内容:", plainText.substring(0, 50));
+      // 处理CDATA格式 (NodeSeek格式)
+      if (content.includes("CDATA[")) {
+        const match = content.match(/CDATA\[(.*?)(?:\]\]|$)/s);
+        if (match && match[1]) {
+          plainText = match[1].trim();
         } else {
-          // 如果没有匹配到完整的CDATA格式，尝试更宽松的提取
-          const relaxedRegex = /CDATA\[([\s\S]*?)(?:\]\]|$)/;
-          const relaxedMatch = content.match(relaxedRegex);
-          if (relaxedMatch && relaxedMatch[1]) {
-            plainText = relaxedMatch[1];
-            console.log(
-              "从宽松CDATA格式提取的内容:",
-              plainText.substring(0, 50)
-            );
-          }
-        }
-      }
-
-      // 如果CDATA提取失败或不含CDATA标签，使用原内容
-      if (!plainText) {
-        plainText = content;
-      }
-
-      // 移除HTML标签
-      plainText = plainText.replace(/<[^>]*>?/gm, "");
-    } else if (typeof content === "object") {
-      // 处理特殊的嵌套内容结构
-      if (content._) {
-        // 一些RSS阅读器使用_字段存储内容
-        plainText =
-          typeof content._ === "string" ? content._ : JSON.stringify(content._);
-        console.log("从对象的 _ 字段提取内容:", plainText.substring(0, 50));
-      } else if (content.$) {
-        // 一些RSS使用$字段
-        plainText =
-          typeof content.$ === "string" ? content.$ : JSON.stringify(content.$);
-        console.log("从对象的 $ 字段提取内容:", plainText.substring(0, 50));
-      } else if (content.content && typeof content.content === "object") {
-        // 处理content对象中可能包含的嵌套内容
-        if (content.content._ || content.content.$) {
-          plainText = content.content._ || content.content.$;
-          console.log(
-            "从嵌套的content._或$ 字段提取内容:",
-            plainText.substring(0, 50)
-          );
-        } else if (content.content.encoded) {
-          plainText = content.content.encoded;
-          console.log(
-            "从content.encoded字段提取内容:",
-            plainText.substring(0, 50)
-          );
+          plainText = content;
         }
       } else {
-        // 如果是对象（可能是JSON格式的内容），尝试按顺序从可能的字段中提取
-        const possibleFields = [
-          "description",
-          "content",
-          "summary",
-          "title",
-          "text",
-          "value",
-          "contentSnippet",
-          "contentEncoded",
-          "encoded",
-        ];
-        for (const field of possibleFields) {
-          if (content[field]) {
-            // 如果找到了字段，检查其内容
-            if (typeof content[field] === "string") {
-              plainText = content[field];
-              console.log(
-                `从对象的 ${field} 字段提取内容:`,
-                plainText.substring(0, 50)
-              );
-              break;
-            } else if (typeof content[field] === "object") {
-              // 处理嵌套对象
-              if (content[field]._ || content[field].$) {
-                plainText = content[field]._ || content[field].$;
-                console.log(
-                  `从对象的 ${field}._或$ 字段提取内容:`,
-                  plainText.substring(0, 50)
-                );
-                break;
-              } else if (content[field].text) {
-                plainText = content[field].text;
-                console.log(
-                  `从对象的 ${field}.text 字段提取内容:`,
-                  plainText.substring(0, 50)
-                );
-                break;
-              } else if (content[field].encoded) {
-                plainText = content[field].encoded;
-                console.log(
-                  `从对象的 ${field}.encoded 字段提取内容:`,
-                  plainText.substring(0, 50)
-                );
-                break;
-              } else {
-                // 尝试将对象转为字符串
-                plainText = JSON.stringify(content[field]);
-                console.log(
-                  `将对象的 ${field} 转换为JSON字符串:`,
-                  plainText.substring(0, 50)
-                );
-                break;
-              }
-            }
-          }
-        }
+        plainText = content;
       }
-
-      // 如果没有找到任何内容，将整个对象转为JSON字符串
-      if (!plainText) {
+    }
+    // 处理对象类型内容
+    else if (content && typeof content === "object") {
+      if (typeof content._ === "string") {
+        // 一些RSS使用_字段
+        plainText = content._;
+      } else if (typeof content.$ === "string") {
+        // 一些RSS使用$字段
+        plainText = content.$;
+      } else {
+        // 转换为字符串
         plainText = JSON.stringify(content);
-        console.log("将对象转换为JSON字符串:", plainText.substring(0, 50));
       }
-    } else {
-      // 其他类型转为字符串
-      plainText = String(content);
-      console.log("转换其他类型为字符串:", plainText.substring(0, 50));
+    }
+    // 其他类型转为字符串
+    else {
+      plainText = String(content || "");
     }
 
-    // 检查移除HTML后是否还有内容
-    if (!plainText.trim()) {
-      console.log("内容清理后为空");
-      return "暂无文本内容预览";
-    }
+    // 移除HTML标签
+    plainText = plainText.replace(/<[^>]*>?/gm, "");
 
-    // 确保是纯文本，移除XML实体和多余空格
+    // 处理XML实体
     plainText = plainText
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
       .replace(/&amp;/g, "&")
       .replace(/&quot;/g, '"')
       .replace(/&apos;/g, "'")
-      .replace(/\s+/g, " ")
       .trim();
+
+    if (!plainText.trim()) {
+      return "暂无文本内容预览";
+    }
 
     // 限制字数
     if (plainText.length <= tooltipConfig.value.maxPreviewLength) {
@@ -435,45 +257,50 @@ const getContentPreview = (content) => {
 
     return plainText.substring(0, tooltipConfig.value.maxPreviewLength) + "...";
   } catch (error) {
-    console.error("内容处理错误:", error, "原始内容:", content);
-    return "内容处理错误";
+    console.error("内容处理错误:", error);
+    return "暂无内容预览";
   }
 };
 
-// 修改调用方式，尝试从更多字段获取内容
+// 修改提示框的方法 - 性能优化版
 const showTooltip = (event, date, content) => {
-  // 设置内容预览，增加对标题的备用支持
-  tooltipContent.value = getContentPreview(content);
+  // 如果内容已提取过，使用缓存
+  const cacheKey =
+    date + (typeof content === "string" ? content.substring(0, 20) : "");
+  let cachedContent = tooltipCache.get(cacheKey);
 
-  // 格式化并设置日期，使用更安全的处理方式
-  try {
-    if (date) {
-      tooltipDate.value = formatDate(date);
-    } else {
-      tooltipDate.value = "未知时间";
-    }
-  } catch (error) {
-    console.error("处理日期时出错:", error);
-    tooltipDate.value = "日期错误";
+  if (cachedContent) {
+    tooltipContent.value = cachedContent.content;
+    tooltipDate.value = cachedContent.date;
+  } else {
+    // 首次处理内容
+    tooltipContent.value = getContentPreview(content);
+    tooltipDate.value = date ? formatDate(date) : "未知时间";
+
+    // 缓存处理结果
+    tooltipCache.set(cacheKey, {
+      content: tooltipContent.value,
+      date: tooltipDate.value,
+    });
   }
 
   showTooltipText.value = true;
 
-  // 延迟计算位置，确保DOM已更新
-  setTimeout(() => {
+  // 延迟计算位置
+  nextTick(() => {
     if (!tooltip.value) return;
 
     const rect = event.target.getBoundingClientRect();
     const tooltipRect = tooltip.value.getBoundingClientRect();
 
-    // 计算最佳位置（优先显示在元素下方）
+    // 计算位置
     let top = rect.bottom + 8;
     const left = Math.min(
       Math.max(rect.left, 20),
       window.innerWidth - tooltipRect.width - 20
     );
 
-    // 检查是否超出屏幕底部，如果是则显示在元素上方
+    // 检查是否超出屏幕底部
     if (top + tooltipRect.height > window.innerHeight - 20) {
       top = rect.top - tooltipRect.height - 8;
     }
@@ -482,14 +309,20 @@ const showTooltip = (event, date, content) => {
       opacity: 1,
       top: `${top}px`,
       left: `${left}px`,
-      maxWidth: tooltipConfig.value.width, // 应用宽度设置
+      width: tooltipConfig.value.width,
     };
-  }, 10);
+  });
 };
 
+// 添加内容缓存机制
+const tooltipCache = new Map();
+
+// 延迟隐藏，优化性能
 const hideTooltip = () => {
-  showTooltipText.value = false;
   tooltipStyle.value.opacity = 0;
+  setTimeout(() => {
+    showTooltipText.value = false;
+  }, 200);
 };
 
 // 确保卡片内容在组件挂载后可滚动
@@ -688,6 +521,7 @@ onMounted(() => {
   border-radius: 0.375rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 90%;
+  width: v-bind("tooltipConfig.width"); /* 使用v-bind绑定宽度 */
   z-index: 100;
   font-size: 0.875rem;
   line-height: 1.25rem;

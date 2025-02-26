@@ -40,7 +40,7 @@ const defaultConfig = {
       // 提示框预览内容的最大字数
       maxPreviewLength: 100,
       // 提示框宽度（像素或百分比）
-      width: "500px",
+      width: "500px !important",
     },
   },
 };
