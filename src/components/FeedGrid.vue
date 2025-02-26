@@ -583,8 +583,8 @@ const calcMobileCardHeight = computed(() => {
 .feed-container {
   padding: 0.5rem 1rem;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  height: calc(100vh - 180px);
+  overflow: auto;
   display: flex;
   flex-direction: column;
 }
@@ -595,6 +595,7 @@ const calcMobileCardHeight = computed(() => {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
   padding: 0.5rem;
+  min-height: min-content;
 }
 
 /* 卡片样式 */
@@ -604,7 +605,8 @@ const calcMobileCardHeight = computed(() => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
+  min-height: 300px;
+  max-height: 500px;
   cursor: pointer;
   gap: 0.5rem;
   transition: all 0.3s;
@@ -612,6 +614,7 @@ const calcMobileCardHeight = computed(() => {
   border-radius: 8px;
   background: var(--card-bg, #fff);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .dark .feed-card {
@@ -652,9 +655,8 @@ const calcMobileCardHeight = computed(() => {
 
 .feed-links {
   overflow-y: auto;
-  max-height: 300px;
-  margin-top: auto;
-  flex: 1;
+  height: 100%;
+  padding-right: 4px;
 }
 
 .feed-links::-webkit-scrollbar {
@@ -858,7 +860,6 @@ const calcMobileCardHeight = computed(() => {
   padding: 0.5rem 0;
   overflow-y: auto !important;
   overflow-x: hidden;
-  height: calc(100% - 3.5rem);
   border-radius: 0 0 0.75rem 0.75rem;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -1077,7 +1078,7 @@ html body .app-container:not(.dark) .tooltip-date {
 @media (max-width: 768px) {
   .feed-container {
     padding: 0.25rem 0.5rem;
-    height: calc(100vh - 9rem); /* 缩短容器高度 */
+    height: calc(100vh - 9rem);
   }
 
   .feed-grid {
@@ -1089,6 +1090,8 @@ html body .app-container:not(.dark) .tooltip-date {
     margin-bottom: 1rem;
     height: auto;
     box-shadow: none;
+    min-height: auto;
+    max-height: none;
   }
 
   .card-header {
@@ -1114,6 +1117,12 @@ html body .app-container:not(.dark) .tooltip-date {
   .card-content {
     padding: 0.25rem 0;
     height: auto;
+    overflow: visible;
+  }
+
+  .feed-links {
+    height: auto;
+    overflow: visible;
   }
 
   .feed-link {
