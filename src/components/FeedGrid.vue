@@ -7,69 +7,54 @@
       <div class="text-gray-500 empty-message">暂无数据</div>
     </div>
     <div v-else>
-      <!-- 移动端视图：滑动卡片 -->
-      <div v-if="isMobile" class="swipe-container" ref="swipeContainer">
-        <!-- 滑动指示器 -->
-        <div class="swipe-indicator" v-if="feeds.length > 1">
-          <div
-            v-for="(feed, index) in feeds"
-            :key="'indicator-' + index"
-            class="indicator-dot"
-            :class="{ active: index === currentCardIndex }"
-          ></div>
-        </div>
-
+      <!-- 移动端布局 -->
+      <div
+        v-if="isMobile"
+        class="feed-grid-mobile"
+        ref="swipeContainer"
+        :style="{ height: calcMobileCardHeight }"
+      >
         <div class="mobile-cards-container" ref="mobileCardsContainer">
           <div
             v-for="(feed, index) in feeds"
-            :key="feed.title"
-            class="feed-card mobile-card"
-            :class="{ active: index === currentCardIndex }"
+            :key="index"
+            class="mobile-card"
             :style="{
               transform: `translateX(${(index - currentCardIndex) * 100}%)`,
             }"
           >
-            <div class="card-header">
-              <h2 class="card-title">{{ feed.title }}</h2>
-            </div>
-            <div class="card-content mobile-card-content">
-              <div class="items-list">
-                <div v-if="feed.error" class="error-message">
-                  {{ feed.error }}
-                </div>
-                <div
-                  v-else-if="!feed.items || feed.items.length === 0"
-                  class="empty-message"
+            <h3 class="feed-title-mobile">{{ feed.title }}</h3>
+            <div class="mobile-card-content">
+              <div
+                v-for="(item, itemIndex) in feed.items"
+                :key="itemIndex"
+                class="feed-link-item-mobile"
+              >
+                <a
+                  :href="item.link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="feed-link-mobile"
                 >
-                  暂无数据
-                </div>
-                <template v-else>
-                  <div
-                    v-for="item in feed.items"
-                    :key="item.id || item.link"
-                    class="feed-item"
-                  >
-                    <a
-                      :href="item.link"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="item-link"
-                    >
-                      <div class="item-title">{{ item.title }}</div>
-                      <div v-if="showItemDate" class="item-date">
-                        {{ formatDate(item.pubDate) }}
-                      </div>
-                    </a>
-                  </div>
-                  <div v-if="feed.items.length > 0" class="h-2"></div>
-                </template>
+                  {{ item.title }}
+                </a>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- 滑动指示器 -->
+        <div class="swipe-indicator">
+          <div
+            v-for="(feed, index) in feeds"
+            :key="index"
+            class="indicator-dot"
+            :class="{ active: index === currentCardIndex }"
+          ></div>
+        </div>
       </div>
 
-      <!-- 桌面端视图：网格卡片 -->
+      <!-- 桌面布局 -->
       <div v-else class="feed-grid" :style="gridStyle">
         <div v-for="feed in feeds" :key="feed.title" class="feed-card">
           <div class="card-header">
@@ -169,6 +154,8 @@ let touchStartY = 0;
 let touchMoveX = 0;
 let touchMoveY = 0;
 let startTime = 0;
+let initialScrollTop = 0;
+let isScrolling = false;
 let resizeObserver = null;
 
 // 移动端导航方法
@@ -184,15 +171,32 @@ const prevCard = () => {
   }
 };
 
-// 新的触摸事件处理函数 - 更简单且兼容性更好
+// 新的触摸事件处理函数 - 专为iOS优化
 const handleTouchStart = (e) => {
   // 记录初始触摸位置和时间
   touchStartX = e.touches[0].clientX;
   touchStartY = e.touches[0].clientY;
   startTime = Date.now();
+
+  // 记录容器的初始滚动位置
+  const contentElement = e.currentTarget.querySelector(".mobile-card-content");
+  if (contentElement) {
+    initialScrollTop = contentElement.scrollTop;
+
+    // 重置滚动状态
+    isScrolling = false;
+
+    // 如果内容可滚动（有足够内容导致滚动条出现）
+    if (contentElement.scrollHeight > contentElement.clientHeight) {
+      console.log("内容可滚动");
+    }
+  }
 };
 
 const handleTouchMove = (e) => {
+  // 防止非移动设备触发
+  if (!isMobile.value) return;
+
   // 更新当前触摸位置
   touchMoveX = e.touches[0].clientX;
   touchMoveY = e.touches[0].clientY;
@@ -201,15 +205,47 @@ const handleTouchMove = (e) => {
   const diffX = touchStartX - touchMoveX;
   const diffY = touchStartY - touchMoveY;
 
-  // 如果水平滑动距离大于垂直滑动，且水平位移足够大
-  // 则阻止默认行为，避免页面滚动干扰卡片切换
+  // 获取当前正在交互的内容元素
+  const contentElement = e.currentTarget.querySelector(".mobile-card-content");
+  if (!contentElement) return;
+
+  // 判断是否为垂直滚动
+  if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 10) {
+    isScrolling = true;
+
+    // 内容元素是否可以滚动
+    const canScrollUp = contentElement.scrollTop > 0;
+    const canScrollDown =
+      contentElement.scrollTop + contentElement.clientHeight <
+      contentElement.scrollHeight;
+
+    // 向上滑动且内容已到顶部，或向下滑动且内容已到底部
+    if ((diffY < 0 && !canScrollUp) || (diffY > 0 && !canScrollDown)) {
+      // 允许页面滚动（不阻止默认行为）
+    } else {
+      // 内容区域内滚动，阻止页面滚动
+      e.stopPropagation();
+    }
+    return;
+  }
+
+  // 如果确定是水平滑动，则阻止默认的滚动行为
   if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
-    e.preventDefault();
+    if (!isScrolling) {
+      // 确保没有开始垂直滚动
+      e.preventDefault();
+    }
   }
 };
 
 const handleTouchEnd = (e) => {
   if (!isMobile.value) return;
+
+  // 如果是垂直滚动，不处理翻页
+  if (isScrolling) {
+    isScrolling = false;
+    return;
+  }
 
   // 计算最终触摸位置
   const touchEndX =
@@ -249,6 +285,30 @@ const handleTouchEnd = (e) => {
   touchStartY = 0;
   touchMoveX = 0;
   touchMoveY = 0;
+  isScrolling = false;
+};
+
+// iOS专用滚动修复函数
+const fixIOSScroll = () => {
+  const contentElements = document.querySelectorAll(".mobile-card-content");
+  contentElements.forEach((el) => {
+    if (el) {
+      // 强制触发iOS的滚动层创建
+      el.style.webkitOverflowScrolling = "touch";
+      // 确保滚动区域真正可滚动
+      el.style.overflow = "auto";
+      // 防止iOS滚动弹性效果影响
+      el.style.overscrollBehavior = "none";
+      // 使用transform创建层叠上下文
+      el.style.transform = "translateZ(0)";
+
+      // 确保区域有足够高度
+      if (el.parentElement) {
+        el.style.minHeight = "100%";
+        el.style.height = "100%";
+      }
+    }
+  });
 };
 
 // 检测设备类型
@@ -292,6 +352,10 @@ onMounted(() => {
     resizeObserver = new ResizeObserver(() => {
       checkMobile();
       attachTouchEvents();
+      // 修复滚动问题
+      if (isMobile.value) {
+        setTimeout(fixIOSScroll, 100);
+      }
     });
 
     if (swipeContainer.value) {
@@ -299,14 +363,11 @@ onMounted(() => {
     }
   }
 
-  // 专门针对iOS设备的处理 - 确保可滚动区域真正可滚动
-  const mobileCardContents = document.querySelectorAll(".mobile-card-content");
-  mobileCardContents.forEach((content) => {
-    if (content) {
-      // 在iOS上显式设置overflow
-      content.style.webkitOverflowScrolling = "touch";
-      content.style.overflowY = "auto";
-    }
+  // 修复iOS的滚动问题
+  setTimeout(fixIOSScroll, 100);
+  // 每当切换卡片时重新修复滚动
+  watch(currentCardIndex, () => {
+    setTimeout(fixIOSScroll, 100);
   });
 });
 
@@ -592,6 +653,14 @@ onMounted(() => {
     { immediate: true, deep: true }
   );
 });
+
+// 修改计算属性，根据窗口高度设置最佳的卡片高度
+const calcMobileCardHeight = computed(() => {
+  // 计算合适的高度，确保卡片底部位于适当位置
+  const viewportHeight = window.innerHeight;
+  // 减去顶部导航栏、标题和底部间距，为内容区域预留空间
+  return viewportHeight - 120 + "px";
+});
 </script>
 
 <style>
@@ -660,6 +729,7 @@ onMounted(() => {
   text-overflow: ellipsis;
   font-size: 1.2rem;
   line-height: 1.4;
+  margin-top: -5px; /* 减少顶部间距 */
 }
 
 .feed-links {
@@ -775,23 +845,59 @@ onMounted(() => {
     box-sizing: border-box;
   }
 
+  /* iOS滚动兼容样式 */
   .mobile-card-content {
     flex: 1;
     overflow-y: auto !important;
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch !important; /* 关键：启用iOS原生滚动动能 */
     padding: 0 5px 10px 5px;
     position: relative;
     height: 100%;
-    /* iOS特定修复 */
+    max-height: 100%;
+
+    /* iOS兼容性修复 */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
+    overscroll-behavior: none; /* 防止iOS上拉弹性效果与滑动冲突 */
+
+    /* 确保滚动区域有必要的高度 */
+    min-height: 100%;
+
+    /* 提高滚动性能 */
+    will-change: scroll-position;
+    scroll-behavior: smooth;
+
+    /* 关键：确保iOS设备正确滚动 */
+    z-index: 1;
+
+    /* 防止动画闪烁 */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   /* 隐藏滚动条但允许滚动 */
   .mobile-card-content::-webkit-scrollbar {
     width: 0px;
     background: transparent;
+    display: none;
+  }
+
+  /* 确保内容可触摸滚动 */
+  .mobile-card-content > * {
+    touch-action: pan-y;
+  }
+
+  /* 确保卡片内容可见并可滚动 */
+  .feed-link-item-mobile {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    touch-action: pan-y; /* 允许垂直滚动 */
+    min-height: 44px; /* iOS推荐的最小触摸高度 */
+  }
+
+  .dark .feed-link-item-mobile {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   /* 滚动指示器 - 内容底部渐变提示 */
@@ -805,19 +911,11 @@ onMounted(() => {
     background: linear-gradient(transparent, var(--el-bg-color, white));
     pointer-events: none;
     opacity: 0.8;
+    z-index: 10;
   }
 
   .dark .mobile-card-content::after {
     background: linear-gradient(transparent, var(--el-fill-color-darker, #333));
-  }
-
-  .feed-link-item-mobile {
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  }
-
-  .dark .feed-link-item-mobile {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .feed-link-mobile {
@@ -832,6 +930,7 @@ onMounted(() => {
     -webkit-line-clamp: 2;
     font-size: 1rem;
     line-height: 1.4;
+    touch-action: pan-y; /* 允许垂直滚动 */
   }
 }
 
@@ -988,13 +1087,11 @@ html body .app-container:not(.dark) .tooltip-date {
 }
 
 /* 移动设备滑动卡片样式 */
-.swipe-container {
+.feed-grid-mobile {
   width: 100%;
-  height: calc(100vh - 12rem); /* 减少高度，使卡片底部靠近版权位置 */
+  height: calc(100vh - 120px); /* 减小高度，为移动端顶部留出更少空间 */
   position: relative;
-  touch-action: pan-x;
-  display: flex;
-  flex-direction: column;
+  margin-top: -10px; /* 向上偏移，减少与顶部的间距 */
 }
 
 /* 移动端卡片内容滚动样式 */
