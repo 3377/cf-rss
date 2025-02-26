@@ -592,9 +592,9 @@ const calcMobileCardHeight = computed(() => {
 /* 卡片网格布局 */
 .feed-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 16px;
-  padding: 0px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  padding: 0.5rem;
 }
 
 /* 卡片样式 */
@@ -603,21 +603,20 @@ const calcMobileCardHeight = computed(() => {
   padding: 16px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  height: 500px;
-  min-height: 400px;
-  max-height: 600px;
+  justify-content: space-between;
+  height: 100%;
   cursor: pointer;
   gap: 0.5rem;
   transition: all 0.3s;
   user-select: none;
   border-radius: 8px;
-  background: var(--el-bg-color);
-  overflow: hidden;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .dark .feed-card {
   background: var(--el-fill-color-darker);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .feed-card:hover {
@@ -676,16 +675,32 @@ const calcMobileCardHeight = computed(() => {
   padding: 6px 0;
   margin-bottom: 6px;
   position: relative;
+  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
+}
+
+.feed-link-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.dark .feed-link-item {
+  border-bottom-color: rgba(75, 85, 105, 0.2);
 }
 
 .feed-link {
   display: block;
-  color: var(--el-text-color-primary);
+  color: var(--text-primary, #2d3748);
   text-decoration: none;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 0.95rem;
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.dark .feed-link {
+  color: var(--el-text-color-primary);
 }
 
 .feed-link:hover {
@@ -693,6 +708,10 @@ const calcMobileCardHeight = computed(() => {
 }
 
 .feed-link:visited {
+  color: var(--text-secondary, #718096);
+}
+
+.dark .feed-link:visited {
   color: var(--el-text-color-secondary);
 }
 
@@ -798,12 +817,18 @@ const calcMobileCardHeight = computed(() => {
 /* 卡片头部样式 */
 .card-header {
   padding: 1rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
   border-radius: 0.75rem 0.75rem 0 0;
+  background: var(--card-header-bg, rgba(248, 250, 252, 0.8));
   position: sticky;
   top: 0;
   z-index: 10;
   margin-bottom: 8px;
+}
+
+.dark .card-header {
+  border-bottom-color: rgba(75, 85, 105, 0.2);
+  background: var(--el-fill-color-darker);
 }
 
 /* 卡片标题样式 */
@@ -819,7 +844,11 @@ const calcMobileCardHeight = computed(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.4;
-  margin-top: -5px; /* 减少顶部间距 */
+  margin-top: -5px;
+  color: var(--text-primary, #1a202c);
+}
+
+.dark .card-title {
   color: var(--el-text-color-primary);
 }
 
@@ -1051,45 +1080,62 @@ html body .app-container:not(.dark) .tooltip-date {
     height: calc(100vh - 9rem); /* 缩短容器高度 */
   }
 
+  .feed-grid {
+    display: block;
+    padding: 0;
+  }
+
   .feed-card {
-    min-height: unset;
-    height: 100%;
+    margin-bottom: 1rem;
+    height: auto;
+    box-shadow: none;
   }
 
   .card-header {
     padding: 0.75rem;
+    background: transparent;
+    border-bottom-color: rgba(226, 232, 240, 0.4);
+  }
+
+  .dark .card-header {
+    border-bottom-color: rgba(75, 85, 105, 0.1);
   }
 
   .card-title {
     font-size: 1.1rem;
     line-height: 1.4;
+    color: var(--text-primary, #2d3748);
+  }
+
+  .dark .card-title {
+    color: var(--el-text-color-primary);
   }
 
   .card-content {
     padding: 0.25rem 0;
-    height: calc(100% - 3rem);
+    height: auto;
   }
 
-  .item-link {
-    padding: 0.6rem 0.75rem;
+  .feed-link {
+    padding: 0.6rem 0;
+    font-size: 0.9rem;
+    white-space: normal;
+    line-height: 1.5;
   }
 
-  .item-title {
-    font-size: 0.95rem;
-    line-height: 1.4;
-    padding-right: 0 !important;
+  .feed-link-item {
+    border-bottom-color: rgba(226, 232, 240, 0.3);
+  }
+
+  .dark .feed-link-item {
+    border-bottom-color: rgba(75, 85, 105, 0.1);
   }
 
   .item-date {
-    position: relative;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-top: 0.25rem;
     display: block;
-    right: auto;
-    top: auto;
-    transform: none;
-    margin-top: 0.3rem;
-    font-size: 0.7rem;
-    opacity: 0.8;
-    padding: 0.15rem 0.3rem;
   }
 }
 
@@ -1097,11 +1143,6 @@ html body .app-container:not(.dark) .tooltip-date {
 @media (max-width: 480px) {
   .feed-container {
     padding: 0.15rem 0.35rem;
-    height: calc(100vh - 8.5rem); /* 进一步缩短容器高度 */
-  }
-
-  .swipe-container {
-    height: calc(100vh - 11rem); /* 更小的高度，让底部更靠近版权 */
   }
 
   .card-header {
@@ -1112,8 +1153,9 @@ html body .app-container:not(.dark) .tooltip-date {
     font-size: 1rem;
   }
 
-  .item-link {
-    padding: 0.5rem 0.6rem;
+  .feed-link {
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
   }
 }
 
