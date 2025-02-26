@@ -333,54 +333,56 @@ body {
 
 @layer components {
 
-    /* 提示框样式改进 */
+    /* 提示框样式修改 */
     .tooltip {
-        position: fixed;
-        z-index: 1000;
-        padding: 8px 12px;
-        border-radius: 6px;
-        transition: opacity 0.2s;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        pointer-events: none;
+        position: fixed !important;
+        z-index: 1000 !important;
+        padding: 10px 14px !important;
+        border-radius: 6px !important;
+        transition: opacity 0.3s ease !important;
+        /* 更平滑的动画 */
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+        pointer-events: auto !important;
+        /* 允许鼠标交互 */
         width: var(--tooltip-width, 360px) !important;
-        /* 使用CSS变量并添加!important确保优先级 */
-        max-width: 90vw;
-        overflow: hidden;
+        max-width: 90vw !important;
+        overflow: hidden !important;
     }
 
     /* 亮色模式提示框 */
     .app-container:not(.dark) .tooltip {
-        background-color: rgba(240, 248, 255, 0.95);
-        border: 1px solid rgba(180, 210, 240, 1);
-        color: #333;
+        background-color: rgba(250, 252, 255, 0.95) !important;
+        border: 1px solid rgba(180, 210, 240, 1) !important;
+        color: #333 !important;
     }
 
     /* 暗色模式提示框 */
     .app-container.dark .tooltip {
-        background-color: rgba(40, 44, 52, 0.95);
-        border: 1px solid rgba(60, 70, 80, 1);
-        color: #eee;
+        background-color: rgba(40, 44, 52, 0.95) !important;
+        border: 1px solid rgba(60, 70, 80, 1) !important;
+        color: #eee !important;
     }
 
     /* 提示框文本样式 */
     .tooltip-content {
-        font-size: 0.9rem;
-        line-height: 1.4;
-        max-height: 150px;
-        overflow-y: auto;
-        margin-top: 4px;
-        white-space: pre-wrap;
-        word-break: break-word;
+        font-size: 0.92rem !important;
+        line-height: 1.5 !important;
+        max-height: 200px !important;
+        /* 增加最大高度 */
+        overflow-y: auto !important;
+        margin-top: 6px !important;
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
     }
 
     /* 提示框日期样式 */
     .tooltip-date {
-        font-size: 0.85rem;
-        opacity: 0.9;
-        padding-bottom: 4px;
-        border-bottom: 1px dashed rgba(128, 128, 128, 0.3);
-        margin-bottom: 4px;
-        color: var(--text-color-secondary);
+        font-size: 0.85rem !important;
+        opacity: 0.9 !important;
+        padding-bottom: 6px !important;
+        border-bottom: 1px dashed rgba(128, 128, 128, 0.3) !important;
+        margin-bottom: 6px !important;
+        color: var(--text-color-secondary) !important;
     }
 }
 

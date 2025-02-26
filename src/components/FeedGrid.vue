@@ -65,16 +65,17 @@
     <!-- 内容预览提示框 -->
     <div
       ref="tooltip"
-      class="title-tooltip"
+      class="tooltip"
       :style="tooltipStyle"
       v-show="showTooltipText"
+      @mouseover="tooltipHovered = true"
+      @mouseleave="
+        tooltipHovered = false;
+        hideTooltip();
+      "
     >
-      <div v-if="tooltipDate" class="tooltip-date">
-        发帖时间：{{ tooltipDate }}
-      </div>
-      <div v-if="tooltipContent" class="tooltip-content">
-        {{ tooltipContent }}
-      </div>
+      <div class="tooltip-date">发帖时间：{{ tooltipDate }}</div>
+      <div class="tooltip-content">{{ tooltipContent }}</div>
     </div>
   </div>
 </template>
@@ -192,8 +193,9 @@ const tooltipStyle = ref({
   width: tooltipConfig.value.width,
 });
 const showTooltipText = ref(false);
+const tooltipHovered = ref(false);
 
-// 简化内容预览获取，专注于实用性和性能
+// 改进getContentPreview函数
 const getContentPreview = (content) => {
   if (!content) {
     return "暂无内容预览";
@@ -204,11 +206,34 @@ const getContentPreview = (content) => {
 
     // 直接处理字符串内容
     if (typeof content === "string") {
-      // 处理CDATA格式 (NodeSeek格式)
+      // 处理CDATA格式
       if (content.includes("CDATA[")) {
         const match = content.match(/CDATA\[(.*?)(?:\]\]|$)/s);
         if (match && match[1]) {
           plainText = match[1].trim();
+        } else {
+          plainText = content;
+        }
+      }
+      // 处理<content>标签包裹的内容
+      else if (content.includes("<content") || content.includes("</content>")) {
+        const contentMatch = content.match(/<content[^>]*>(.*?)<\/content>/s);
+        if (contentMatch && contentMatch[1]) {
+          plainText = contentMatch[1].trim();
+        } else {
+          plainText = content;
+        }
+      }
+      // 处理<description>标签包裹的内容
+      else if (
+        content.includes("<description") ||
+        content.includes("</description>")
+      ) {
+        const descMatch = content.match(
+          /<description[^>]*>(.*?)<\/description>/s
+        );
+        if (descMatch && descMatch[1]) {
+          plainText = descMatch[1].trim();
         } else {
           plainText = content;
         }
@@ -218,7 +243,24 @@ const getContentPreview = (content) => {
     }
     // 处理对象类型内容
     else if (content && typeof content === "object") {
-      if (typeof content._ === "string") {
+      // 尝试提取更多字段
+      if (content.content) {
+        // 优先使用content字段
+        plainText =
+          typeof content.content === "string"
+            ? content.content
+            : content.content._ ||
+              content.content.$ ||
+              JSON.stringify(content.content);
+      } else if (content.description) {
+        // 其次尝试description字段
+        plainText =
+          typeof content.description === "string"
+            ? content.description
+            : content.description._ ||
+              content.description.$ ||
+              JSON.stringify(content.description);
+      } else if (typeof content._ === "string") {
         // 一些RSS使用_字段
         plainText = content._;
       } else if (typeof content.$ === "string") {
@@ -245,6 +287,12 @@ const getContentPreview = (content) => {
       .replace(/&quot;/g, '"')
       .replace(/&apos;/g, "'")
       .trim();
+
+    // 添加调试输出
+    console.log(
+      "提取的内容：",
+      plainText.substring(0, 50) + (plainText.length > 50 ? "..." : "")
+    );
 
     if (!plainText.trim()) {
       return "暂无文本内容预览";
@@ -317,12 +365,18 @@ const showTooltip = (event, date, content) => {
 // 添加内容缓存机制
 const tooltipCache = new Map();
 
-// 延迟隐藏，优化性能
+// 修改hideTooltip函数
 const hideTooltip = () => {
+  // 如果鼠标正在提示框上，不隐藏
+  if (tooltipHovered.value) return;
+
   tooltipStyle.value.opacity = 0;
   setTimeout(() => {
-    showTooltipText.value = false;
-  }, 200);
+    if (!tooltipHovered.value) {
+      // 再次检查鼠标是否在提示框上
+      showTooltipText.value = false;
+    }
+  }, 300); // 延长时间到300ms
 };
 
 // 确保卡片内容在组件挂载后可滚动
