@@ -36,9 +36,8 @@
                   @mouseover="
                     showTooltip(
                       $event,
-                      item.title,
                       item.pubDate,
-                      item.description || item.content
+                      item.description || item.content || item.summary
                     )
                   "
                   @mouseleave="hideTooltip"
@@ -64,11 +63,8 @@
       :style="tooltipStyle"
       v-show="showTooltipText"
     >
-      <div class="tooltip-header">
-        <div v-if="tooltipDate" class="tooltip-date">
-          发帖时间：{{ tooltipDate }}
-        </div>
-        <div class="tooltip-title">{{ tooltipTitle }}</div>
+      <div v-if="tooltipDate" class="tooltip-date">
+        发帖时间：{{ tooltipDate }}
       </div>
       <div v-if="tooltipContent" class="tooltip-content">
         {{ tooltipContent }}
@@ -181,7 +177,6 @@ const tooltipConfig = ref({
 
 // 修改标题提示功能
 const tooltip = ref(null);
-const tooltipTitle = ref("");
 const tooltipContent = ref("");
 const tooltipDate = ref("");
 const tooltipStyle = ref({
@@ -196,8 +191,31 @@ const showTooltipText = ref(false);
 const getContentPreview = (content) => {
   if (!content) return "暂无内容预览";
 
-  // 移除HTML标签
-  const plainText = content.replace(/<[^>]*>?/gm, "");
+  // 检查内容类型，并执行适当的处理
+  let plainText = "";
+
+  try {
+    if (typeof content === "string") {
+      // 移除HTML标签
+      plainText = content.replace(/<[^>]*>?/gm, "");
+    } else if (typeof content === "object") {
+      // 如果是对象（可能是JSON格式的内容），尝试提取文本
+      plainText = JSON.stringify(content);
+    } else {
+      // 其他类型转为字符串
+      plainText = String(content);
+    }
+
+    // 调试输出
+    console.log("原始内容类型:", typeof content);
+    console.log(
+      "内容预览结果:",
+      plainText.substring(0, 50) + (plainText.length > 50 ? "..." : "")
+    );
+  } catch (error) {
+    console.error("内容处理错误:", error);
+    return "内容处理错误";
+  }
 
   // 检查移除HTML后是否还有内容
   if (!plainText.trim()) {
@@ -212,11 +230,9 @@ const getContentPreview = (content) => {
   return plainText.substring(0, tooltipConfig.value.maxPreviewLength) + "...";
 };
 
-// 修改显示提示框的方法，添加内容预览
-const showTooltip = (event, title, date, content) => {
-  if (!title) return;
-
-  tooltipTitle.value = title;
+// 修改显示提示框的方法，删除标题显示，仅显示内容预览
+const showTooltip = (event, date, content) => {
+  // 设置内容预览
   tooltipContent.value = getContentPreview(content);
 
   // 格式化并设置日期，使用更安全的处理方式
@@ -289,34 +305,27 @@ onMounted(() => {
           firstFeed: {
             title: newFeeds[0].title,
             itemCount: newFeeds[0].items?.length || 0,
-            firstItemDateSample: newFeeds[0].items?.[0]?.pubDate || "无日期",
-            firstItemDateType: typeof newFeeds[0].items?.[0]?.pubDate,
-          },
-        });
-
-        // 检查所有feed中是否存在日期格式问题
-        newFeeds.forEach((feed, feedIndex) => {
-          if (feed.items && feed.items.length > 0) {
-            feed.items.forEach((item, itemIndex) => {
-              if (item.pubDate) {
-                try {
-                  const date = new Date(item.pubDate);
-                  if (isNaN(date.getTime())) {
-                    console.warn(
-                      `检测到无效日期: feed[${feedIndex}].items[${itemIndex}].pubDate = "${
-                        item.pubDate
-                      }" (${typeof item.pubDate})`
-                    );
-                  }
-                } catch (e) {
-                  console.error(
-                    `日期检查错误: feed[${feedIndex}].items[${itemIndex}].pubDate = "${item.pubDate}"`,
-                    e
-                  );
+            firstItemSample: newFeeds[0].items?.[0]
+              ? {
+                  title: newFeeds[0].items[0].title,
+                  pubDate: newFeeds[0].items[0].pubDate,
+                  hasDescription: !!newFeeds[0].items[0].description,
+                  hasContent: !!newFeeds[0].items[0].content,
+                  hasSummary: !!newFeeds[0].items[0].summary,
+                  descriptionPreview: newFeeds[0].items[0].description
+                    ? newFeeds[0].items[0].description.substring(0, 50) + "..."
+                    : "N/A",
+                  contentPreview: newFeeds[0].items[0].content
+                    ? typeof newFeeds[0].items[0].content === "string"
+                      ? newFeeds[0].items[0].content.substring(0, 50) + "..."
+                      : "非字符串内容"
+                    : "N/A",
+                  summaryPreview: newFeeds[0].items[0].summary
+                    ? newFeeds[0].items[0].summary.substring(0, 50) + "..."
+                    : "N/A",
                 }
-              }
-            });
-          }
+              : "No items",
+          },
         });
       }
     },
@@ -467,19 +476,6 @@ onMounted(() => {
   transition: opacity 0.2s ease;
   text-align: left; /* 改为左对齐更适合阅读 */
   overflow: hidden;
-}
-
-.tooltip-header {
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
-
-.tooltip-title {
-  font-weight: 600;
-  font-size: 0.95rem;
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
-  text-align: center;
 }
 
 /* 修改提示框日期样式 */
