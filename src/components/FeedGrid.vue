@@ -117,7 +117,7 @@
                           item.description || item.content || item.summary
                         )
                     "
-                    @mouseleave="!isMobile && hideTooltip"
+                    @mouseleave="!isMobile && hideTooltip()"
                   >
                     <div class="item-title">{{ item.title }}</div>
                     <div v-if="showItemDate" class="item-date">
