@@ -541,6 +541,11 @@ button {
     font-size: 0.75rem !important;
     max-width: 85px;
   }
+
+  /* 移动端内容区域样式优化 */
+  .content-area {
+    margin-bottom: 0.5rem;
+  }
 }
 
 /* 小型移动设备优化 */
@@ -596,6 +601,10 @@ button {
     display: flex;
     flex-direction: column;
     line-height: 1.4;
+  }
+
+  .content-area {
+    margin-bottom: 0.25rem;
   }
 }
 

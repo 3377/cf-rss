@@ -6,58 +6,136 @@
     >
       <div class="text-gray-500 empty-message">暂无数据</div>
     </div>
-    <div v-else class="feed-grid" :style="gridStyle">
-      <div v-for="feed in feeds" :key="feed.title" class="feed-card">
-        <div class="card-header">
-          <h2 class="card-title">{{ feed.title }}</h2>
+    <div v-else>
+      <!-- 移动端视图：滑动卡片 -->
+      <div v-if="isMobile" class="swipe-container" ref="swipeContainer">
+        <div class="mobile-nav" v-if="feeds.length > 1">
+          <button
+            @click="prevCard"
+            class="mobile-nav-btn"
+            :disabled="currentCardIndex === 0"
+            :class="{ 'opacity-50': currentCardIndex === 0 }"
+          >
+            &#9664;
+          </button>
+          <div class="mobile-indicator">
+            {{ currentCardIndex + 1 }} / {{ feeds.length }}
+          </div>
+          <button
+            @click="nextCard"
+            class="mobile-nav-btn"
+            :disabled="currentCardIndex >= feeds.length - 1"
+            :class="{ 'opacity-50': currentCardIndex >= feeds.length - 1 }"
+          >
+            &#9654;
+          </button>
         </div>
-        <div class="card-content">
-          <div class="items-list">
-            <div v-if="feed.error" class="error-message">
-              {{ feed.error }}
+
+        <div class="mobile-cards-container" ref="mobileCardsContainer">
+          <div
+            v-for="(feed, index) in feeds"
+            :key="feed.title"
+            class="feed-card mobile-card"
+            :class="{ active: index === currentCardIndex }"
+            :style="{
+              transform: `translateX(${(index - currentCardIndex) * 100}%)`,
+            }"
+          >
+            <div class="card-header">
+              <h2 class="card-title">{{ feed.title }}</h2>
             </div>
-            <div
-              v-else-if="!feed.items || feed.items.length === 0"
-              class="empty-message"
-            >
-              暂无数据
-            </div>
-            <template v-else>
-              <div
-                v-for="item in feed.items"
-                :key="item.id || item.link"
-                class="feed-item"
-              >
-                <a
-                  :href="item.link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="item-link"
-                  @mouseover="
-                    showTooltip(
-                      $event,
-                      item.pubDate,
-                      item.description || item.content || item.summary
-                    )
-                  "
-                  @mouseleave="hideTooltip"
+            <div class="card-content">
+              <div class="items-list">
+                <div v-if="feed.error" class="error-message">
+                  {{ feed.error }}
+                </div>
+                <div
+                  v-else-if="!feed.items || feed.items.length === 0"
+                  class="empty-message"
                 >
-                  <div class="item-title">{{ item.title }}</div>
-                  <div v-if="showItemDate" class="item-date">
-                    {{ formatDate(item.pubDate) }}
+                  暂无数据
+                </div>
+                <template v-else>
+                  <div
+                    v-for="item in feed.items"
+                    :key="item.id || item.link"
+                    class="feed-item"
+                  >
+                    <a
+                      :href="item.link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="item-link"
+                    >
+                      <div class="item-title">{{ item.title }}</div>
+                      <div v-if="showItemDate" class="item-date">
+                        {{ formatDate(item.pubDate) }}
+                      </div>
+                    </a>
                   </div>
-                </a>
+                  <div v-if="feed.items.length > 0" class="h-2"></div>
+                </template>
               </div>
-              <!-- 添加额外的填充元素确保内容能滚动 -->
-              <div v-if="feed.items.length > 0" class="h-2"></div>
-            </template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 桌面端视图：网格卡片 -->
+      <div v-else class="feed-grid" :style="gridStyle">
+        <div v-for="feed in feeds" :key="feed.title" class="feed-card">
+          <div class="card-header">
+            <h2 class="card-title">{{ feed.title }}</h2>
+          </div>
+          <div class="card-content">
+            <div class="items-list">
+              <div v-if="feed.error" class="error-message">
+                {{ feed.error }}
+              </div>
+              <div
+                v-else-if="!feed.items || feed.items.length === 0"
+                class="empty-message"
+              >
+                暂无数据
+              </div>
+              <template v-else>
+                <div
+                  v-for="item in feed.items"
+                  :key="item.id || item.link"
+                  class="feed-item"
+                >
+                  <a
+                    :href="item.link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="item-link"
+                    @mouseover="
+                      !isMobile &&
+                        showTooltip(
+                          $event,
+                          item.pubDate,
+                          item.description || item.content || item.summary
+                        )
+                    "
+                    @mouseleave="!isMobile && hideTooltip"
+                  >
+                    <div class="item-title">{{ item.title }}</div>
+                    <div v-if="showItemDate" class="item-date">
+                      {{ formatDate(item.pubDate) }}
+                    </div>
+                  </a>
+                </div>
+                <div v-if="feed.items.length > 0" class="h-2"></div>
+              </template>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 内容预览提示框 -->
+    <!-- 内容预览提示框 (仅桌面端显示) -->
     <div
+      v-if="!isMobile"
       ref="tooltip"
       class="title-tooltip"
       :style="tooltipStyle"
@@ -74,7 +152,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watchEffect, watch } from "vue";
+import { ref, computed, onMounted, watchEffect, watch, onUnmounted } from "vue";
 import { format, parseISO } from "date-fns";
 import { RSS_CONFIG } from "../config/rss.config";
 
@@ -92,6 +170,146 @@ const props = defineProps({
 // 获取配置
 const showItemDate = ref(RSS_CONFIG.display?.showItemDate || false);
 const dateFormat = ref(RSS_CONFIG.display?.dateFormat || "yyyy-MM-dd HH:mm");
+
+// 移动端检测和滑动相关状态
+const isMobile = ref(false);
+const currentCardIndex = ref(0);
+const swipeContainer = ref(null);
+const mobileCardsContainer = ref(null);
+let touchStartX = 0;
+let touchEndX = 0;
+let resizeObserver = null;
+
+// 移动端导航方法
+const nextCard = () => {
+  if (currentCardIndex.value < props.feeds.length - 1) {
+    currentCardIndex.value++;
+  }
+};
+
+const prevCard = () => {
+  if (currentCardIndex.value > 0) {
+    currentCardIndex.value--;
+  }
+};
+
+// 检测设备类型
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 768;
+};
+
+// 处理触摸事件
+const handleTouchStart = (e) => {
+  if (!isMobile.value) return;
+
+  try {
+    touchStartX = e.touches[0].clientX;
+  } catch (error) {
+    console.error("触摸事件处理错误:", error);
+  }
+};
+
+const handleTouchMove = (e) => {
+  if (!isMobile.value) return;
+
+  try {
+    touchEndX = e.touches[0].clientX;
+
+    // 计算滑动距离百分比
+    const swipeDist = touchEndX - touchStartX;
+    const maxDist = window.innerWidth * 0.5; // 最大滑动距离为屏幕宽度的一半
+    const percentage =
+      Math.min(Math.abs(swipeDist) / maxDist, 1) * (swipeDist < 0 ? -1 : 1);
+
+    // 如果滑动距离足够大，应用动态位移
+    if (Math.abs(percentage) > 0.05) {
+      const cards = document.querySelectorAll(".mobile-card");
+      cards.forEach((card, index) => {
+        const baseTransform = `translateX(${
+          (index - currentCardIndex.value) * 100
+        }%)`;
+        const dynamicTransform = `translateX(calc(${
+          (index - currentCardIndex.value) * 100
+        }% + ${percentage * 30}px))`;
+        card.style.transform = dynamicTransform;
+      });
+    }
+  } catch (error) {
+    console.error("触摸移动处理错误:", error);
+  }
+};
+
+const handleTouchEnd = () => {
+  if (!isMobile.value) return;
+
+  try {
+    const swipeThreshold = 50;
+    if (touchStartX - touchEndX > swipeThreshold) {
+      // 向左滑动
+      nextCard();
+    } else if (touchEndX - touchStartX > swipeThreshold) {
+      // 向右滑动
+      prevCard();
+    }
+
+    // 无论如何，重置所有卡片位置
+    setTimeout(() => {
+      const cards = document.querySelectorAll(".mobile-card");
+      cards.forEach((card, index) => {
+        card.style.transform = `translateX(${
+          (index - currentCardIndex.value) * 100
+        }%)`;
+      });
+    }, 50);
+
+    touchStartX = 0;
+    touchEndX = 0;
+  } catch (error) {
+    console.error("触摸结束处理错误:", error);
+  }
+};
+
+// 监听窗口大小变化
+onMounted(() => {
+  checkMobile();
+  window.addEventListener("resize", checkMobile);
+
+  // 添加触摸事件监听
+  if (swipeContainer.value) {
+    swipeContainer.value.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+    swipeContainer.value.addEventListener("touchmove", handleTouchMove, {
+      passive: true,
+    });
+    swipeContainer.value.addEventListener("touchend", handleTouchEnd, {
+      passive: true,
+    });
+  }
+
+  // 使用ResizeObserver监听容器大小变化
+  resizeObserver = new ResizeObserver(() => {
+    checkMobile();
+  });
+
+  if (swipeContainer.value) {
+    resizeObserver.observe(swipeContainer.value);
+  }
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", checkMobile);
+
+  if (swipeContainer.value) {
+    swipeContainer.value.removeEventListener("touchstart", handleTouchStart);
+    swipeContainer.value.removeEventListener("touchmove", handleTouchMove);
+    swipeContainer.value.removeEventListener("touchend", handleTouchEnd);
+  }
+
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+});
 
 // 计算网格样式
 const gridStyle = computed(() => {
@@ -257,6 +475,9 @@ const getContentPreview = (content) => {
 
 // 修改显示提示框的方法
 const showTooltip = (event, date, content) => {
+  // 如果是移动设备，则不显示提示框
+  if (isMobile.value) return;
+
   // 设置内容预览
   tooltipContent.value = getContentPreview(content);
 
@@ -367,6 +588,8 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 卡片网格布局 */
@@ -536,22 +759,77 @@ html body .app-container:not(.dark) .tooltip-date {
   text-align: left;
   word-break: break-word;
   white-space: pre-line;
-  text-indent: 1em;
+  text-indent: 0;
   padding: 0.25rem 0;
+}
+
+/* 移动设备滑动卡片样式 */
+.swipe-container {
+  width: 100%;
+  height: calc(100vh - 12rem); /* 减少高度，使卡片底部靠近版权位置 */
+  position: relative;
+  touch-action: pan-x;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.mobile-nav-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: #4b5563;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.dark .mobile-nav-btn {
+  color: #e5e7eb;
+}
+
+.mobile-indicator {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.dark .mobile-indicator {
+  color: #9ca3af;
+}
+
+.mobile-cards-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mobile-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease;
 }
 
 /* 移动设备适配 */
 @media (max-width: 768px) {
-  .feed-grid {
-    grid-template-columns: 1fr !important;
-    gap: 1rem;
-    width: 100%;
-    padding: 0.5rem;
+  .feed-container {
+    padding: 0.25rem 0.5rem;
+    height: calc(100vh - 9rem); /* 缩短容器高度 */
   }
 
   .feed-card {
-    min-height: 300px;
-    margin-bottom: 1rem;
+    min-height: unset;
+    height: 100%;
   }
 
   .card-header {
@@ -589,31 +867,25 @@ html body .app-container:not(.dark) .tooltip-date {
     opacity: 0.8;
     padding: 0.15rem 0.3rem;
   }
-
-  /* 优化标题提示框在移动端的展示 */
-  .title-tooltip {
-    max-width: 94%;
-    left: 3% !important;
-    padding: 0.5rem;
-    font-size: 0.8rem;
-    line-height: 1.3;
-  }
 }
 
 /* 适配较小屏幕设备 */
 @media (max-width: 480px) {
   .feed-container {
+    padding: 0.15rem 0.35rem;
+    height: calc(100vh - 8.5rem); /* 进一步缩短容器高度 */
+  }
+
+  .swipe-container {
+    height: calc(100vh - 11rem); /* 更小的高度，让底部更靠近版权 */
+  }
+
+  .mobile-nav {
     padding: 0.25rem 0.5rem;
   }
 
-  .feed-grid {
-    gap: 0.75rem;
-    padding: 0.25rem;
-  }
-
-  .feed-card {
-    min-height: 250px;
-    margin-bottom: 0.75rem;
+  .mobile-nav-btn {
+    font-size: 1rem;
   }
 
   .card-header {
