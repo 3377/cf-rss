@@ -18,7 +18,6 @@
         @touchend="handleTouchEnd"
       >
         <!-- 滑动指示器 -->
-        <div class="swipe-tip">← 左右滑动切换 →</div>
 
         <div class="mobile-cards-container" ref="mobileCardsContainer">
           <div
@@ -193,12 +192,18 @@ let resizeObserver = null;
 const nextCard = () => {
   if (currentCardIndex.value < props.feeds.length - 1) {
     currentCardIndex.value++;
+  } else {
+    // 到达最后一个时，循环回第一个
+    currentCardIndex.value = 0;
   }
 };
 
 const prevCard = () => {
   if (currentCardIndex.value > 0) {
     currentCardIndex.value--;
+  } else {
+    // 到达第一个时，循环到最后一个
+    currentCardIndex.value = props.feeds.length - 1;
   }
 };
 
@@ -230,11 +235,11 @@ const handleTouchEnd = (e) => {
 
   // 简单判断：如果移动足够距离，则切换卡片
   if (Math.abs(diffX) > 50) {
-    if (diffX > 0 && currentCardIndex.value < props.feeds.length - 1) {
+    if (diffX > 0) {
       // 向左滑动 -> 下一页
       nextCard();
       console.log("向左滑动，切换到下一卡片");
-    } else if (diffX < 0 && currentCardIndex.value > 0) {
+    } else if (diffX < 0) {
       // 向右滑动 -> 上一页
       prevCard();
       console.log("向右滑动，切换到上一卡片");
@@ -1130,25 +1135,6 @@ html body .app-container:not(.dark) .tooltip-date {
 }
 
 /* 滑动提示文本 */
-.swipe-tip {
-  text-align: center;
-  padding: 5px 0;
-  font-size: 0.85rem;
-  color: #909399;
-  opacity: 0.8;
-  margin-bottom: 8px;
-  margin-top: -5px;
-}
-
-/* 保证滑动指示样式 */
-.swipe-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 0;
-  margin: 5px 0;
-  gap: 8px;
-}
 
 .indicator-dot {
   width: 8px;
