@@ -907,20 +907,46 @@ body,
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-height: 90vh; /* 设置最大高度为视口高度的90% */
   overflow: hidden;
+  position: relative;
 }
 
 .card-header {
   flex-shrink: 0;
   border-radius: 0.75rem 0.75rem 0 0 !important;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: inherit;
 }
 
 .card-content {
-  flex: 1;
-  height: calc(100vh - 200px);
+  flex: 1 1 auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding: 1rem;
   border-radius: 0 0 0.75rem 0.75rem !important;
   background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
+  min-height: 0; /* 确保内容可以滚动 */
+}
+
+/* 确保滚动条样式在所有浏览器中一致 */
+.card-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.card-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+/* 暗色模式下的滚动条 */
+.dark .card-content::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 </style>
