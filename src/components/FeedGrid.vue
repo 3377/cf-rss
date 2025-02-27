@@ -740,15 +740,32 @@ const calcMobileCardHeight = computed(() => {
   .feed-card {
     height: auto;
     min-height: 350px;
+    border-radius: 0.85rem !important;
   }
 
   .card-header {
-    padding: 0.75rem 0.75rem 0.5rem;
-    border-radius: 0.75rem 0.75rem 0 0 !important;
+    padding: 0.75rem;
+    border-radius: 0.85rem 0.85rem 0 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.5rem;
   }
 
   .card-title {
     font-size: 1.1rem;
+    margin: 0;
+    padding: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-card-content {
+    border-radius: 0 0 0.85rem 0.85rem !important;
   }
 
   .feed-link-item-mobile {
@@ -790,7 +807,7 @@ const calcMobileCardHeight = computed(() => {
     padding: 0 5px 10px 5px;
     position: relative;
     height: calc(100% - 60px);
-    border-radius: 0 0 0.75rem 0.75rem;
+    border-radius: 0 0 0.85rem 0.85rem !important;
   }
 
   /* 在亮色模式下确保滚动 */
@@ -912,11 +929,13 @@ body,
   }
 
   .card-header {
-    padding: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    min-height: 3.2rem;
   }
 
   .card-title {
     font-size: 1rem;
+    line-height: 1.3;
   }
 
   .feed-link {
