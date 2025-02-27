@@ -609,7 +609,7 @@ const calcMobileCardHeight = computed(() => {
   flex-direction: column;
   height: calc(100vh - 90px); /* 调整为接近视口高度 */
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.2s ease;
   margin: 0;
 }
 
@@ -619,8 +619,9 @@ const calcMobileCardHeight = computed(() => {
 }
 
 .feed-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  /* 移除上浮和阴影变化效果 */
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* ---------- 卡片头部 ---------- */
@@ -662,18 +663,24 @@ const calcMobileCardHeight = computed(() => {
 /* ---------- 卡片内容区域 ---------- */
 .card-content {
   flex: 1;
-  overflow-y: auto !important; /* 强制启用滚动 */
+  overflow-y: auto !important;
   padding: 0.75rem 1rem;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch !important;
   position: relative;
   display: flex;
   flex-direction: column;
+  z-index: 2; /* 提高层级 */
+  height: auto !important; /* 避免固定高度限制滚动 */
+  min-height: 0 !important; /* 允许内容滚动 */
   border-radius: 0 0 0.75rem 0.75rem !important; /* 底部圆角 */
 }
 
-/* 确保亮色模式下内容也可以滚动 */
-.app-container:not(.dark) .card-content {
-  overflow-y: auto !important; /* 确保亮色模式下也可以滚动 */
+/* 添加特殊亮色模式专用的滚动样式 */
+html body .app-container:not(.dark) .feed-card .card-content {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
 
 /* 隐藏滚动条 */
@@ -797,6 +804,9 @@ const calcMobileCardHeight = computed(() => {
   display: flex;
   flex-direction: column;
   width: 100%;
+  overflow: hidden;
+  border-bottom-left-radius: 0.75rem !important;
+  border-bottom-right-radius: 0.75rem !important;
 }
 
 /* ---------- 提示框样式 ---------- */
@@ -960,13 +970,12 @@ html body .app-container:not(.dark) .tooltip-date {
   }
 
   .card-content {
-    border-radius: 0 0 0.75rem 0.75rem !important;
     overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
-  /* 确保亮色模式下也能滚动 */
-  .app-container:not(.dark) .card-content,
-  .app-container:not(.dark) .mobile-card-content {
+  /* 在亮色模式下确保滚动 */
+  html body .app-container:not(.dark) .card-content {
     overflow-y: auto !important;
   }
 }
@@ -1041,5 +1050,43 @@ body,
   width: 100%;
   overflow: hidden;
   overscroll-behavior: none;
+}
+
+/* 确保全局所有卡片组件都有圆角 */
+.card-content,
+.mobile-card-content,
+.feed-card,
+.mobile-card {
+  border-radius: 0.75rem !important;
+}
+
+/* 明确设置卡片头部和内容区域的圆角 */
+.card-header,
+.mobile-card .card-header {
+  border-top-left-radius: 0.75rem !important;
+  border-top-right-radius: 0.75rem !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.card-content,
+.mobile-card-content {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0.75rem !important;
+  border-bottom-right-radius: 0.75rem !important;
+}
+
+/* 添加内容溢出处理 */
+.items-list {
+  border-top: none;
+  padding-bottom: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  border-bottom-left-radius: 0.75rem !important;
+  border-bottom-right-radius: 0.75rem !important;
 }
 </style>

@@ -376,7 +376,7 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 
 .content-area {
   flex: 1;
-  overflow: auto;
+  overflow: auto !important;
   display: flex;
   flex-direction: column;
   margin-top: 0;
@@ -413,11 +413,13 @@ html body .app-container.bg-gray-50 .footer {
 
 /* 移除全局滚动条 */
 html,
-body {
+body,
+#app,
+.app-container {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  height: 100vh;
+  height: 100%;
 }
 
 body {
@@ -670,6 +672,23 @@ button {
   overflow-y: auto !important;
 }
 
+/* 确保亮色模式下卡片内容可以滚动 */
+html body .app-container:not(.dark) .card-content,
+html body .app-container:not(.dark) .mobile-card-content {
+  background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* 隐藏亮色模式下的滚动条 */
+html body .app-container:not(.dark) .card-content::-webkit-scrollbar,
+html body .app-container:not(.dark) .mobile-card-content::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+
 /* 确保卡片标题区域有顶部圆角 */
 .card-header {
   border-radius: 0.75rem 0.75rem 0 0 !important;
@@ -811,5 +830,34 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
   .footer {
     overflow: hidden;
   }
+}
+
+/* 全局确保内容区域可以滚动 */
+.content-area {
+  flex: 1;
+  overflow: auto !important;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+/* 重置可能阻止滚动的全局设置 */
+html, body, #app, .app-container {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 确保卡片内容在任何情况下都可以滚动 */
+.card-content,
+.mobile-card-content,
+html body .app-container .card-content,
+html body .app-container .mobile-card-content,
+html body .app-container:not(.dark) .card-content,
+html body .app-container:not(.dark) .mobile-card-content,
+html body .app-container.dark .card-content,
+html body .app-container.dark .mobile-card-content {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 </style>
