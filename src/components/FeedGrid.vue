@@ -615,10 +615,7 @@ const calcMobileCardHeight = computed(() => {
   gap: 0.6rem;
   flex: 1;
   overflow-y: auto !important;
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
   padding: 0.2rem 0.2rem 1.5rem 0.2rem;
-  overflow-x: hidden;
   height: 100%;
   -webkit-overflow-scrolling: touch;
 }
@@ -681,9 +678,10 @@ const calcMobileCardHeight = computed(() => {
   padding: 0;
   margin: 0;
   list-style-type: none;
-  overflow-y: auto;
+  overflow-y: auto !important;
   height: 100%;
   flex: 1;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- 链接项样式 ---------- */
@@ -734,7 +732,6 @@ const calcMobileCardHeight = computed(() => {
   .feed-card {
     height: auto;
     min-height: 350px;
-    border-radius: 0.85rem !important;
   }
 
   .card-header {
@@ -1108,5 +1105,33 @@ html body .app-container:not(.dark) .tooltip-date {
 .feed-item:last-child {
   border-bottom: none;
   margin-bottom: 2rem;
+}
+
+/* 移除特定于亮色模式的滚动限制 */
+html body .app-container:not(.dark) .card-content,
+html body .app-container:not(.dark) .mobile-card-content,
+html body .app-container:not(.dark) .items-list {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* 确保所有滚动容器都可以正常滚动 */
+.card-content,
+.mobile-card-content,
+.items-list,
+.feed-grid {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* 统一滚动条隐藏 */
+.card-content::-webkit-scrollbar,
+.mobile-card-content::-webkit-scrollbar,
+.items-list::-webkit-scrollbar,
+.feed-grid::-webkit-scrollbar {
+  display: none;
+  width: 0;
 }
 </style>
