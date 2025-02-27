@@ -318,17 +318,17 @@ onUnmounted(() => {
 
 <style>
 /* 全局基础设置 */
-html, body, #app {
+html,
+body,
+#app {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 /* 应用容器样式 */
 .app-container {
   height: 100vh;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -344,6 +344,7 @@ html body .app-container.bg-gray-50 {
   background-position: 0 0, 0 5px, 5px -5px, -5px 0 !important;
 }
 
+/* 确保内容区域可以滚动 */
 .content-area {
   flex: 1;
   overflow: auto !important;
@@ -877,5 +878,27 @@ html body .app-container.dark .card-content,
 html body .app-container.dark .mobile-card-content {
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
+}
+
+/* 全局确保网格区域可以滚动 */
+.feed-grid {
+  overflow-y: auto !important;
+}
+
+/* 全局滚动设置 */
+.feed-grid,
+.content-area,
+.card-content,
+.mobile-card-content {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 仅在主容器上限制溢出 */
+html,
+body,
+#app,
+.app-container {
+  overflow: hidden;
 }
 </style>

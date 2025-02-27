@@ -582,10 +582,10 @@ const calcMobileCardHeight = computed(() => {
 /* ---------- 主容器样式 ---------- */
 .feed-container {
   height: calc(100vh - 55px);
-  overflow: hidden;
   padding: 0.15rem 0.25rem;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* 只在容器本身禁止溢出，允许子元素滚动 */
 }
 
 /* ---------- 网格布局 ---------- */
@@ -595,9 +595,11 @@ const calcMobileCardHeight = computed(() => {
   grid-auto-rows: minmax(calc(100vh - 95px), auto);
   gap: 0.6rem;
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto !important; /* 确保网格可以滚动 */
   padding: 0.2rem 0.2rem 0.4rem 0.2rem;
   overflow-x: hidden;
+  height: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- 卡片样式 ---------- */
@@ -639,6 +641,7 @@ const calcMobileCardHeight = computed(() => {
   display: flex;
   flex-direction: column;
   border-radius: 0 0 0.75rem 0.75rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* 隐藏滚动条 */
@@ -1056,5 +1059,16 @@ html body .app-container:not(.dark) .tooltip-date {
   white-space: pre-line;
   text-indent: 0;
   padding: 0.25rem 0;
+}
+
+/* ---------- 卡片内的项目 ---------- */
+.feed-item {
+  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.6));
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.feed-item:last-child {
+  border-bottom: none;
 }
 </style>
