@@ -599,7 +599,7 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 主容器样式 ---------- */
 .feed-container {
-  height: calc(100vh - 85px); /* 调整主容器高度，为底部版权留出空间 */
+  height: calc(100vh - 85px);
   padding: 0.15rem 0.25rem;
   display: flex;
   flex-direction: column;
@@ -611,16 +611,15 @@ const calcMobileCardHeight = computed(() => {
 .feed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-auto-rows: minmax(min-content, auto); /* 改为自适应内容高度 */
+  grid-auto-rows: minmax(min-content, auto);
   gap: 0.6rem;
   flex: 1;
   overflow-y: auto !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
-  padding: 0.2rem 0.2rem 2.5rem 0.2rem;
+  padding: 0.2rem 0.2rem 1.5rem 0.2rem;
   overflow-x: hidden;
   height: 100%;
-  max-height: calc(100vh - 130px); /* 限制最大高度 */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -636,8 +635,7 @@ const calcMobileCardHeight = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 150px); /* 调整卡片高度，确保不会超过版权区域 */
-  max-height: calc(100vh - 150px); /* 添加最大高度限制 */
+  height: calc(100vh - 180px); /* 减小卡片高度 */
   overflow: hidden;
   transition: box-shadow 0.3s ease;
   margin: 0;
@@ -651,7 +649,7 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 卡片头部 ---------- */
 .card-header {
-  padding: 0.6rem 0.75rem;
+  padding: 0.5rem 0.75rem; /* 减小头部内边距 */
   border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
   background: var(--card-header-bg, rgba(248, 250, 252, 0.8));
   position: sticky;
@@ -670,8 +668,7 @@ const calcMobileCardHeight = computed(() => {
   flex-direction: column;
   border-radius: 0 0 0.75rem 0.75rem;
   -webkit-overflow-scrolling: touch;
-  height: calc(100% - 60px);
-  max-height: calc(100vh - 210px); /* 调整内容区域最大高度 */
+  height: calc(100% - 50px); /* 调整内容区域高度 */
 }
 
 /* ---------- 链接区域 ---------- */
@@ -959,7 +956,7 @@ body,
 
 /* ---------- 卡片标题 ---------- */
 .card-title {
-  font-size: 1.25rem;
+  font-size: 1.15rem; /* 稍微减小标题字体大小 */
   font-weight: bold;
   text-align: center;
   margin: 0;
@@ -969,7 +966,7 @@ body,
   -webkit-line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.4;
+  line-height: 1.3;
   color: var(--text-primary, #1a202c);
 }
 
