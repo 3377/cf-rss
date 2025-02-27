@@ -119,7 +119,6 @@ body {
     -webkit-overflow-scrolling: touch !important;
     position: relative !important;
     z-index: 1 !important;
-    padding: 0.5rem 0 !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
 }
