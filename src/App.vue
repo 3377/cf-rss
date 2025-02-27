@@ -121,7 +121,7 @@
             >RSS Reader</a
           >
           <span>&nbsp;</span>
-          <span>Powered by Drfy & hstz.com</span>
+          <span>Powered by Drfy & ll.sd</span>
         </div>
       </div>
     </footer>
