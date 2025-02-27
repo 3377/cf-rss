@@ -318,10 +318,26 @@ onUnmounted(() => {
 
 <style>
 .app-container {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.footer {
+  padding: 1rem;
+  text-align: center;
+  background: var(--bg-color);
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
 }
 
 /* 亮色模式样式 - 更高优先级 */
