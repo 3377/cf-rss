@@ -651,24 +651,17 @@ const calcMobileCardHeight = computed(() => {
 
 .feed-links {
   flex: 1; /* 让链接列表填充剩余空间 */
-  overflow-y: auto;
+  overflow-y: auto !important; /* 强制启用滚动 */
   padding: 0.5rem 0;
   display: flex;
   flex-direction: column;
+  scrollbar-width: none; /* Firefox隐藏滚动条 */
+  -ms-overflow-style: none; /* IE隐藏滚动条 */
 }
 
 .feed-links::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.feed-links::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
-
-.dark .feed-links::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  display: none; /* Chrome/Safari隐藏滚动条 */
+  width: 0; /* 保证完全隐藏 */
 }
 
 .feed-link-item {
@@ -676,6 +669,7 @@ const calcMobileCardHeight = computed(() => {
   margin-bottom: 6px;
   position: relative;
   border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
+  cursor: pointer;
 }
 
 .feed-link-item:last-child {
@@ -697,6 +691,7 @@ const calcMobileCardHeight = computed(() => {
   font-size: 0.95rem;
   padding: 0.5rem 0;
   position: relative;
+  z-index: 2; /* 确保链接可点击 */
 }
 
 .dark .feed-link {
@@ -824,34 +819,46 @@ const calcMobileCardHeight = computed(() => {
     grid-template-columns: 1fr;
     gap: 0.5rem;
     flex: 1;
-    min-height: calc(100% - 10px); /* 确保网格填满容器 */
+    min-height: calc(100% - 10px);
   }
 
   .feed-card {
     min-height: auto;
-    height: 100%; /* 拉伸卡片填满可用空间 */
+    height: 100%;
   }
 
   .card-content {
-    overflow-y: visible;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch; /* 为iOS设备提供平滑滚动 */
   }
 
   .feed-links {
     height: auto;
-    overflow-y: visible;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch; /* 为iOS设备提供平滑滚动 */
+  }
+
+  /* 调整移动端标题样式 */
+  .card-header {
+    padding: 0.75rem 0.75rem 0.5rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    margin-top: 0;
   }
 }
 
 /* 卡片头部样式 */
 .card-header {
-  padding: 1rem;
+  padding: 1rem 1rem 0.75rem; /* 调整上下内边距 */
   border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
   border-radius: 0.75rem 0.75rem 0 0;
   background: var(--card-header-bg, rgba(248, 250, 252, 0.8));
   position: sticky;
   top: 0;
   z-index: 10;
-  margin-bottom: 8px;
+  margin-bottom: 0; /* 减少底部边距 */
 }
 
 .dark .card-header {
@@ -872,7 +879,7 @@ const calcMobileCardHeight = computed(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.4;
-  margin-top: -5px;
+  margin-top: 0; /* 移除顶部边距 */
   color: var(--text-primary, #1a202c);
 }
 
@@ -883,22 +890,42 @@ const calcMobileCardHeight = computed(() => {
 /* 卡片内容区域样式 */
 .card-content {
   flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow-y: auto !important; /* 强制启用滚动 */
+  padding: 0.75rem 1rem;
+  scrollbar-width: none; /* Firefox隐藏滚动条 */
+  -ms-overflow-style: none; /* IE隐藏滚动条 */
   display: flex;
   flex-direction: column;
+  height: calc(100% - 70px); /* 减去标题区域高度 */
+  position: relative;
+  -webkit-overflow-scrolling: touch;
 }
 
 .card-content::-webkit-scrollbar {
-  display: none;
+  display: none; /* Chrome/Safari隐藏滚动条 */
+  width: 0; /* 保证完全隐藏 */
+}
+
+.feed-links {
+  flex: 1; /* 让链接列表填充剩余空间 */
+  overflow-y: auto !important; /* 强制启用滚动 */
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: none; /* Firefox隐藏滚动条 */
+  -ms-overflow-style: none; /* IE隐藏滚动条 */
+  position: relative;
+  height: 100%;
 }
 
 /* 项目列表样式 */
 .items-list {
   border-top: none;
-  padding-bottom: 0.75rem;
+  padding-bottom: 0;
+  flex: 1;
+  display: flex; 
+  flex-direction: column;
+  width: 100%;
 }
 
 /* 项目样式 */
@@ -1069,12 +1096,19 @@ html body .app-container:not(.dark) .tooltip-date {
 /* 移动卡片内容区域 */
 .mobile-card-content {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto !important;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   padding: 0 5px 10px 5px;
   position: relative;
   height: calc(100% - 60px);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-card-content::-webkit-scrollbar {
+  display: none;
+  width: 0;
 }
 
 /* 移动卡片容器 - 处理横向滑动 */
@@ -1155,5 +1189,13 @@ html body .app-container:not(.dark) .tooltip-date {
 .feed-links {
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/* 确保整体布局在所有设备上正确滚动 */
+html,
+body,
+#app,
+.app-container {
+  overscroll-behavior: none; /* 防止iOS橡皮筋效果 */
 }
 </style>
