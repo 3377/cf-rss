@@ -585,29 +585,34 @@ const calcMobileCardHeight = computed(() => {
   padding: 0.15rem 0.25rem;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden; /* 只在容器本身禁止溢出，允许子元素滚动 */
 }
 
 /* ---------- 网格布局 ---------- */
 .feed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  padding: 1.5rem;
-  overflow: visible;
+  grid-auto-rows: minmax(calc(100vh - 95px), auto);
+  gap: 0.6rem;
+  flex: 1;
+  overflow-y: auto !important; /* 确保网格可以滚动 */
+  padding: 0.2rem 0.2rem 0.4rem 0.2rem;
+  overflow-x: hidden;
   height: 100%;
-  align-items: stretch;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- 卡片样式 ---------- */
 .feed-card {
-  display: flex !important;
-  flex-direction: column !important;
-  height: calc(100vh - 120px) !important;
-  min-height: 400px !important;
   background: var(--card-bg);
   border-radius: 0.75rem;
-  overflow: hidden !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 90px);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  margin: 0;
 }
 
 /* 移除hover效果 */
@@ -618,25 +623,26 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 卡片头部 ---------- */
 .card-header {
-  flex-shrink: 0 !important;
-  padding: 1rem !important;
-  background: var(--card-header-bg);
-  border-bottom: 1px solid var(--card-border);
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 10 !important;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
+  background: var(--card-header-bg, rgba(248, 250, 252, 0.8));
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-radius: 0.75rem 0.75rem 0 0;
 }
 
 /* ---------- 卡片内容区域 ---------- */
 .card-content {
-  flex: 1 1 auto !important;
+  flex: 1;
   overflow-y: auto !important;
-  overflow-x: hidden !important;
-  height: 0 !important;
-  min-height: 0 !important;
-  padding: 1rem !important;
-  position: relative !important;
-  -webkit-overflow-scrolling: touch !important;
+  padding: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 0 0.75rem 0.75rem;
+  -webkit-overflow-scrolling: touch;
+  height: calc(100% - 60px); /* 减去头部高度 */
 }
 
 /* 隐藏滚动条 */
@@ -662,10 +668,12 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 项目列表 ---------- */
 .items-list {
-  padding: 0 !important;
-  margin: 0 !important;
-  list-style: none !important;
-  width: 100% !important;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  overflow-y: auto; /* 改为 auto 允许滚动 */
+  height: 100%; /* 添加高度确保可以滚动 */
+  flex: 1; /* 允许列表占用剩余空间 */
 }
 
 /* ---------- 链接项样式 ---------- */
@@ -688,15 +696,17 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 链接样式 ---------- */
 .feed-link {
-  display: block !important;
-  padding: 0.5rem !important;
-  color: var(--text-color);
-  text-decoration: none !important;
-  transition: background-color 0.2s ease !important;
+  display: block;
+  padding: 0.75rem 0; /* 修改内边距 */
+  color: var(--text-color, #2c3e50);
+  text-decoration: none;
+  position: relative;
+  transition: all 0.2s ease;
 }
 
 .item-link:hover {
-  background-color: var(--hover-bg);
+  color: var(--el-color-primary);
+  background: transparent; /* 移除hover背景色 */
 }
 
 /* ---------- 移动设备适配 ---------- */
@@ -959,37 +969,44 @@ body,
   white-space: nowrap;
   transition: all 0.3s ease;
   position: relative;
-  width: 100%;
+  width: calc(100% - 120px); /* 为日期留出空间 */
   max-width: 100%;
   font-weight: normal;
   margin-bottom: 2px;
+  padding-right: 1rem; /* 为日期留出空间 */
 }
 
 /* ---------- 项目日期 ---------- */
 .item-date {
   position: absolute;
-  right: 1rem;
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  opacity: 1;
+  opacity: 0.8;
   transition: all 0.3s ease;
   white-space: nowrap;
 }
 
+.item-link:hover .item-date {
+  opacity: 1;
+}
+
 /* ---------- 项目链接样式 ---------- */
 .item-link {
-  display: block !important;
-  padding: 0.5rem !important;
-  color: var(--text-color);
-  text-decoration: none !important;
-  transition: background-color 0.2s ease !important;
+  display: block;
+  padding: 0.75rem 0; /* 修改内边距 */
+  color: var(--text-color, #2c3e50);
+  text-decoration: none;
+  position: relative;
+  transition: all 0.2s ease;
 }
 
 .item-link:hover {
-  background-color: var(--hover-bg);
+  color: var(--el-color-primary);
+  background: transparent; /* 移除hover背景色 */
 }
 
 /* ---------- 链接访问状态 ---------- */
@@ -1054,12 +1071,14 @@ html body .app-container:not(.dark) .tooltip-date {
 
 /* ---------- 卡片内的项目 ---------- */
 .feed-item {
-  border-bottom: 1px solid var(--card-border);
-  margin: 0 !important;
-  padding: 0.5rem 0 !important;
+  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding: 0 1rem; /* 添加左右内边距 */
 }
 
 .feed-item:last-child {
-  border-bottom: none !important;
+  border-bottom: none;
+  margin-bottom: 1rem; /* 增加底部间距 */
 }
 </style>
