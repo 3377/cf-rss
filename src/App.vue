@@ -383,8 +383,9 @@ html body .app-container.bg-gray-50 .content-area {
 
 /* 确保卡片内容区域有底部圆角和滚动功能 */
 .card-content {
-  border-radius: 0 0 0.75rem 0.75rem !important;
-  overflow-y: auto !important;
+  height: calc(100vh - 200px); /* 减去头部和其他固定元素的高度 */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* 为 iOS 设备添加平滑滚动 */
 }
 
 /* 确保亮色模式下卡片内容可以滚动 */
@@ -412,7 +413,7 @@ html body .app-container.dark .mobile-card-content {
 
 /* 确保卡片标题区域有顶部圆角 */
 .card-header {
-  border-radius: 0.75rem 0.75rem 0 0 !important;
+  flex-shrink: 0;
 }
 
 /* 移动优化 */
@@ -552,7 +553,7 @@ button {
   border-bottom: 1px solid var(--card-border, rgba(160, 190, 230, 0.9)) !important;
 }
 
-.app-container:not(.dark) .card-content {
+.app-container:not(.dark) .card-body {
   background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
   overflow-y: auto !important;
 }
@@ -900,5 +901,26 @@ body,
 #app,
 .app-container {
   overflow: hidden;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card-header {
+  flex-shrink: 0;
+  border-radius: 0.75rem 0.75rem 0 0 !important;
+}
+
+.card-content {
+  flex: 1;
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0 0 0.75rem 0.75rem !important;
+  background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
 }
 </style>
