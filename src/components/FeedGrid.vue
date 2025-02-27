@@ -1,5 +1,5 @@
 <template>
-  <div class="feed-container">
+  <div class="feed-container" :class="{ loaded: isLoaded }">
     <div
       v-if="!feeds || feeds.length === 0"
       class="flex items-center justify-center h-full"
@@ -188,6 +188,9 @@ let startX = 0;
 let startY = 0;
 let resizeObserver = null;
 
+// 添加加载状态
+const isLoaded = ref(false);
+
 // 移动端导航方法
 const nextCard = () => {
   if (currentCardIndex.value < props.feeds.length - 1) {
@@ -279,6 +282,17 @@ const initSwipe = () => {
 
 // 组件挂载时只进行设备检查
 onMounted(() => {
+  // 确保 DOM 和样式都已加载
+  document.documentElement.style.setProperty(
+    "--el-bg-color",
+    getComputedStyle(document.documentElement).getPropertyValue("--el-bg-color")
+  );
+
+  // 延迟设置加载完成状态
+  setTimeout(() => {
+    isLoaded.value = true;
+  }, 100);
+
   checkMobile();
   window.addEventListener("resize", checkMobile);
 
@@ -579,22 +593,9 @@ const calcMobileCardHeight = computed(() => {
 </script>
 
 <style>
-/* ---------- 隐藏滚动条 ---------- */
-.card-content::-webkit-scrollbar,
-.feed-links::-webkit-scrollbar,
-.mobile-card-content::-webkit-scrollbar,
-.items-list::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-}
-
-.card-content,
-.feed-links,
-.mobile-card-content,
-.items-list {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-  -webkit-overflow-scrolling: touch !important;
+/* ---------- 初始化样式 ---------- */
+:root {
+  --feed-transition-duration: 0.3s;
 }
 
 /* ---------- 主容器样式 ---------- */
@@ -606,6 +607,18 @@ const calcMobileCardHeight = computed(() => {
   overflow: hidden;
   margin-top: -1rem;
   margin-bottom: 1rem;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+  will-change: opacity;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ---------- 网格布局 ---------- */
@@ -619,11 +632,9 @@ const calcMobileCardHeight = computed(() => {
   padding: 0.2rem 0.2rem 2rem 0.2rem;
   height: calc(100% - 30px);
   -webkit-overflow-scrolling: touch;
-}
-
-.feed-grid::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out 0.1s forwards;
+  will-change: opacity, transform;
 }
 
 /* ---------- 卡片样式 ---------- */
@@ -636,9 +647,23 @@ const calcMobileCardHeight = computed(() => {
   height: calc(100vh - 200px);
   max-height: calc(100vh - 200px);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all var(--feed-transition-duration) ease;
   margin: 0;
   border: 1px solid var(--el-border-color-lighter);
+  opacity: 0;
+  animation: cardFadeIn 0.3s ease-out 0.2s forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ---------- 卡片头部 ---------- */
@@ -911,6 +936,7 @@ body,
   width: 100%;
   overflow: hidden;
   overscroll-behavior: none;
+  background: var(--el-bg-color);
 }
 
 /* 确保全局所有卡片组件都有圆角 */
@@ -1135,5 +1161,24 @@ html body .app-container .feed-grid {
 .feed-links {
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/* 预加载状态 */
+.feed-container::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--el-bg-color);
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+  pointer-events: none;
+}
+
+.feed-container.loaded::before {
+  opacity: 0;
 }
 </style>
