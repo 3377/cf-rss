@@ -605,6 +605,7 @@ const calcMobileCardHeight = computed(() => {
   flex-direction: column;
   overflow: hidden;
   margin-top: -1rem;
+  margin-bottom: 1rem;
 }
 
 /* ---------- 网格布局 ---------- */
@@ -614,9 +615,9 @@ const calcMobileCardHeight = computed(() => {
   grid-auto-rows: minmax(min-content, auto);
   gap: 0.6rem;
   flex: 1;
-  overflow-y: auto !important;
-  padding: 0.2rem 0.2rem 1.5rem 0.2rem;
-  height: 100%;
+  overflow-y: auto;
+  padding: 0.2rem 0.2rem 2rem 0.2rem;
+  height: calc(100% - 30px);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -632,7 +633,8 @@ const calcMobileCardHeight = computed(() => {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px);
+  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
   overflow: hidden;
   transition: all 0.3s ease;
   margin: 0;
@@ -656,14 +658,14 @@ const calcMobileCardHeight = computed(() => {
 /* ---------- 卡片内容区域 ---------- */
 .card-content {
   flex: 1;
-  overflow-y: auto !important;
+  overflow-y: scroll;
   padding: 0.3rem 0 0 0;
   position: relative;
   display: flex;
   flex-direction: column;
   border-radius: 0 0 1rem 1rem;
   -webkit-overflow-scrolling: touch;
-  height: calc(100% - 50px);
+  height: calc(100% - 60px);
   background: var(--el-bg-color);
 }
 
@@ -678,7 +680,7 @@ const calcMobileCardHeight = computed(() => {
   padding: 0;
   margin: 0;
   list-style-type: none;
-  overflow-y: auto !important;
+  overflow-y: scroll;
   height: 100%;
   flex: 1;
   -webkit-overflow-scrolling: touch;
@@ -720,18 +722,19 @@ const calcMobileCardHeight = computed(() => {
   }
 
   .feed-container {
-    height: calc(100vh - 50px);
+    height: calc(100vh - 70px);
     padding: 0.5rem;
+    margin-bottom: 0;
   }
 
   .feed-grid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
+    padding-bottom: 1rem;
   }
 
   .feed-card {
     height: auto;
     min-height: 350px;
+    max-height: none;
   }
 
   .card-header {
@@ -1107,31 +1110,30 @@ html body .app-container:not(.dark) .tooltip-date {
   margin-bottom: 2rem;
 }
 
-/* 移除特定于亮色模式的滚动限制 */
-html body .app-container:not(.dark) .card-content,
-html body .app-container:not(.dark) .mobile-card-content,
-html body .app-container:not(.dark) .items-list {
-  overflow-y: auto !important;
+/* 移除所有特定于亮色模式的样式覆盖 */
+html body .app-container .card-content,
+html body .app-container .mobile-card-content,
+html body .app-container .items-list,
+html body .app-container .feed-grid {
+  overflow-y: scroll !important;
   -webkit-overflow-scrolling: touch !important;
-}
-
-/* 确保所有滚动容器都可以正常滚动 */
-.card-content,
-.mobile-card-content,
-.items-list,
-.feed-grid {
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 }
 
 /* 统一滚动条隐藏 */
 .card-content::-webkit-scrollbar,
 .mobile-card-content::-webkit-scrollbar,
 .items-list::-webkit-scrollbar,
-.feed-grid::-webkit-scrollbar {
+.feed-grid::-webkit-scrollbar,
+.feed-links::-webkit-scrollbar {
   display: none;
-  width: 0;
+}
+
+.card-content,
+.mobile-card-content,
+.items-list,
+.feed-grid,
+.feed-links {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 </style>
