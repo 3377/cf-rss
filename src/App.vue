@@ -132,7 +132,6 @@
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
 import { getRSSConfig, RSS_CONFIG } from "./config/rss.config";
-import "@/assets/styles.css";
 
 const feeds = ref([]);
 const loading = ref(true);
@@ -884,7 +883,11 @@ html body .app-container.dark .mobile-card-content {
 
 /* 全局确保网格区域可以滚动 */
 .feed-grid {
-  overflow-y: auto !important;
+  display: grid;
+  gap: var(--card-gap, 24px);
+  padding: var(--layout-padding, 2%) var(--layout-side-margin, 2%);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+  align-items: start;
 }
 
 /* 全局滚动设置 */
@@ -907,34 +910,38 @@ body,
 .card {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  max-height: 90vh; /* 设置最大高度为视口高度的90% */
+  background: var(--card-bg, #ffffff);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   overflow: hidden;
-  position: relative;
+  height: calc(
+    100vh - var(--header-height, 60px) - var(--layout-padding, 2%) * 2
+  );
+  max-height: 800px;
 }
 
 .card-header {
-  flex-shrink: 0;
-  border-radius: 0.75rem 0.75rem 0 0 !important;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: inherit;
+  flex: 0 0 auto;
+  padding: 1rem;
+  background: var(--card-header-bg, #f8fafc);
+  border-bottom: 1px solid var(--card-border-color, #e2e8f0);
+  border-radius: 0.75rem 0.75rem 0 0;
 }
 
 .card-content {
   flex: 1 1 auto;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 1rem;
-  border-radius: 0 0 0.75rem 0.75rem !important;
-  background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
-  min-height: 0; /* 确保内容可以滚动 */
+  background: var(--card-content-bg, rgba(200, 225, 245, 1));
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+  max-height: calc(100% - var(--header-height, 60px));
 }
 
-/* 确保滚动条样式在所有浏览器中一致 */
+/* 自定义滚动条样式 */
 .card-content::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .card-content::-webkit-scrollbar-track {
@@ -943,66 +950,30 @@ body,
 
 .card-content::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
-/* 暗色模式下的滚动条 */
 .dark .card-content::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-.card-container {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  height: 100%;
-  min-height: 0;
-  max-height: calc(100vh - 80px);
-  overflow: hidden;
-  border-radius: 0.75rem;
-  background: var(--card-bg, #ffffff);
-}
-
-.card-header {
-  flex: 0 0 auto;
-  padding: 1rem;
-  border-radius: 0.75rem 0.75rem 0 0;
-  background: inherit;
-  z-index: 2;
-}
-
-.card-content {
-  flex: 1 1 auto;
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  padding: 1rem;
-  margin: 0;
-  height: 100%;
-  min-height: 0;
-  -webkit-overflow-scrolling: touch;
-  background: var(--card-content-bg, rgba(200, 225, 245, 1));
-  border-radius: 0 0 0.75rem 0.75rem;
-}
-
-/* 确保内容列表正确显示 */
-.feed-list {
+/* 确保链接列表正确显示 */
+.link-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.feed-item {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+.link-list li {
+  margin-bottom: 0.75rem;
 }
 
-/* 响应式布局调整 */
-@media (min-width: 1024px) {
-  .card-container {
-    max-height: calc(100vh - 100px);
-  }
-  
-  .card-content {
-    max-height: none;
-  }
+.link-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* 暗色模式下的滚动条 */
+.dark .card-content::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 </style>
