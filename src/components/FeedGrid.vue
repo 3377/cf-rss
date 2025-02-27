@@ -631,25 +631,29 @@ const calcMobileCardHeight = computed(() => {
 /* ---------- 卡片样式 ---------- */
 .feed-card {
   background: var(--el-bg-color);
-  border-radius: 0.85rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   height: calc(100vh - 180px);
   overflow: hidden;
-  transition: box-shadow 0.3s ease;
+  transition: all 0.3s ease;
   margin: 0;
+  border: 1px solid var(--el-border-color-lighter);
 }
 
 /* ---------- 卡片头部 ---------- */
 .card-header {
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
+  padding: 0.75rem;
   background: var(--el-bg-color);
   position: sticky;
   top: 0;
   z-index: 10;
-  border-radius: 0.85rem 0.85rem 0 0;
+  border-radius: 1rem 1rem 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.5rem;
 }
 
 /* ---------- 卡片内容区域 ---------- */
@@ -805,23 +809,29 @@ const calcMobileCardHeight = computed(() => {
     padding: 12px 15px;
     box-sizing: border-box;
     background: var(--el-bg-color);
-    border-radius: 0.85rem !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 1.2rem !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     overflow: hidden;
+    border: 1px solid var(--el-border-color-lighter);
   }
 
   .mobile-card .card-header {
     margin: -12px -15px 0;
     padding: 0.75rem;
-    border-radius: 0.85rem 0.85rem 0 0 !important;
+    border-radius: 1.2rem 1.2rem 0 0 !important;
     background: var(--el-bg-color);
-    border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
+    border-bottom: none;
+    min-height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .mobile-card-content {
     margin: 0 -15px;
     padding: 0.5rem 15px;
-    border-radius: 0 0 0.85rem 0.85rem !important;
+    border-radius: 0 0 1.2rem 1.2rem !important;
+    background: var(--el-bg-color);
   }
 
   /* 在亮色模式下确保滚动 */
@@ -862,9 +872,10 @@ const calcMobileCardHeight = computed(() => {
   padding: 12px 15px;
   box-sizing: border-box;
   background: var(--el-bg-color);
-  border-radius: 0.85rem !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 1.2rem !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  border: 1px solid var(--el-border-color-lighter);
 }
 
 .dark .mobile-card {
@@ -875,9 +886,13 @@ const calcMobileCardHeight = computed(() => {
 .mobile-card .card-header {
   margin: -12px -15px 0;
   padding: 0.75rem;
-  border-radius: 0.85rem 0.85rem 0 0 !important;
+  border-radius: 1.2rem 1.2rem 0 0 !important;
   background: var(--el-bg-color);
-  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
+  border-bottom: none;
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ---------- 错误和空数据提示 ---------- */
@@ -907,14 +922,14 @@ body,
 .mobile-card-content,
 .feed-card,
 .mobile-card {
-  border-radius: 0.85rem !important;
+  border-radius: 1rem !important;
 }
 
 /* 明确设置卡片头部和内容区域的圆角 */
 .card-header,
 .mobile-card .card-header {
-  border-top-left-radius: 0.85rem !important;
-  border-top-right-radius: 0.85rem !important;
+  border-top-left-radius: 1rem !important;
+  border-top-right-radius: 1rem !important;
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
 }
@@ -923,8 +938,8 @@ body,
 .mobile-card-content {
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
-  border-bottom-left-radius: 0.85rem !important;
-  border-bottom-right-radius: 0.85rem !important;
+  border-bottom-left-radius: 1rem !important;
+  border-bottom-right-radius: 1rem !important;
 }
 
 /* ---------- 滑动指示器 ---------- */
@@ -958,8 +973,8 @@ body,
 
 /* ---------- 卡片标题 ---------- */
 .card-title {
-  font-size: 1.15rem; /* 稍微减小标题字体大小 */
-  font-weight: bold;
+  font-size: 1.15rem;
+  font-weight: 600;
   text-align: center;
   margin: 0;
   padding: 0;
@@ -968,8 +983,8 @@ body,
   -webkit-line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.3;
-  color: var(--text-primary, #1a202c);
+  line-height: 1.4;
+  color: var(--el-text-color-primary);
 }
 
 .dark .card-title {
@@ -983,17 +998,18 @@ body,
   white-space: nowrap;
   transition: all 0.3s ease;
   position: relative;
-  width: 100%; /* 让标题占据整个宽度 */
+  width: 100%;
   max-width: 100%;
   font-weight: normal;
   margin-bottom: 2px;
-  padding-right: 0; /* 移除右侧内边距 */
+  padding-right: 0;
+  color: var(--el-text-color-primary);
 }
 
 /* ---------- 项目日期 ---------- */
 .item-date {
   position: absolute;
-  right: 0.25rem; /* 调整日期位置，靠近右边框 */
+  right: 0.25rem;
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.75rem;
@@ -1001,7 +1017,8 @@ body,
   opacity: 0.8;
   transition: all 0.3s ease;
   white-space: nowrap;
-  background: var(--card-bg); /* 添加背景色，防止文字重叠 */
+  color: var(--el-text-color-secondary);
+  background: var(--el-bg-color);
 }
 
 .item-link:hover .item-date {
@@ -1011,17 +1028,17 @@ body,
 /* ---------- 项目链接样式 ---------- */
 .item-link {
   display: block;
-  padding: 0.5rem 0.25rem; /* 调整内边距 */
-  color: var(--text-color, #2c3e50);
+  padding: 0.5rem 0.25rem;
+  color: var(--el-text-color-primary);
   text-decoration: none;
   position: relative;
   transition: all 0.2s ease;
-  width: 100%; /* 确保链接占据整个宽度 */
+  width: 100%;
 }
 
 .item-link:hover {
   color: var(--el-color-primary);
-  background: transparent; /* 移除hover背景色 */
+  background: transparent;
 }
 
 /* ---------- 链接访问状态 ---------- */
@@ -1085,15 +1102,15 @@ html body .app-container:not(.dark) .tooltip-date {
 
 /* ---------- 卡片内的项目 ---------- */
 .feed-item {
-  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
+  border-bottom: 1px solid var(--el-border-color-lighter);
   margin-bottom: 0.5rem;
   position: relative;
-  padding: 0 0.25rem 0 0.25rem;
+  padding: 0 0.25rem;
   width: 100%;
 }
 
 .feed-item:last-child {
   border-bottom: none;
-  margin-bottom: 2rem; /* 增加最后一个项目的底部间距 */
+  margin-bottom: 2rem;
 }
 </style>
