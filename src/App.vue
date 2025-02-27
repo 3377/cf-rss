@@ -884,11 +884,10 @@ html body .app-container.dark .mobile-card-content {
 /* 全局确保网格区域可以滚动 */
 .feed-grid {
   display: grid;
-  gap: var(--card-gap, 24px);
-  padding: var(--layout-padding, 2%) var(--layout-side-margin, 2%);
+  gap: 24px;
+  padding: 2%;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
   align-items: start;
-  height: 100%;
 }
 
 /* 全局滚动设置 */
@@ -913,55 +912,44 @@ body,
   flex-direction: column;
   background: var(--card-bg, #ffffff);
   border-radius: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-  height: 100%; /* 改为100%高度 */
-  min-height: 500px; /* 设置最小高度 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  height: 600px; /* 固定卡片高度 */
 }
 
 .card-header {
-  flex: 0 0 auto;
   padding: 1rem;
   background: var(--card-header-bg, #f8fafc);
   border-bottom: 1px solid var(--card-border-color, #e2e8f0);
-  border-radius: 0.75rem 0.75rem 0 0;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  flex-shrink: 0; /* 防止头部被压缩 */
 }
 
 .card-content {
-  flex: 1 1 auto;
-  overflow-y: auto !important;
+  flex: 1;
+  overflow-y: auto !important; /* 强制显示滚动条 */
   padding: 1rem;
-  background: var(--card-content-bg, rgba(200, 225, 245, 1));
-  -webkit-overflow-scrolling: touch;
-  position: relative;
-  height: auto; /* 让高度自动计算 */
+  height: calc(100% - 60px); /* 减去头部高度 */
 }
 
 /* 自定义滚动条样式 */
 .card-content::-webkit-scrollbar {
-  width: 6px !important;
-  display: block !important;
+  width: 6px;
+  height: 6px;
 }
 
 .card-content::-webkit-scrollbar-track {
-  background: transparent !important;
+  background: transparent;
 }
 
 .card-content::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2) !important;
-  border-radius: 3px !important;
-  display: block !important;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
 }
 
 .dark .card-content::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* 确保链接列表正确显示 */
+/* 确保内容区域的链接列表样式正确 */
 .link-list {
   list-style: none;
   padding: 0;
