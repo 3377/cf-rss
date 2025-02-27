@@ -125,7 +125,6 @@
                     </div>
                   </a>
                 </div>
-                <div v-if="feed.items.length > 0" class="h-2"></div>
               </template>
             </div>
           </div>
