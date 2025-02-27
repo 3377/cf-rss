@@ -582,12 +582,10 @@ const calcMobileCardHeight = computed(() => {
 /* 卡片容器样式 */
 .feed-container {
   flex: 1;
-  overflow: auto;
-  padding: 1rem;
-  padding-bottom: 4rem; /* 为底部版权留出空间 */
   display: flex;
   flex-direction: column;
   width: 100%;
+  overflow: auto;
 }
 
 /* 卡片网格布局 */
@@ -595,6 +593,7 @@ const calcMobileCardHeight = computed(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
+  padding: 1rem;
   flex: 1;
 }
 
@@ -1072,6 +1071,7 @@ html body .app-container:not(.dark) .tooltip-date {
   .feed-grid {
     grid-template-columns: 1fr;
     gap: 0.5rem;
+    padding: 0.5rem;
   }
 
   .feed-card {

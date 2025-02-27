@@ -321,23 +321,28 @@ onUnmounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  padding-bottom: 30px; /* 为底部版权信息留出空间 */
 }
 
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .footer {
-  padding: 1rem;
+  height: 30px;
   text-align: center;
   background: var(--bg-color);
-  position: fixed;
+  position: absolute;
   bottom: 0;
-  width: 100%;
-  z-index: 10;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
 }
 
 /* 亮色模式样式 - 更高优先级 */
