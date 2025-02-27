@@ -125,6 +125,7 @@
                     </div>
                   </a>
                 </div>
+                <div v-if="feed.items.length > 0" class="h-2"></div>
               </template>
             </div>
           </div>
@@ -584,34 +585,29 @@ const calcMobileCardHeight = computed(() => {
   padding: 0.15rem 0.25rem;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* 只在容器本身禁止溢出，允许子元素滚动 */
+  overflow: hidden;
 }
 
 /* ---------- 网格布局 ---------- */
 .feed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-auto-rows: minmax(calc(100vh - 95px), auto);
-  gap: 0.6rem;
-  flex: 1;
-  overflow-y: auto !important; /* 确保网格可以滚动 */
-  padding: 0.2rem 0.2rem 0.4rem 0.2rem;
-  overflow-x: hidden;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  overflow: visible;
   height: 100%;
-  -webkit-overflow-scrolling: touch;
+  align-items: stretch;
 }
 
 /* ---------- 卡片样式 ---------- */
 .feed-card {
+  display: flex !important;
+  flex-direction: column !important;
+  height: calc(100vh - 120px) !important;
+  min-height: 400px !important;
   background: var(--card-bg);
   border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 90px);
-  overflow: hidden;
-  transition: box-shadow 0.3s ease;
-  margin: 0;
+  overflow: hidden !important;
 }
 
 /* 移除hover效果 */
@@ -622,25 +618,25 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 卡片头部 ---------- */
 .card-header {
-  padding: 0.6rem 0.75rem;
-  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
-  background: var(--card-header-bg, rgba(248, 250, 252, 0.8));
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  border-radius: 0.75rem 0.75rem 0 0;
+  flex-shrink: 0 !important;
+  padding: 1rem !important;
+  background: var(--card-header-bg);
+  border-bottom: 1px solid var(--card-border);
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
 }
 
 /* ---------- 卡片内容区域 ---------- */
 .card-content {
-  flex: 1;
+  flex: 1 1 auto !important;
   overflow-y: auto !important;
-  padding: 0;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  border-radius: 0 0 0.75rem 0.75rem;
-  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 1rem !important;
+  position: relative !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 /* 隐藏滚动条 */
@@ -666,10 +662,10 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 项目列表 ---------- */
 .items-list {
-  padding: 0;
-  margin: 0;
-  list-style-type: none;
-  overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+  list-style: none !important;
+  width: 100% !important;
 }
 
 /* ---------- 链接项样式 ---------- */
@@ -692,16 +688,15 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 链接样式 ---------- */
 .feed-link {
-  display: block;
-  padding: 0.5rem 0;
-  color: var(--text-primary, #2d3748);
-  text-decoration: none;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: 0.95rem;
-  position: relative;
-  z-index: 2;
+  display: block !important;
+  padding: 0.5rem !important;
+  color: var(--text-color);
+  text-decoration: none !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.item-link:hover {
+  background-color: var(--hover-bg);
 }
 
 /* ---------- 移动设备适配 ---------- */
@@ -986,18 +981,15 @@ body,
 
 /* ---------- 项目链接样式 ---------- */
 .item-link {
-  display: block;
-  padding: 0.75rem 1rem;
-  color: var(--text-color, #2c3e50);
-  text-decoration: none;
-  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
-  word-break: break-word;
-  z-index: 2;
-  position: relative;
+  display: block !important;
+  padding: 0.5rem !important;
+  color: var(--text-color);
+  text-decoration: none !important;
+  transition: background-color 0.2s ease !important;
 }
 
 .item-link:hover {
-  color: var(--el-color-primary);
+  background-color: var(--hover-bg);
 }
 
 /* ---------- 链接访问状态 ---------- */
@@ -1062,12 +1054,12 @@ html body .app-container:not(.dark) .tooltip-date {
 
 /* ---------- 卡片内的项目 ---------- */
 .feed-item {
-  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.6));
-  margin-bottom: 0.5rem;
-  position: relative;
+  border-bottom: 1px solid var(--card-border);
+  margin: 0 !important;
+  padding: 0.5rem 0 !important;
 }
 
 .feed-item:last-child {
-  border-bottom: none;
+  border-bottom: none !important;
 }
 </style>

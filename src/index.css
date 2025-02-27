@@ -67,134 +67,78 @@ body {
     background-color: rgba(240, 245, 252, 0.6) !important;
 }
 
-/* 桌面端卡片基础样式 */
-.feed-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
-    padding: 1rem;
-    height: calc(100vh - 60px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.feed-card {
+/* 亮色模式下的卡片样式 */
+.app-container:not(.dark) .feed-card {
+    background-color: rgba(200, 225, 245, 1) !important;
+    border: 1px solid rgba(160, 190, 230, 0.9) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05), 0 3px 6px rgba(0, 0, 0, 0.03) !important;
+    border-radius: 0.75rem !important;
+    overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
-    background: var(--card-bg);
-    border-radius: 0.75rem !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden !important;
-    height: calc(100vh - 90px) !important;
-    position: relative;
+    height: calc(100vh - 120px) !important;
+    min-height: 400px !important;
 }
 
-.card-header {
-    padding: 1rem;
-    background: var(--card-header-bg);
-    border-bottom: 1px solid var(--card-border);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    flex-shrink: 0;
+/* 亮色模式下的卡片头部样式 */
+.app-container:not(.dark) .card-header {
+    background-color: rgba(180, 210, 240, 1) !important;
+    border-bottom: 1px solid rgba(160, 190, 230, 0.9) !important;
+    flex-shrink: 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    padding: 1rem !important;
 }
 
-.card-content {
-    flex: 1;
+/* 亮色模式下的卡片内容区域样式 */
+.app-container:not(.dark) .card-content {
+    background-color: rgba(200, 225, 245, 1) !important;
+    flex: 1 1 auto !important;
     overflow-y: auto !important;
-    overflow-x: hidden;
-    height: calc(100% - 60px) !important;
-    padding: 0.5rem;
-    -webkit-overflow-scrolling: touch;
-    position: relative;
+    overflow-x: hidden !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    padding: 1rem !important;
+    margin: 0 !important;
+    position: relative !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 
+.card-content::-webkit-scrollbar {
+    display: none;
+}
+
+/* 确保内容填充卡片但不溢出 */
 .items-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.feed-item {
-    border-bottom: 1px solid var(--card-border);
-    padding: 0.5rem 0;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+    width: 100% !important;
 }
 
 .feed-item:last-child {
-    border-bottom: none;
+    border-bottom: none !important;
 }
 
-.item-link {
-    display: block;
-    padding: 0.5rem;
-    color: var(--text-primary);
-    text-decoration: none;
-    border-radius: 0.375rem;
-    transition: background-color 0.2s;
+/* 亮色模式下的卡片项目样式 */
+.app-container:not(.dark) .feed-item {
+    border-bottom: 1px solid rgba(160, 190, 230, 0.8) !important;
+    margin: 0 !important;
+    padding: 0.5rem 0 !important;
 }
 
-.item-link:hover {
-    background-color: var(--hover-bg);
+/* 亮色模式下的链接悬停效果 */
+.app-container:not(.dark) .item-link {
+    display: block !important;
+    padding: 0.5rem !important;
+    color: #2c4270 !important;
+    text-decoration: none !important;
+    transition: background-color 0.2s ease !important;
 }
 
-.item-title {
-    font-size: 0.95rem;
-    line-height: 1.4;
-    margin-bottom: 0.25rem;
-}
-
-.item-date {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-/* 亮色模式特定样式 */
-.app-container:not(.dark) .feed-card {
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    border: 1px solid rgba(160, 190, 230, 0.9) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
-}
-
-.app-container:not(.dark) .card-header {
-    background-color: rgba(248, 250, 252, 0.95) !important;
-    border-bottom: 1px solid rgba(160, 190, 230, 0.9) !important;
-}
-
-.app-container:not(.dark) .card-content {
-    background-color: rgba(255, 255, 255, 0.95) !important;
-}
-
-/* 暗色模式特定样式 */
-.app-container.dark .feed-card {
-    background-color: rgba(30, 41, 59, 0.95) !important;
-    border: 1px solid rgba(51, 65, 85, 0.9) !important;
-}
-
-.app-container.dark .card-header {
-    background-color: rgba(30, 41, 59, 0.98) !important;
-    border-bottom: 1px solid rgba(51, 65, 85, 0.9) !important;
-}
-
-.app-container.dark .card-content {
-    background-color: rgba(30, 41, 59, 0.95) !important;
-}
-
-/* 滚动条样式 */
-.card-content::-webkit-scrollbar {
-    width: 4px;
-}
-
-.card-content::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.card-content::-webkit-scrollbar-thumb {
-    background-color: rgba(156, 163, 175, 0.3);
-    border-radius: 4px;
-}
-
-.dark .card-content::-webkit-scrollbar-thumb {
-    background-color: rgba(156, 163, 175, 0.2);
+.app-container:not(.dark) .item-link:hover {
+    background-color: rgba(180, 210, 240, 0.5) !important;
 }
 
 /* 亮色模式下的卡片标题样式 */
@@ -225,19 +169,117 @@ body {
     border: 1px solid rgba(160, 190, 230, 0.9) !important;
 }
 
-/* 移动端适配 */
+/* 保留原有的暗色模式样式 */
+.dark .feed-card {
+    background: rgba(31, 41, 55, 0.9) !important;
+    border-color: rgba(55, 65, 81, 0.5) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .card-header {
+    border-color: #374151 !important;
+    background-color: rgba(31, 41, 55, 0.7) !important;
+}
+
+.dark .card-title {
+    color: #f3f4f6 !important;
+}
+
+.dark .card-content {
+    background-color: rgba(31, 41, 55, 1) !important;
+}
+
+.dark .items-list {
+    border-color: #374151 !important;
+}
+
+.dark .feed-item {
+    border-color: #374151 !important;
+}
+
+.dark .item-link:hover {
+    background: rgba(55, 65, 81, 0.7) !important;
+}
+
+.dark .item-title {
+    color: #f3f4f6 !important;
+}
+
+.dark .item-link:hover .item-title {
+    color: #3b82f6 !important;
+}
+
+.dark .item-date {
+    background: #1f2937 !important;
+    color: #9ca3af !important;
+}
+
+.dark .item-link:hover .item-date {
+    background: rgba(55, 65, 81, 0.9) !important;
+}
+
+.dark .empty-message {
+    color: #9ca3af !important;
+}
+
+.dark .title-tooltip {
+    background: rgba(31, 41, 55, 0.95) !important;
+    color: #f3f4f6 !important;
+    border-color: rgba(55, 65, 81, 0.8) !important;
+}
+
+/* 添加全局页面滚动箭头样式 */
+::-webkit-scrollbar-button:single-button {
+    background-color: rgba(200, 225, 245, 0.8);
+    border-radius: 10px;
+    border: 1px solid rgba(160, 190, 230, 0.7);
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+}
+
+.dark ::-webkit-scrollbar-button:single-button {
+    background-color: rgba(55, 65, 81, 0.8);
+    border: 1px solid rgba(75, 85, 101, 0.7);
+}
+
+::-webkit-scrollbar-button:single-button:hover {
+    background-color: rgba(180, 210, 240, 1);
+    border: 1px solid rgba(150, 180, 220, 0.8);
+}
+
+.dark ::-webkit-scrollbar-button:single-button:hover {
+    background-color: rgba(75, 85, 101, 0.9);
+    border: 1px solid rgba(95, 105, 121, 0.8);
+}
+
+/* 整体页面滚动箭头 */
+::-webkit-scrollbar-button {
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+}
+
+::-webkit-scrollbar-button:vertical:start:decrement,
+::-webkit-scrollbar-button:vertical:end:increment,
+::-webkit-scrollbar-button:horizontal:start:decrement,
+::-webkit-scrollbar-button:horizontal:end:increment {
+    border-radius: 12px;
+    background-size: 10px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* 移动设备优化 */
 @media (max-width: 768px) {
     .feed-grid {
+        grid-template-columns: 1fr !important;
         padding: 0.5rem;
-        gap: 0.5rem;
+        overflow-y: auto;
     }
 
     .feed-card {
         height: auto !important;
-    }
-
-    .card-content {
-        height: auto !important;
+        min-height: 300px !important;
     }
 
     .card-title {
@@ -281,4 +323,15 @@ body {
 /* 亮色模式下的提示框日期样式 */
 .app-container:not(.dark) .tooltip-date {
     color: #2563eb !important;
+}
+
+/* 修复feed-grid的滚动问题 */
+.feed-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    gap: 1.5rem !important;
+    padding: 1.5rem !important;
+    overflow: visible !important;
+    align-items: stretch !important;
+    height: auto !important;
 }
