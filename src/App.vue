@@ -376,7 +376,7 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 
 .content-area {
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
   display: flex;
   flex-direction: column;
   margin-top: 0;
@@ -647,6 +647,8 @@ button {
 
 /* 确保内容区域滚动时不显示滚动条 */
 .content-area::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
   display: none;
 }
 
@@ -661,9 +663,10 @@ button {
   overflow: hidden !important;
 }
 
-/* 确保卡片内容区域有底部圆角 */
+/* 确保卡片内容区域有底部圆角和滚动功能 */
 .card-content {
   border-radius: 0 0 0.75rem 0.75rem !important;
+  overflow-y: auto !important;
 }
 
 /* 移动优化 */
