@@ -901,19 +901,4 @@ body,
 .app-container {
   overflow: hidden;
 }
-
-/* 全局滚动设置 */
-html body .content-area,
-html body .feed-grid,
-html body .card-content,
-html body .items-list {
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-}
-
-/* 确保卡片内容区域可以滚动 */
-.card-content {
-  overflow-y: auto !important;
-  max-height: 350px !important;
-}
 </style>

@@ -592,13 +592,13 @@ const calcMobileCardHeight = computed(() => {
 .feed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-auto-rows: minmax(400px, auto);
+  grid-auto-rows: minmax(calc(100vh - 95px), auto);
   gap: 0.6rem;
   flex: 1;
   overflow-y: auto !important; /* 确保网格可以滚动 */
   padding: 0.2rem 0.2rem 0.4rem 0.2rem;
   overflow-x: hidden;
-  height: calc(100vh - 75px) !important; /* 强制设置高度 */
+  height: 100%;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -609,10 +609,8 @@ const calcMobileCardHeight = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 400px !important; /* 固定高度 */
-  min-height: 400px;
-  max-height: 400px !important; /* 限制最大高度 */
-  overflow: hidden; /* 只在容器本身禁止溢出 */
+  height: calc(100vh - 90px);
+  overflow: hidden;
   transition: box-shadow 0.3s ease;
   margin: 0;
 }
@@ -644,8 +642,6 @@ const calcMobileCardHeight = computed(() => {
   flex-direction: column;
   border-radius: 0 0 0.75rem 0.75rem;
   -webkit-overflow-scrolling: touch;
-  height: 100%; /* 确保高度占满剩余空间 */
-  max-height: calc(100% - 48px); /* 减去标题高度 */
 }
 
 /* 隐藏滚动条 */
@@ -674,11 +670,7 @@ const calcMobileCardHeight = computed(() => {
   padding: 0;
   margin: 0;
   list-style-type: none;
-  overflow-y: auto !important; /* 修改为可滚动 */
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+  overflow: hidden;
 }
 
 /* ---------- 链接项样式 ---------- */
