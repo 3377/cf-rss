@@ -664,9 +664,10 @@ const calcMobileCardHeight = computed(() => {
   position: relative;
   display: flex;
   flex-direction: column;
-  border-radius: 0 0 0.75rem 0.75rem;
+  border-radius: 0 0 1rem 1rem;
   -webkit-overflow-scrolling: touch;
-  height: calc(100% - 50px); /* 调整内容区域高度 */
+  height: calc(100% - 50px);
+  background: var(--el-bg-color);
 }
 
 /* ---------- 链接区域 ---------- */
@@ -690,9 +691,8 @@ const calcMobileCardHeight = computed(() => {
   padding: 6px 0;
   margin-bottom: 6px;
   position: relative;
-  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
+  border-bottom: 1px solid var(--el-border-color-lighter);
   cursor: pointer;
-  padding-left: 0; /* 移除左侧内边距 */
 }
 
 .feed-link-item:last-child {
@@ -700,23 +700,19 @@ const calcMobileCardHeight = computed(() => {
   margin-bottom: 0;
 }
 
-.dark .feed-link-item {
-  border-bottom-color: rgba(75, 85, 105, 0.2);
-}
-
-/* ---------- 链接样式 ---------- */
-.feed-link {
+.item-link {
   display: block;
-  padding: 0.5rem 0; /* 减小上下内边距 */
-  color: var(--text-color, #2c3e50);
+  padding: 0.5rem 0.25rem;
+  color: var(--el-text-color-primary);
   text-decoration: none;
   position: relative;
   transition: all 0.2s ease;
+  width: 100%;
 }
 
 .item-link:hover {
   color: var(--el-color-primary);
-  background: transparent; /* 移除hover背景色 */
+  background: transparent;
 }
 
 /* ---------- 移动设备适配 ---------- */
@@ -768,13 +764,13 @@ const calcMobileCardHeight = computed(() => {
 
   .feed-link-item-mobile {
     padding: 10px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--el-border-color-lighter);
     touch-action: pan-y;
     min-height: 44px;
   }
 
-  .dark .feed-link-item-mobile {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  .feed-link-item-mobile:last-child {
+    border-bottom: none;
   }
 
   .feed-link-mobile {
@@ -957,12 +953,8 @@ body,
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: var(--el-text-color-disabled);
   transition: all 0.2s ease;
-}
-
-.dark .indicator-dot {
-  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .indicator-dot.active {
@@ -1044,7 +1036,7 @@ body,
 /* ---------- 链接访问状态 ---------- */
 .feed-link:visited,
 .dark .feed-link:visited {
-  color: var(--el-text-color-placeholder);
+  color: var(--el-text-color-secondary);
 }
 
 .dark .feed-link {
@@ -1056,7 +1048,7 @@ body,
   position: fixed;
   padding: 0.5rem 0.75rem;
   border-radius: 0.375rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   max-width: 90%;
   width: auto !important;
   z-index: 100;
@@ -1067,6 +1059,8 @@ body,
   transition: opacity 0.2s ease;
   text-align: left;
   overflow: hidden;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
 }
 
 .tooltip-date {
@@ -1075,9 +1069,10 @@ body,
   opacity: 1;
   margin-bottom: 0.3rem;
   padding-bottom: 0.3rem;
-  border-bottom: 1px dashed rgba(160, 190, 230, 0.5);
+  border-bottom: 1px solid var(--el-border-color-lighter);
   text-align: center;
   display: block !important;
+  color: var(--el-color-primary) !important;
 }
 
 html body .app-container:not(.dark) .tooltip-date {
@@ -1098,6 +1093,7 @@ html body .app-container:not(.dark) .tooltip-date {
   white-space: pre-line;
   text-indent: 0;
   padding: 0.25rem 0;
+  color: var(--el-text-color-primary);
 }
 
 /* ---------- 卡片内的项目 ---------- */
