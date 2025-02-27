@@ -347,7 +347,7 @@ html body .app-container.bg-gray-50 {
 /* 确保内容区域可以滚动 */
 .content-area {
   flex: 1;
-  overflow: auto !important;
+  overflow: visible !important;
   display: flex;
   flex-direction: column;
   margin-top: 0;
@@ -852,7 +852,7 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
 /* 全局确保内容区域可以滚动 */
 .content-area {
   flex: 1;
-  overflow: auto !important;
+  overflow: visible !important;
   display: flex;
   flex-direction: column;
   margin-top: 0;
@@ -888,6 +888,7 @@ html body .app-container.dark .mobile-card-content {
   padding: var(--layout-padding, 2%) var(--layout-side-margin, 2%);
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
   align-items: start;
+  height: 100%;
 }
 
 /* 全局滚动设置 */
@@ -915,10 +916,8 @@ body,
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   overflow: hidden;
-  height: calc(
-    100vh - var(--header-height, 60px) - var(--layout-padding, 2%) * 2
-  );
-  max-height: 800px;
+  height: 100%; /* 改为100%高度 */
+  min-height: 500px; /* 设置最小高度 */
 }
 
 .card-header {
@@ -927,30 +926,35 @@ body,
   background: var(--card-header-bg, #f8fafc);
   border-bottom: 1px solid var(--card-border-color, #e2e8f0);
   border-radius: 0.75rem 0.75rem 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .card-content {
   flex: 1 1 auto;
-  overflow-y: auto;
+  overflow-y: auto !important;
   padding: 1rem;
   background: var(--card-content-bg, rgba(200, 225, 245, 1));
   -webkit-overflow-scrolling: touch;
-  min-height: 0;
-  max-height: calc(100% - var(--header-height, 60px));
+  position: relative;
+  height: auto; /* 让高度自动计算 */
 }
 
 /* 自定义滚动条样式 */
 .card-content::-webkit-scrollbar {
-  width: 6px;
+  width: 6px !important;
+  display: block !important;
 }
 
 .card-content::-webkit-scrollbar-track {
-  background: transparent;
+  background: transparent !important;
 }
 
 .card-content::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 3px !important;
+  display: block !important;
 }
 
 .dark .card-content::-webkit-scrollbar-thumb {
