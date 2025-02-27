@@ -581,7 +581,7 @@ const calcMobileCardHeight = computed(() => {
 <style>
 /* 卡片容器样式 */
 .feed-container {
-  height: calc(100vh - 120px); /* 修改高度，让内容区域更接近底部版权位置 */
+  height: calc(100vh - 60px); /* 显著增加高度，让内容几乎填满到底部版权前 */
   overflow: auto;
   padding: 1rem;
 }
@@ -805,7 +805,7 @@ const calcMobileCardHeight = computed(() => {
   }
 
   .feed-container {
-    height: calc(100vh - 160px); /* 移动端高度调整 */
+    height: calc(100vh - 80px); /* 移动端高度也相应增加 */
     padding: 0.5rem;
   }
 }
@@ -1066,7 +1066,7 @@ html body .app-container:not(.dark) .tooltip-date {
 /* 移动设备适配 */
 @media (max-width: 768px) {
   .feed-container {
-    height: calc(100vh - 160px); /* 移动端高度调整 */
+    height: calc(100vh - 80px); /* 移动端高度也相应增加 */
     padding: 0.5rem;
   }
 
@@ -1093,7 +1093,7 @@ html body .app-container:not(.dark) .tooltip-date {
 /* 适配较小屏幕设备 */
 @media (max-width: 480px) {
   .feed-container {
-    height: calc(100vh - 140px); /* 小屏幕设备高度调整 */
+    height: calc(100vh - 70px); /* 小屏幕设备高度调整 */
     padding: 0.15rem 0.35rem;
   }
 
