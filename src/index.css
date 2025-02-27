@@ -94,8 +94,6 @@ body {
 /* 亮色模式下的卡片内容区域样式 */
 .app-container:not(.dark) .card-content {
     background-color: rgba(200, 225, 245, 1) !important;
-    scrollbar-width: thin !important;
-    -ms-overflow-style: -ms-autohiding-scrollbar !important;
     scroll-behavior: smooth !important;
     height: auto !important;
     min-height: 100px !important;
@@ -105,26 +103,12 @@ body {
     -webkit-overflow-scrolling: touch !important;
     will-change: scroll-position !important;
     border-radius: 0 0 0.75rem 0.75rem !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
 }
 
-.card-content::-webkit-scrollbar {
-    width: 4px !important;
-    height: 4px !important;
-}
-
-.card-content::-webkit-scrollbar-track {
-    background: transparent !important;
-    border-radius: 2px !important;
-}
-
-.card-content::-webkit-scrollbar-thumb {
-    background: rgba(160, 190, 230, 0.5) !important;
-    border-radius: 2px !important;
-    transition: background 0.2s ease !important;
-}
-
-.card-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(160, 190, 230, 0.8) !important;
+.app-container:not(.dark) .card-content::-webkit-scrollbar {
+    display: none !important;
 }
 
 /* 确保内容填充卡片但不溢出 */
@@ -136,6 +120,12 @@ body {
     position: relative !important;
     z-index: 1 !important;
     padding: 0.5rem 0 !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.items-list::-webkit-scrollbar {
+    display: none !important;
 }
 
 .feed-item:last-child {
@@ -241,45 +231,24 @@ body {
     border-color: rgba(55, 65, 81, 0.8) !important;
 }
 
-/* 添加全局页面滚动箭头样式 */
+/* 移除全局页面滚动箭头样式 */
 ::-webkit-scrollbar-button:single-button {
-    background-color: rgba(200, 225, 245, 0.8);
-    border-radius: 10px;
-    border: 1px solid rgba(160, 190, 230, 0.7);
-    backdrop-filter: blur(4px);
-    transition: all 0.2s ease;
+    display: none !important;
 }
 
-.dark ::-webkit-scrollbar-button:single-button {
-    background-color: rgba(55, 65, 81, 0.8);
-    border: 1px solid rgba(75, 85, 101, 0.7);
+::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
 }
 
-::-webkit-scrollbar-button:single-button:hover {
-    background-color: rgba(180, 210, 240, 1);
-    border: 1px solid rgba(150, 180, 220, 0.8);
+* {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
 }
 
-.dark ::-webkit-scrollbar-button:single-button:hover {
-    background-color: rgba(75, 85, 101, 0.9);
-    border: 1px solid rgba(95, 105, 121, 0.8);
-}
-
-/* 整体页面滚动箭头 */
-::-webkit-scrollbar-button {
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-}
-
-::-webkit-scrollbar-button:vertical:start:decrement,
-::-webkit-scrollbar-button:vertical:end:increment,
-::-webkit-scrollbar-button:horizontal:start:decrement,
-::-webkit-scrollbar-button:horizontal:end:increment {
-    border-radius: 12px;
-    background-size: 10px;
-    background-repeat: no-repeat;
-    background-position: center;
+*::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
 }
 
 /* 移动设备优化 */

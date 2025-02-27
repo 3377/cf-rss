@@ -579,13 +579,31 @@ const calcMobileCardHeight = computed(() => {
 </script>
 
 <style>
+/* ---------- 隐藏滚动条 ---------- */
+.card-content::-webkit-scrollbar,
+.feed-links::-webkit-scrollbar,
+.mobile-card-content::-webkit-scrollbar,
+.items-list::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+}
+
+.card-content,
+.feed-links,
+.mobile-card-content,
+.items-list {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
 /* ---------- 主容器样式 ---------- */
 .feed-container {
   height: calc(100vh - 55px);
   padding: 0.15rem 0.25rem;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* 只在容器本身禁止溢出，允许子元素滚动 */
+  overflow: hidden;
 }
 
 /* ---------- 网格布局 ---------- */
@@ -595,11 +613,18 @@ const calcMobileCardHeight = computed(() => {
   grid-auto-rows: minmax(calc(100vh - 95px), auto);
   gap: 0.6rem;
   flex: 1;
-  overflow-y: auto !important; /* 确保网格可以滚动 */
+  overflow-y: auto !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
   padding: 0.2rem 0.2rem 0.4rem 0.2rem;
   overflow-x: hidden;
   height: 100%;
   -webkit-overflow-scrolling: touch;
+}
+
+.feed-grid::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
 }
 
 /* ---------- 卡片样式 ---------- */
@@ -643,21 +668,6 @@ const calcMobileCardHeight = computed(() => {
   border-radius: 0 0 0.75rem 0.75rem;
   -webkit-overflow-scrolling: touch;
   height: calc(100% - 60px); /* 减去头部高度 */
-}
-
-/* 隐藏滚动条 */
-.card-content::-webkit-scrollbar,
-.feed-links::-webkit-scrollbar,
-.mobile-card-content::-webkit-scrollbar {
-  display: none;
-}
-
-.card-content,
-.feed-links,
-.mobile-card-content {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- 链接区域 ---------- */
