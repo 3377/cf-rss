@@ -630,32 +630,26 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 卡片样式 ---------- */
 .feed-card {
-  background: var(--card-bg);
+  background: var(--el-bg-color);
   border-radius: 0.85rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px); /* 减小卡片高度 */
+  height: calc(100vh - 180px);
   overflow: hidden;
   transition: box-shadow 0.3s ease;
   margin: 0;
 }
 
-/* 移除hover效果 */
-.feed-card:hover {
-  transform: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
 /* ---------- 卡片头部 ---------- */
 .card-header {
-  padding: 0.5rem 0.75rem; /* 减小头部内边距 */
+  padding: 0.5rem 0.75rem;
   border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
-  background: var(--card-header-bg, rgba(248, 250, 252, 0.8));
+  background: var(--el-bg-color);
   position: sticky;
   top: 0;
   z-index: 10;
-  border-radius: 0.75rem 0.75rem 0 0;
+  border-radius: 0.85rem 0.85rem 0 0;
 }
 
 /* ---------- 卡片内容区域 ---------- */
@@ -799,14 +793,34 @@ const calcMobileCardHeight = computed(() => {
     -webkit-overflow-scrolling: touch !important;
   }
 
+  .mobile-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease-out;
+    padding: 12px 15px;
+    box-sizing: border-box;
+    background: var(--el-bg-color);
+    border-radius: 0.85rem !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .mobile-card .card-header {
+    margin: -12px -15px 0;
+    padding: 0.75rem;
+    border-radius: 0.85rem 0.85rem 0 0 !important;
+    background: var(--el-bg-color);
+    border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
+  }
+
   .mobile-card-content {
-    flex: 1;
-    overflow-y: auto !important;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    padding: 0 5px 10px 5px;
-    position: relative;
-    height: calc(100% - 60px);
+    margin: 0 -15px;
+    padding: 0.5rem 15px;
     border-radius: 0 0 0.85rem 0.85rem !important;
   }
 
@@ -848,8 +862,9 @@ const calcMobileCardHeight = computed(() => {
   padding: 12px 15px;
   box-sizing: border-box;
   background: var(--el-bg-color);
-  border-radius: 0.75rem !important; /* 移动端卡片圆角 */
+  border-radius: 0.85rem !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .dark .mobile-card {
@@ -858,7 +873,11 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 移动端卡片头部 ---------- */
 .mobile-card .card-header {
-  border-radius: 0.75rem 0.75rem 0 0 !important; /* 移动端顶部圆角 */
+  margin: -12px -15px 0;
+  padding: 0.75rem;
+  border-radius: 0.85rem 0.85rem 0 0 !important;
+  background: var(--el-bg-color);
+  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
 }
 
 /* ---------- 错误和空数据提示 ---------- */
@@ -888,14 +907,14 @@ body,
 .mobile-card-content,
 .feed-card,
 .mobile-card {
-  border-radius: 0.75rem !important;
+  border-radius: 0.85rem !important;
 }
 
 /* 明确设置卡片头部和内容区域的圆角 */
 .card-header,
 .mobile-card .card-header {
-  border-top-left-radius: 0.75rem !important;
-  border-top-right-radius: 0.75rem !important;
+  border-top-left-radius: 0.85rem !important;
+  border-top-right-radius: 0.85rem !important;
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
 }
@@ -904,44 +923,8 @@ body,
 .mobile-card-content {
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
-  border-bottom-left-radius: 0.75rem !important;
-  border-bottom-right-radius: 0.75rem !important;
-}
-
-/* 添加内容溢出处理 */
-.items-list {
-  border-top: none;
-  padding-bottom: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  overflow: hidden;
-  border-bottom-left-radius: 0.75rem !important;
-  border-bottom-right-radius: 0.75rem !important;
-}
-
-/* ---------- 较小屏幕设备适配 ---------- */
-@media (max-width: 480px) {
-  .feed-container {
-    height: calc(100vh - 70px);
-    padding: 0.15rem 0.35rem;
-  }
-
-  .card-header {
-    padding: 0.6rem 0.75rem;
-    min-height: 3.2rem;
-  }
-
-  .card-title {
-    font-size: 1rem;
-    line-height: 1.3;
-  }
-
-  .feed-link {
-    padding: 0.5rem 0;
-    font-size: 0.85rem;
-  }
+  border-bottom-left-radius: 0.85rem !important;
+  border-bottom-right-radius: 0.85rem !important;
 }
 
 /* ---------- 滑动指示器 ---------- */
