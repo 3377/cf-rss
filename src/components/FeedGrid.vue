@@ -583,185 +583,83 @@ const calcMobileCardHeight = computed(() => {
 .feed-container {
   height: calc(100vh - 55px);
   overflow: hidden;
-  padding: 1rem;
+  padding: 0.15rem 0.25rem;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ---------- 网格布局 ---------- */
 .feed-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-auto-rows: minmax(calc(100vh - 95px), auto);
+  gap: 0.6rem;
+  flex: 1;
   overflow-y: auto;
-  height: 100%;
-  padding-bottom: 1rem;
+  padding: 0.2rem 0.2rem 0.4rem 0.2rem;
+  overflow-x: hidden;
 }
 
 /* ---------- 卡片样式 ---------- */
 .feed-card {
+  background: var(--card-bg);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: 400px;
-  max-height: calc(100vh - 90px);
+  height: calc(100vh - 90px);
   overflow: hidden;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
+  margin: 0;
 }
 
 /* 移除hover效果 */
 .feed-card:hover {
   transform: none;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* ---------- 卡片头部 ---------- */
 .card-header {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
+  background: var(--card-header-bg, rgba(248, 250, 252, 0.8));
+  position: sticky;
+  top: 0;
+  z-index: 10;
   border-radius: 0.75rem 0.75rem 0 0;
-}
-
-.dark .card-header {
-  border-bottom-color: rgba(75, 85, 105, 0.2);
-  background: var(--el-fill-color-darker);
-}
-
-/* ---------- 卡片标题 ---------- */
-.card-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.4;
-  color: var(--text-primary, #1a202c);
-}
-
-.dark .card-title {
-  color: var(--el-text-color-primary);
 }
 
 /* ---------- 卡片内容区域 ---------- */
 .card-content {
   flex: 1;
+  overflow-y: auto !important;
   padding: 0;
-  overflow-y: auto !important;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   border-radius: 0 0 0.75rem 0.75rem;
-}
-
-/* 确保所有情况下内容区域都可以滚动 */
-.app-container .card-content {
-  overflow-y: auto !important;
-}
-
-.app-container:not(.dark) .card-content {
-  overflow-y: auto !important;
-}
-
-.app-container.dark .card-content {
-  overflow-y: auto !important;
 }
 
 /* 隐藏滚动条 */
 .card-content::-webkit-scrollbar,
-.feed-links::-webkit-scrollbar {
+.feed-links::-webkit-scrollbar,
+.mobile-card-content::-webkit-scrollbar {
   display: none;
 }
 
 .card-content,
-.feed-links {
+.feed-links,
+.mobile-card-content {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- 链接区域 ---------- */
 .feed-links {
-  height: 100%;
+  flex: 1;
   overflow-y: auto !important;
-}
-
-/* ---------- 链接项 ---------- */
-.feed-item {
-  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
-  margin-bottom: 0.5rem;
-}
-
-.feed-item:last-child {
-  border-bottom: none;
-}
-
-.feed-link-item {
-  position: relative;
-  cursor: pointer;
-}
-
-/* ---------- 链接样式 ---------- */
-.item-link {
-  display: block;
-  padding: 0.75rem 1rem;
-  color: var(--text-color, #2c3e50);
-  text-decoration: none;
-  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
-  word-break: break-word;
-  z-index: 2;
-  position: relative;
-}
-
-.item-link:hover {
-  color: var(--el-color-primary);
-}
-
-.feed-link {
-  display: block;
-  padding: 0.75rem 1rem;
-  color: var(--text-color, #2c3e50);
-  text-decoration: none;
-  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
-  word-break: break-word;
-  z-index: 2;
-  position: relative;
-}
-
-.feed-link:visited,
-.dark .feed-link:visited {
-  color: var(--el-text-color-placeholder);
-}
-
-.dark .feed-link {
-  color: var(--el-text-color-primary);
-}
-
-/* ---------- 项目标题 ---------- */
-.item-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transition: all 0.3s ease;
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  font-weight: normal;
-  margin-bottom: 2px;
-}
-
-/* ---------- 项目日期 ---------- */
-.item-date {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  opacity: 1;
-  transition: all 0.3s ease;
-  white-space: nowrap;
 }
 
 /* ---------- 项目列表 ---------- */
@@ -772,54 +670,115 @@ const calcMobileCardHeight = computed(() => {
   overflow: hidden;
 }
 
-/* ---------- 提示框样式 ---------- */
-.title-tooltip {
-  position: fixed;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 90%;
-  width: auto !important;
-  z-index: 100;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  pointer-events: none;
-  backdrop-filter: blur(5px);
-  transition: opacity 0.2s ease;
-  text-align: left;
+/* ---------- 链接项样式 ---------- */
+.feed-link-item {
+  padding: 6px 0;
+  margin-bottom: 6px;
+  position: relative;
+  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
+  cursor: pointer;
+}
+
+.feed-link-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.dark .feed-link-item {
+  border-bottom-color: rgba(75, 85, 105, 0.2);
+}
+
+/* ---------- 链接样式 ---------- */
+.feed-link {
+  display: block;
+  padding: 0.5rem 0;
+  color: var(--text-primary, #2d3748);
+  text-decoration: none;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.95rem;
+  position: relative;
+  z-index: 2;
 }
 
-.tooltip-date {
-  font-weight: 500;
-  font-size: 0.85rem;
-  opacity: 1;
-  margin-bottom: 0.3rem;
-  padding-bottom: 0.3rem;
-  border-bottom: 1px dashed rgba(160, 190, 230, 0.5);
-  text-align: center;
-  display: block !important;
-}
+/* ---------- 移动设备适配 ---------- */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
 
-html body .app-container:not(.dark) .tooltip-date {
-  color: #2563eb !important;
-}
+  .feed-container {
+    height: calc(100vh - 50px);
+    padding: 0.5rem;
+  }
 
-.dark .tooltip-date {
-  color: #3b82f6 !important;
-  border-bottom-color: rgba(75, 85, 105, 0.5);
-}
+  .feed-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
 
-.tooltip-content {
-  line-height: 1.5;
-  font-size: 0.85rem;
-  max-height: 200px;
-  overflow-y: auto;
-  text-align: left;
-  word-break: break-word;
-  white-space: pre-line;
-  text-indent: 0;
-  padding: 0.25rem 0;
+  .feed-card {
+    height: auto;
+    min-height: 350px;
+  }
+
+  .card-header {
+    padding: 0.75rem 0.75rem 0.5rem;
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .feed-link-item-mobile {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    touch-action: pan-y;
+    min-height: 44px;
+  }
+
+  .dark .feed-link-item-mobile {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .feed-link-mobile {
+    display: block;
+    color: var(--el-text-color-primary);
+    text-decoration: none;
+    overflow: hidden;
+    white-space: normal;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 1rem;
+    line-height: 1.4;
+    touch-action: pan-y;
+  }
+
+  .card-content {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .mobile-card-content {
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 5px 10px 5px;
+    position: relative;
+    height: calc(100% - 60px);
+    border-radius: 0 0 0.75rem 0.75rem;
+  }
+
+  /* 在亮色模式下确保滚动 */
+  html body .app-container:not(.dark) .card-content,
+  html body .app-container:not(.dark) .mobile-card-content {
+    overflow-y: auto !important;
+  }
 }
 
 /* ---------- 移动设备滑动卡片 ---------- */
@@ -854,111 +813,16 @@ html body .app-container:not(.dark) .tooltip-date {
   box-sizing: border-box;
   background: var(--el-bg-color);
   border-radius: 0.75rem !important; /* 移动端卡片圆角 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .dark .mobile-card {
   background: var(--el-fill-color-darker);
 }
 
-.mobile-card-content {
-  overflow-y: auto !important;
-  border-radius: 0 0 0.75rem 0.75rem;
-}
-
 /* ---------- 移动端卡片头部 ---------- */
 .mobile-card .card-header {
   border-radius: 0.75rem 0.75rem 0 0 !important; /* 移动端顶部圆角 */
-}
-
-/* ---------- 移动设备适配 ---------- */
-@media (max-width: 768px) {
-  .feed-container {
-    height: calc(100vh - 50px);
-    padding: 0.5rem;
-  }
-
-  .feed-grid {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
-  .feed-card {
-    min-height: 300px;
-    max-height: none;
-  }
-
-  .card-header {
-    padding: 0.75rem;
-  }
-
-  .card-content,
-  .mobile-card-content {
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .feed-link {
-    padding: 0.75rem;
-    font-size: 0.9rem;
-  }
-
-  /* 确保触摸滚动平滑 */
-  .feed-grid,
-  .card-content,
-  .mobile-card-content,
-  .feed-links {
-    -webkit-overflow-scrolling: touch;
-  }
-}
-
-/* ---------- 较小屏幕设备适配 ---------- */
-@media (max-width: 480px) {
-  .feed-container {
-    height: calc(100vh - 70px);
-    padding: 0.15rem 0.35rem;
-  }
-
-  .card-header {
-    padding: 0.6rem;
-  }
-
-  .card-title {
-    font-size: 1rem;
-  }
-
-  .feed-link {
-    padding: 0.5rem 0;
-    font-size: 0.85rem;
-  }
-}
-
-/* ---------- 滑动指示器 ---------- */
-.swipe-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 0;
-  margin: 5px 0;
-  gap: 8px;
-  touch-action: none;
-}
-
-.indicator-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
-}
-
-.dark .indicator-dot {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.indicator-dot.active {
-  width: 12px;
-  height: 12px;
-  background-color: var(--el-color-primary);
 }
 
 /* ---------- 错误和空数据提示 ---------- */
@@ -1019,5 +883,178 @@ body,
   overflow: hidden;
   border-bottom-left-radius: 0.75rem !important;
   border-bottom-right-radius: 0.75rem !important;
+}
+
+/* ---------- 较小屏幕设备适配 ---------- */
+@media (max-width: 480px) {
+  .feed-container {
+    height: calc(100vh - 70px);
+    padding: 0.15rem 0.35rem;
+  }
+
+  .card-header {
+    padding: 0.6rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .feed-link {
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+  }
+}
+
+/* ---------- 滑动指示器 ---------- */
+.swipe-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+  margin: 5px 0;
+  gap: 8px;
+  touch-action: none;
+}
+
+.indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.dark .indicator-dot {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.indicator-dot.active {
+  width: 12px;
+  height: 12px;
+  background-color: var(--el-color-primary);
+}
+
+/* ---------- 卡片标题 ---------- */
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+  color: var(--text-primary, #1a202c);
+}
+
+.dark .card-title {
+  color: var(--el-text-color-primary);
+}
+
+/* ---------- 项目标题 ---------- */
+.item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  font-weight: normal;
+  margin-bottom: 2px;
+}
+
+/* ---------- 项目日期 ---------- */
+.item-date {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  opacity: 1;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+/* ---------- 项目链接样式 ---------- */
+.item-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: var(--text-color, #2c3e50);
+  text-decoration: none;
+  border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
+  word-break: break-word;
+  z-index: 2;
+  position: relative;
+}
+
+.item-link:hover {
+  color: var(--el-color-primary);
+}
+
+/* ---------- 链接访问状态 ---------- */
+.feed-link:visited,
+.dark .feed-link:visited {
+  color: var(--el-text-color-placeholder);
+}
+
+.dark .feed-link {
+  color: var(--el-text-color-primary);
+}
+
+/* ---------- 提示框样式 ---------- */
+.title-tooltip {
+  position: fixed;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 90%;
+  width: auto !important;
+  z-index: 100;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  pointer-events: none;
+  backdrop-filter: blur(5px);
+  transition: opacity 0.2s ease;
+  text-align: left;
+  overflow: hidden;
+}
+
+.tooltip-date {
+  font-weight: 500;
+  font-size: 0.85rem;
+  opacity: 1;
+  margin-bottom: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px dashed rgba(160, 190, 230, 0.5);
+  text-align: center;
+  display: block !important;
+}
+
+html body .app-container:not(.dark) .tooltip-date {
+  color: #2563eb !important;
+}
+
+.dark .tooltip-date {
+  color: #3b82f6 !important;
+  border-bottom-color: rgba(75, 85, 105, 0.5);
+}
+
+.tooltip-content {
+  line-height: 1.5;
+  font-size: 0.85rem;
+  max-height: 200px;
+  overflow-y: auto;
+  text-align: left;
+  word-break: break-word;
+  white-space: pre-line;
+  text-indent: 0;
+  padding: 0.25rem 0;
 }
 </style>
