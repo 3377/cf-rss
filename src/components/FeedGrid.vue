@@ -603,7 +603,7 @@ const calcMobileCardHeight = computed(() => {
 /* ---------- 卡片样式 ---------- */
 .feed-card {
   background: var(--card-bg);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem !important; /* 统一设置圆角 */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -631,6 +631,7 @@ const calcMobileCardHeight = computed(() => {
   position: sticky;
   top: 0;
   z-index: 10;
+  border-radius: 0.75rem 0.75rem 0 0 !important; /* 顶部圆角 */
 }
 
 .dark .card-header {
@@ -667,6 +668,12 @@ const calcMobileCardHeight = computed(() => {
   position: relative;
   display: flex;
   flex-direction: column;
+  border-radius: 0 0 0.75rem 0.75rem !important; /* 底部圆角 */
+}
+
+/* 确保亮色模式下内容也可以滚动 */
+.app-container:not(.dark) .card-content {
+  overflow-y: auto !important; /* 确保亮色模式下也可以滚动 */
 }
 
 /* 隐藏滚动条 */
@@ -849,6 +856,7 @@ html body .app-container:not(.dark) .tooltip-date {
   position: relative;
   margin-top: -10px;
   overflow: hidden;
+  border-radius: 0.75rem;
 }
 
 .mobile-cards-container {
@@ -857,6 +865,7 @@ html body .app-container:not(.dark) .tooltip-date {
   height: 100%;
   overflow: hidden;
   touch-action: none;
+  border-radius: 0.75rem;
 }
 
 .mobile-card {
@@ -871,7 +880,7 @@ html body .app-container:not(.dark) .tooltip-date {
   padding: 12px 15px;
   box-sizing: border-box;
   background: var(--el-bg-color);
-  border-radius: 8px;
+  border-radius: 0.75rem !important; /* 移动端卡片圆角 */
 }
 
 .dark .mobile-card {
@@ -886,6 +895,12 @@ html body .app-container:not(.dark) .tooltip-date {
   padding: 0 5px 10px 5px;
   position: relative;
   height: calc(100% - 60px);
+  border-radius: 0 0 0.75rem 0.75rem;
+}
+
+/* ---------- 移动端卡片头部 ---------- */
+.mobile-card .card-header {
+  border-radius: 0.75rem 0.75rem 0 0 !important; /* 移动端顶部圆角 */
 }
 
 /* ---------- 移动设备适配 ---------- */
@@ -911,6 +926,7 @@ html body .app-container:not(.dark) .tooltip-date {
 
   .card-header {
     padding: 0.75rem 0.75rem 0.5rem;
+    border-radius: 0.75rem 0.75rem 0 0 !important;
   }
 
   .card-title {
@@ -941,6 +957,17 @@ html body .app-container:not(.dark) .tooltip-date {
     font-size: 1rem;
     line-height: 1.4;
     touch-action: pan-y;
+  }
+
+  .card-content {
+    border-radius: 0 0 0.75rem 0.75rem !important;
+    overflow-y: auto !important;
+  }
+
+  /* 确保亮色模式下也能滚动 */
+  .app-container:not(.dark) .card-content,
+  .app-container:not(.dark) .mobile-card-content {
+    overflow-y: auto !important;
   }
 }
 

@@ -482,6 +482,7 @@ button {
 
 .app-container:not(.dark) .card-content {
   background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
+  overflow-y: auto !important;
 }
 
 .app-container:not(.dark) .card-title {
@@ -667,6 +668,11 @@ button {
 .card-content {
   border-radius: 0 0 0.75rem 0.75rem !important;
   overflow-y: auto !important;
+}
+
+/* 确保卡片标题区域有顶部圆角 */
+.card-header {
+  border-radius: 0.75rem 0.75rem 0 0 !important;
 }
 
 /* 移动优化 */
