@@ -317,22 +317,70 @@ onUnmounted(() => {
 </script>
 
 <style>
-.app-container {
-  height: 100vh;
+/* 全局滚动设置 */
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
-/* 亮色模式样式 - 更高优先级 */
-html body .app-container.bg-gray-50 {
-  background-color: #f0f4fa !important;
-  background-image: linear-gradient(45deg, #e6ecf6 25%, transparent 25%),
-    linear-gradient(-45deg, #e6ecf6 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #e6ecf6 75%),
-    linear-gradient(-45deg, transparent 75%, #e6ecf6 75%) !important;
-  background-size: 10px 10px !important;
-  background-position: 0 0, 0 5px, 5px -5px, -5px 0 !important;
+/* 应用容器样式 */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+/* 确保内容区域可以滚动 */
+.content-area {
+  flex: 1;
+  overflow: auto !important;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+/* 简化卡片圆角设置 */
+.feed-card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+/* 卡片内容滚动设置 */
+.card-content {
+  border-radius: 0 0 0.75rem 0.75rem;
+  overflow-y: auto !important;
+}
+
+/* 确保亮色模式下内容可以滚动 */
+.app-container:not(.dark) .card-content {
+  background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
+  overflow-y: auto !important;
+}
+
+/* 确保暗色模式下内容可以滚动 */
+.app-container.dark .card-content {
+  overflow-y: auto !important;
+}
+
+/* 隐藏滚动条 */
+.content-area::-webkit-scrollbar,
+.card-content::-webkit-scrollbar {
+  display: none;
+}
+
+.content-area,
+.card-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .header {
@@ -372,24 +420,6 @@ html body .app-container.bg-gray-50 button.bg-green-500 {
 html body .app-container.bg-gray-50 button.bg-green-500:hover {
   background-color: #3d9c6e !important;
   box-shadow: 0 3px 6px rgba(76, 175, 125, 0.2) !important;
-}
-
-.content-area {
-  flex: 1;
-  overflow: auto !important;
-  display: flex;
-  flex-direction: column;
-  margin-top: 0;
-  margin-bottom: 5px;
-}
-
-html body .app-container.bg-gray-50 .content-area {
-  background-color: rgba(240, 245, 252, 0.4) !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
-}
-
-.dark .content-area {
-  background-color: rgba(17, 24, 39, 0.3);
 }
 
 .footer {
@@ -648,60 +678,6 @@ button {
   background-color: rgba(75, 85, 101, 0.9);
 }
 
-/* 确保内容区域滚动时不显示滚动条 */
-.content-area::-webkit-scrollbar {
-  width: 0;
-  background: transparent;
-  display: none;
-}
-
-.content-area {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-/* 确保页面中的所有卡片底部有圆角 */
-.feed-card {
-  border-radius: 0.75rem !important;
-  overflow: hidden !important;
-}
-
-/* 确保卡片内容区域有底部圆角和滚动功能 */
-.card-content {
-  border-radius: 0 0 0.75rem 0.75rem !important;
-  overflow-y: auto !important;
-}
-
-/* 确保亮色模式下卡片内容可以滚动 */
-html body .app-container:not(.dark) .card-content,
-html body .app-container:not(.dark) .mobile-card-content {
-  background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
-  overflow-y: auto !important;
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-}
-
-/* 隐藏亮色模式下的滚动条 */
-html body .app-container:not(.dark) .card-content::-webkit-scrollbar,
-html body .app-container:not(.dark) .mobile-card-content::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  background: transparent !important;
-}
-
-/* 确保卡片标题区域有顶部圆角 */
-.card-header {
-  border-radius: 0.75rem 0.75rem 0 0 !important;
-}
-
-/* 移动优化 */
-@media (max-width: 768px) {
-  ::-webkit-scrollbar-button {
-    width: 20px;
-    height: 20px;
-  }
-}
-
 /* 提示框样式 */
 .title-tooltip {
   text-align: center !important;
@@ -843,7 +819,10 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
 }
 
 /* 重置可能阻止滚动的全局设置 */
-html, body, #app, .app-container {
+html,
+body,
+#app,
+.app-container {
   height: 100%;
   overflow: hidden;
 }
