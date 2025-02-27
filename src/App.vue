@@ -380,7 +380,7 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
   display: flex;
   flex-direction: column;
   margin-top: 0;
-  margin-bottom: 0.75rem;
+  margin-bottom: 5px;
 }
 
 html body .app-container.bg-gray-50 .content-area {
@@ -398,6 +398,7 @@ html body .app-container.bg-gray-50 .content-area {
   backdrop-filter: blur(8px);
   padding-top: 0.25rem;
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
+  margin-top: 0;
 }
 
 html body .app-container.bg-gray-50 .footer {

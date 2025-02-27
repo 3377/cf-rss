@@ -581,9 +581,12 @@ const calcMobileCardHeight = computed(() => {
 <style>
 /* 卡片容器样式 */
 .feed-container {
-  height: calc(100vh - 60px); /* 显著增加高度，让内容几乎填满到底部版权前 */
-  overflow: auto;
-  padding: 1rem;
+  height: calc(100vh - 55px); /* 高度填充到非常接近底部 */
+  overflow: hidden; /* 改为hidden，让内部元素处理滚动 */
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 /* 卡片网格布局 */
@@ -591,19 +594,23 @@ const calcMobileCardHeight = computed(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
-  padding-bottom: 1rem;
+  flex: 1; /* 让网格填充剩余空间 */
+  height: 100%; /* 填充整个容器高度 */
+  min-height: 100%; /* 确保最小高度 */
+  overflow-y: auto; /* 允许网格滚动 */
 }
 
 /* 卡片样式 */
 .feed-card {
+  display: flex;
+  flex-direction: column;
   background: var(--card-bg);
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  min-height: 300px;
-  max-height: 500px;
+  min-height: 400px; /* 增加最小高度 */
+  max-height: none; /* 移除最大高度限制 */
   overflow: hidden;
+  height: auto;
 }
 
 .dark .feed-card {
@@ -643,9 +650,11 @@ const calcMobileCardHeight = computed(() => {
 }
 
 .feed-links {
-  height: 100%;
+  flex: 1; /* 让链接列表填充剩余空间 */
   overflow-y: auto;
   padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .feed-links::-webkit-scrollbar {
@@ -805,8 +814,31 @@ const calcMobileCardHeight = computed(() => {
   }
 
   .feed-container {
-    height: calc(100vh - 80px); /* 移动端高度也相应增加 */
+    height: calc(100vh - 80px);
     padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .feed-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    flex: 1;
+    min-height: calc(100% - 10px); /* 确保网格填满容器 */
+  }
+
+  .feed-card {
+    min-height: auto;
+    height: 100%; /* 拉伸卡片填满可用空间 */
+  }
+
+  .card-content {
+    overflow-y: visible;
+  }
+
+  .feed-links {
+    height: auto;
+    overflow-y: visible;
   }
 }
 
@@ -855,6 +887,8 @@ const calcMobileCardHeight = computed(() => {
   padding: 1rem;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-content::-webkit-scrollbar {
@@ -980,7 +1014,7 @@ html body .app-container:not(.dark) .tooltip-date {
 /* 移动设备滑动卡片样式 */
 .feed-grid-mobile {
   width: 100%;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 90px); /* 增加移动端高度 */
   position: relative;
   margin-top: -10px;
   overflow: hidden;
@@ -1063,37 +1097,10 @@ html body .app-container:not(.dark) .tooltip-date {
   touch-action: none; /* 禁用该区域的默认触摸行为 */
 }
 
-/* 移动设备适配 */
-@media (max-width: 768px) {
-  .feed-container {
-    height: calc(100vh - 80px); /* 移动端高度也相应增加 */
-    padding: 0.5rem;
-  }
-
-  .feed-grid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  .feed-card {
-    min-height: auto;
-    max-height: none;
-  }
-
-  .card-content {
-    overflow-y: visible;
-  }
-
-  .feed-links {
-    height: auto;
-    overflow-y: visible;
-  }
-}
-
 /* 适配较小屏幕设备 */
 @media (max-width: 480px) {
   .feed-container {
-    height: calc(100vh - 70px); /* 小屏幕设备高度调整 */
+    height: calc(100vh - 70px);
     padding: 0.15rem 0.35rem;
   }
 
