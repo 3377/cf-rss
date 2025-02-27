@@ -132,6 +132,7 @@
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
 import { getRSSConfig, RSS_CONFIG } from "./config/rss.config";
+import "@/assets/styles.css";
 
 const feeds = ref([]);
 const loading = ref(true);
@@ -948,5 +949,60 @@ body,
 /* 暗色模式下的滚动条 */
 .dark .card-content::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  min-height: 0;
+  max-height: calc(100vh - 80px);
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: var(--card-bg, #ffffff);
+}
+
+.card-header {
+  flex: 0 0 auto;
+  padding: 1rem;
+  border-radius: 0.75rem 0.75rem 0 0;
+  background: inherit;
+  z-index: 2;
+}
+
+.card-content {
+  flex: 1 1 auto;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  padding: 1rem;
+  margin: 0;
+  height: 100%;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  background: var(--card-content-bg, rgba(200, 225, 245, 1));
+  border-radius: 0 0 0.75rem 0.75rem;
+}
+
+/* 确保内容列表正确显示 */
+.feed-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feed-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式布局调整 */
+@media (min-width: 1024px) {
+  .card-container {
+    max-height: calc(100vh - 100px);
+  }
+  
+  .card-content {
+    max-height: none;
+  }
 }
 </style>
