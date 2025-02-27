@@ -347,7 +347,7 @@ html body .app-container.bg-gray-50 {
 /* 确保内容区域可以滚动 */
 .content-area {
   flex: 1;
-  overflow: visible !important;
+  overflow: auto !important;
   display: flex;
   flex-direction: column;
   margin-top: 0;
@@ -371,30 +371,21 @@ html body .app-container.bg-gray-50 .content-area {
 }
 
 .content-area {
-  scrollbar-width: auto !important;
-  -ms-overflow-style: auto !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 /* 确保页面中的所有卡片底部有圆角 */
 .feed-card {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 200px);
-  background: var(--card-bg, #ffffff);
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 0.75rem !important;
+  overflow: hidden !important;
 }
 
 /* 确保卡片内容区域有底部圆角和滚动功能 */
 .card-content {
-  flex: 1 1 auto;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-  padding: 1rem;
-  background: var(--card-content-bg, rgba(200, 225, 245, 1));
-  min-height: 0;
-  height: auto;
+  height: calc(100vh - 200px); /* 减去头部和其他固定元素的高度 */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* 为 iOS 设备添加平滑滚动 */
 }
 
 /* 确保亮色模式下卡片内容可以滚动 */
@@ -422,11 +413,7 @@ html body .app-container.dark .mobile-card-content {
 
 /* 确保卡片标题区域有顶部圆角 */
 .card-header {
-  flex: 0 0 auto;
-  padding: 1rem;
-  background: var(--card-header-bg, #f8fafc);
-  border-bottom: 1px solid var(--card-border-color, #e2e8f0);
-  border-radius: 0.75rem 0.75rem 0 0;
+  flex-shrink: 0;
 }
 
 /* 移动优化 */
@@ -865,7 +852,7 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
 /* 全局确保内容区域可以滚动 */
 .content-area {
   flex: 1;
-  overflow: visible !important;
+  overflow: auto !important;
   display: flex;
   flex-direction: column;
   margin-top: 0;
@@ -901,8 +888,6 @@ html body .app-container.dark .mobile-card-content {
   padding: var(--layout-padding, 2%) var(--layout-side-margin, 2%);
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
   align-items: start;
-  height: 100%;
-  overflow: visible !important;
 }
 
 /* 全局滚动设置 */
@@ -946,18 +931,17 @@ body,
 
 .card-content {
   flex: 1 1 auto;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
   padding: 1rem;
   background: var(--card-content-bg, rgba(200, 225, 245, 1));
+  -webkit-overflow-scrolling: touch;
   min-height: 0;
-  height: auto;
+  max-height: calc(100% - var(--header-height, 60px));
 }
 
 /* 自定义滚动条样式 */
 .card-content::-webkit-scrollbar {
-  width: 6px !important;
-  display: block !important;
+  width: 6px;
 }
 
 .card-content::-webkit-scrollbar-track {
@@ -967,7 +951,6 @@ body,
 .card-content::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
-  display: block !important;
 }
 
 .dark .card-content::-webkit-scrollbar-thumb {
