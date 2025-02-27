@@ -1072,7 +1072,6 @@ html body .app-container:not(.dark) .tooltip-date {
 }
 
 .tooltip-content {
-  line-height: 1.5;
   font-size: 0.85rem;
   max-height: 200px;
   overflow-y: auto;

@@ -917,7 +917,6 @@ body,
 }
 
 .card-header {
-  padding: 1rem;
   background: var(--card-header-bg, #f8fafc);
   border-bottom: 1px solid var(--card-border-color, #e2e8f0);
   flex-shrink: 0; /* 防止头部被压缩 */
@@ -926,7 +925,6 @@ body,
 .card-content {
   flex: 1;
   overflow-y: auto !important; /* 强制显示滚动条 */
-  padding: 1rem;
   height: calc(100% - 60px); /* 减去头部高度 */
 }
 
