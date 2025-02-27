@@ -662,13 +662,13 @@ const calcMobileCardHeight = computed(() => {
 .card-content {
   flex: 1;
   overflow-y: auto !important;
-  padding: 0;
+  padding: 0.3rem 0 0 0; /* 减小顶部内边距，使内容更靠近标题 */
   position: relative;
   display: flex;
   flex-direction: column;
   border-radius: 0 0 0.75rem 0.75rem;
   -webkit-overflow-scrolling: touch;
-  height: calc(100% - 60px); /* 减去头部高度 */
+  height: calc(100% - 60px);
 }
 
 /* ---------- 链接区域 ---------- */
@@ -709,7 +709,7 @@ const calcMobileCardHeight = computed(() => {
 /* ---------- 链接样式 ---------- */
 .feed-link {
   display: block;
-  padding: 0.75rem 0; /* 修改内边距 */
+  padding: 0.5rem 0; /* 减小上下内边距 */
   color: var(--text-color, #2c3e50);
   text-decoration: none;
   position: relative;
@@ -981,11 +981,11 @@ body,
   white-space: nowrap;
   transition: all 0.3s ease;
   position: relative;
-  width: calc(100% - 120px); /* 为日期留出空间 */
+  width: calc(100% - 100px); /* 减小预留给日期的空间 */
   max-width: 100%;
   font-weight: normal;
   margin-bottom: 2px;
-  padding-right: 1rem; /* 为日期留出空间 */
+  padding-right: 0.5rem; /* 减小右侧内边距 */
 }
 
 /* ---------- 项目日期 ---------- */
@@ -1009,7 +1009,7 @@ body,
 /* ---------- 项目链接样式 ---------- */
 .item-link {
   display: block;
-  padding: 0.75rem 0; /* 修改内边距 */
+  padding: 0.5rem 0; /* 减小上下内边距 */
   color: var(--text-color, #2c3e50);
   text-decoration: none;
   position: relative;
@@ -1086,11 +1086,11 @@ html body .app-container:not(.dark) .tooltip-date {
   border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
   margin-bottom: 0.5rem;
   position: relative;
-  padding: 0 0.5rem 0 0.75rem; /* 调整左右内边距 */
+  padding: 0 0.25rem 0 0.5rem; /* 减小左右内边距，使内容更靠近边缘 */
 }
 
 .feed-item:last-child {
   border-bottom: none;
-  margin-bottom: 1rem; /* 增加底部间距 */
+  margin-bottom: 1rem;
 }
 </style>
