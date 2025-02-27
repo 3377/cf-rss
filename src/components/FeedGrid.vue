@@ -981,25 +981,25 @@ body,
   white-space: nowrap;
   transition: all 0.3s ease;
   position: relative;
-  width: calc(100% - 100px); /* 减小预留给日期的空间 */
+  width: 100%; /* 让标题占据整个宽度 */
   max-width: 100%;
   font-weight: normal;
   margin-bottom: 2px;
-  padding-right: 0.5rem; /* 减小右侧内边距 */
+  padding-right: 0; /* 移除右侧内边距 */
 }
 
 /* ---------- 项目日期 ---------- */
 .item-date {
   position: absolute;
-  right: 0;
+  right: 0.25rem; /* 调整日期位置，靠近右边框 */
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+  padding: 0.25rem 0;
   opacity: 0.8;
   transition: all 0.3s ease;
   white-space: nowrap;
+  background: var(--card-bg); /* 添加背景色，防止文字重叠 */
 }
 
 .item-link:hover .item-date {
@@ -1009,11 +1009,12 @@ body,
 /* ---------- 项目链接样式 ---------- */
 .item-link {
   display: block;
-  padding: 0.5rem 0; /* 减小上下内边距 */
+  padding: 0.5rem 0.25rem; /* 调整内边距 */
   color: var(--text-color, #2c3e50);
   text-decoration: none;
   position: relative;
   transition: all 0.2s ease;
+  width: 100%; /* 确保链接占据整个宽度 */
 }
 
 .item-link:hover {
@@ -1086,7 +1087,8 @@ html body .app-container:not(.dark) .tooltip-date {
   border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
   margin-bottom: 0.5rem;
   position: relative;
-  padding: 0 0.25rem 0 0.5rem; /* 减小左右内边距，使内容更靠近边缘 */
+  padding: 0 0.25rem 0 0.25rem; /* 减小左右内边距到最小 */
+  width: 100%; /* 确保项目占据整个宽度 */
 }
 
 .feed-item:last-child {
