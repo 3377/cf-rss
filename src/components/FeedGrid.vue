@@ -581,8 +581,8 @@ const calcMobileCardHeight = computed(() => {
 <style>
 /* ---------- 主容器样式 ---------- */
 .feed-container {
-  height: calc(100vh - 55px);
-  padding: 0.5rem;
+  height: calc(100vh - 55px); /* 留出顶部和底部空间 */
+  padding: 0.15rem 0.25rem; /* 减少内边距以增加可用空间 */
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -592,11 +592,12 @@ const calcMobileCardHeight = computed(() => {
 .feed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
+  grid-auto-rows: minmax(calc(100vh - 95px), auto); /* 设置网格自动行高度 */
+  gap: 0.6rem; /* 减小网格间距 */
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 1rem;
-  height: 100%; /* 确保高度填充 */
+  padding: 0.2rem 0.2rem 0.4rem 0.2rem; /* 调整内边距 */
+  overflow-x: hidden;
 }
 
 /* ---------- 卡片样式 ---------- */
@@ -606,10 +607,10 @@ const calcMobileCardHeight = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 500px; /* 固定高度 */
+  height: calc(100vh - 90px); /* 调整为接近视口高度 */
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative; /* 确保相对定位 */
+  margin: 0;
 }
 
 .dark .feed-card {
@@ -624,7 +625,7 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 卡片头部 ---------- */
 .card-header {
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 0.75rem; /* 减少头部内边距 */
   border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.8));
   background: var(--card-header-bg, rgba(248, 250, 252, 0.8));
   position: sticky;
@@ -664,8 +665,8 @@ const calcMobileCardHeight = computed(() => {
   padding: 0.75rem 1rem;
   -webkit-overflow-scrolling: touch;
   position: relative;
-  height: calc(100% - 60px); /* 计算内容区域的高度 */
-  min-height: 200px; /* 设置最小高度 */
+  display: flex;
+  flex-direction: column;
 }
 
 /* 隐藏滚动条 */
