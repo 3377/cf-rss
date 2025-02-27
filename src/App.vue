@@ -318,38 +318,10 @@ onUnmounted(() => {
 
 <style>
 .app-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.header {
-  padding: 0.75rem 1rem 0.25rem;
-  flex-shrink: 0;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.content-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin: 0;
+  height: 100vh;
   overflow: hidden;
-  position: relative;
-}
-
-.footer {
-  height: 30px;
-  text-align: center;
-  background: var(--bg-color);
-  border-top: 1px solid #e5e7eb;
-  flex-shrink: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
+  flex-direction: column;
 }
 
 /* 亮色模式样式 - 更高优先级 */
@@ -361,6 +333,14 @@ html body .app-container.bg-gray-50 {
     linear-gradient(-45deg, transparent 75%, #e6ecf6 75%) !important;
   background-size: 10px 10px !important;
   background-position: 0 0, 0 5px, 5px -5px, -5px 0 !important;
+}
+
+.header {
+  padding: 0.75rem 1rem 0.25rem;
+  flex-shrink: 0;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 html body .app-container.bg-gray-50 .header {
@@ -394,6 +374,15 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
   box-shadow: 0 3px 6px rgba(76, 175, 125, 0.2) !important;
 }
 
+.content-area {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
 html body .app-container.bg-gray-50 .content-area {
   background-color: rgba(240, 245, 252, 0.4) !important;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
@@ -401,6 +390,19 @@ html body .app-container.bg-gray-50 .content-area {
 
 .dark .content-area {
   background-color: rgba(17, 24, 39, 0.3);
+}
+
+.footer {
+  flex-shrink: 0;
+  border-top: 1px solid #e5e7eb;
+  backdrop-filter: blur(8px);
+  padding-top: 0.25rem;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
+}
+
+html body .app-container.bg-gray-50 .footer {
+  background-color: rgba(235, 242, 250, 0.9) !important;
+  border-top: 1px solid rgba(200, 215, 235, 0.6) !important;
 }
 
 .dark .footer {

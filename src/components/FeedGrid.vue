@@ -581,33 +581,39 @@ const calcMobileCardHeight = computed(() => {
 <style>
 /* 卡片容器样式 */
 .feed-container {
-  flex: 1;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  height: calc(100vh - 180px);
+  overflow: auto;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: calc(100vh - 120px); /* 减去头部和底部的高度 */
-  overflow: auto;
 }
 
 /* 卡片网格布局 */
 .feed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
-  flex: 1;
-  min-height: 100%;
+  gap: 24px;
+  padding: 0.5rem;
+  min-height: min-content;
 }
 
 /* 卡片样式 */
 .feed-card {
-  background: var(--card-bg);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  padding: 16px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   min-height: 300px;
   max-height: 500px;
+  cursor: pointer;
+  gap: 0.5rem;
+  transition: all 0.3s;
+  user-select: none;
+  border-radius: 8px;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -648,9 +654,9 @@ const calcMobileCardHeight = computed(() => {
 }
 
 .feed-links {
-  height: 100%;
   overflow-y: auto;
-  padding: 0.5rem 0;
+  height: 100%;
+  padding-right: 4px;
 }
 
 .feed-links::-webkit-scrollbar {
@@ -851,12 +857,17 @@ const calcMobileCardHeight = computed(() => {
 /* 卡片内容区域样式 */
 .card-content {
   flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
+  padding: 0.5rem 0;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  border-radius: 0 0 0.75rem 0.75rem;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  scroll-behavior: smooth;
 }
 
+/* 隐藏滚动条 */
 .card-content::-webkit-scrollbar {
   display: none;
 }
@@ -1066,28 +1077,74 @@ html body .app-container:not(.dark) .tooltip-date {
 /* 移动设备适配 */
 @media (max-width: 768px) {
   .feed-container {
-    height: auto;
-    min-height: calc(100vh - 180px);
-    padding: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    height: calc(100vh - 9rem);
   }
 
   .feed-grid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
+    display: block;
+    padding: 0;
   }
 
   .feed-card {
+    margin-bottom: 1rem;
+    height: auto;
+    box-shadow: none;
     min-height: auto;
     max-height: none;
   }
 
+  .card-header {
+    padding: 0.75rem;
+    background: transparent;
+    border-bottom-color: rgba(226, 232, 240, 0.4);
+  }
+
+  .dark .card-header {
+    border-bottom-color: rgba(75, 85, 105, 0.1);
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    color: var(--text-primary, #2d3748);
+  }
+
+  .dark .card-title {
+    color: var(--el-text-color-primary);
+  }
+
   .card-content {
-    overflow-y: visible;
+    padding: 0.25rem 0;
+    height: auto;
+    overflow: visible;
   }
 
   .feed-links {
     height: auto;
-    overflow-y: visible;
+    overflow: visible;
+  }
+
+  .feed-link {
+    padding: 0.6rem 0;
+    font-size: 0.9rem;
+    white-space: normal;
+    line-height: 1.5;
+  }
+
+  .feed-link-item {
+    border-bottom-color: rgba(226, 232, 240, 0.3);
+  }
+
+  .dark .feed-link-item {
+    border-bottom-color: rgba(75, 85, 105, 0.1);
+  }
+
+  .item-date {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-top: 0.25rem;
+    display: block;
   }
 }
 
