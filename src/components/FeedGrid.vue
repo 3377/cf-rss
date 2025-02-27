@@ -604,7 +604,7 @@ const calcMobileCardHeight = computed(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-top: -1rem; /* 减小顶部间距 */
+  margin-top: -1rem;
 }
 
 /* ---------- 网格布局 ---------- */
@@ -617,9 +617,9 @@ const calcMobileCardHeight = computed(() => {
   overflow-y: auto !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
-  padding: 0.2rem 0.2rem 2rem 0.2rem; /* 增加底部内边距 */
+  padding: 0.2rem 0.2rem 3rem 0.2rem; /* 增加底部内边距，为版权留出空间 */
   overflow-x: hidden;
-  height: 100%;
+  height: calc(100% - 30px); /* 减去版权区域的高度 */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -635,7 +635,7 @@ const calcMobileCardHeight = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 90px);
+  height: calc(100vh - 120px); /* 调整卡片高度，为版权留出空间 */
   overflow: hidden;
   transition: box-shadow 0.3s ease;
   margin: 0;
@@ -662,13 +662,14 @@ const calcMobileCardHeight = computed(() => {
 .card-content {
   flex: 1;
   overflow-y: auto !important;
-  padding: 0.3rem 0 0 0; /* 减小顶部内边距，使内容更靠近标题 */
+  padding: 0.3rem 0 0 0;
   position: relative;
   display: flex;
   flex-direction: column;
   border-radius: 0 0 0.75rem 0.75rem;
   -webkit-overflow-scrolling: touch;
   height: calc(100% - 60px);
+  max-height: calc(100vh - 180px); /* 添加最大高度限制 */
 }
 
 /* ---------- 链接区域 ---------- */
