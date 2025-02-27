@@ -888,7 +888,6 @@ html body .app-container.dark .mobile-card-content {
   padding: 2%;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
   align-items: start;
-  margin: -10px 2%; /* 修改后的 margin */
 }
 
 /* 全局滚动设置 */

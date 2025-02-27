@@ -601,7 +601,7 @@ const calcMobileCardHeight = computed(() => {
 /* ---------- 主容器样式 ---------- */
 .feed-container {
   height: calc(100vh - 85px);
-  padding: 0.5rem 0.5rem;
+  padding: 0.25rem 0.5rem;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -747,7 +747,7 @@ const calcMobileCardHeight = computed(() => {
 
   .feed-container {
     height: calc(100vh - 70px);
-    padding: 0.5rem;
+    padding: 0.25rem 0.5rem;
     margin: 0;
   }
 
