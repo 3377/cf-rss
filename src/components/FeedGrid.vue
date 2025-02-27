@@ -604,6 +604,7 @@ const calcMobileCardHeight = computed(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin-top: -0.5rem; /* 减少顶部空白 */
 }
 
 /* ---------- 网格布局 ---------- */
@@ -616,7 +617,7 @@ const calcMobileCardHeight = computed(() => {
   overflow-y: auto !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
-  padding: 0.2rem 0.2rem 0.4rem 0.2rem;
+  padding: 0.2rem 0.2rem 1rem 0.2rem; /* 增加底部间距 */
   overflow-x: hidden;
   height: 100%;
   -webkit-overflow-scrolling: touch;
@@ -681,9 +682,9 @@ const calcMobileCardHeight = computed(() => {
   padding: 0;
   margin: 0;
   list-style-type: none;
-  overflow-y: auto; /* 改为 auto 允许滚动 */
-  height: 100%; /* 添加高度确保可以滚动 */
-  flex: 1; /* 允许列表占用剩余空间 */
+  overflow-y: auto;
+  height: 100%;
+  flex: 1;
 }
 
 /* ---------- 链接项样式 ---------- */
@@ -693,6 +694,7 @@ const calcMobileCardHeight = computed(() => {
   position: relative;
   border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
   cursor: pointer;
+  padding-left: 0; /* 移除左侧内边距 */
 }
 
 .feed-link-item:last-child {
@@ -1084,7 +1086,7 @@ html body .app-container:not(.dark) .tooltip-date {
   border-bottom: 1px solid var(--card-border, rgba(226, 232, 240, 0.5));
   margin-bottom: 0.5rem;
   position: relative;
-  padding: 0 1rem; /* 添加左右内边距 */
+  padding: 0 0.5rem 0 0.75rem; /* 调整左右内边距 */
 }
 
 .feed-item:last-child {
