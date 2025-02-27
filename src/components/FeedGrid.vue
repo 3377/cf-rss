@@ -600,7 +600,7 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 主容器样式 ---------- */
 .feed-container {
-  height: calc(100vh - 65px);
+  height: calc(100vh - 32px);
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -746,7 +746,7 @@ const calcMobileCardHeight = computed(() => {
   }
 
   .feed-container {
-    height: calc(100vh - 55px);
+    height: calc(100vh - 28px);
     padding: 0;
     margin: 0;
   }
@@ -864,7 +864,7 @@ const calcMobileCardHeight = computed(() => {
 /* ---------- 移动设备滑动卡片 ---------- */
 .feed-grid-mobile {
   width: 100%;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 35px);
   position: relative;
   margin-top: 0;
   overflow: hidden;
