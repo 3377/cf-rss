@@ -331,7 +331,7 @@ body,
   height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  padding: 0.15rem 0;
 }
 
 /* 亮色模式样式 - 更高优先级 */
@@ -348,11 +348,11 @@ html body .app-container.bg-gray-50 {
 /* 确保内容区域可以滚动 */
 .content-area {
   flex: 1;
-  overflow: visible !important;
   display: flex;
   flex-direction: column;
-  margin: 0.15rem 0 !important;
+  margin: 0 !important;
   padding: 0 !important;
+  overflow: hidden !important;
 }
 
 html body .app-container.bg-gray-50 .content-area {

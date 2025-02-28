@@ -623,46 +623,22 @@ const calcMobileCardHeight = computed(() => {
 /* ---------- 网格布局 ---------- */
 .feed-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-auto-rows: minmax(min-content, auto);
-  gap: 0.6rem;
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.2rem 0.2rem 1.5rem 0.2rem;
-  height: 100%;
-  -webkit-overflow-scrolling: touch;
-  opacity: 0;
-  animation: fadeIn 0.3s ease-out 0.1s forwards;
-  will-change: opacity, transform;
+  gap: 1rem;
+  padding: 0 2%;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+  align-items: start;
+  margin: 0;
 }
 
 /* ---------- 卡片样式 ---------- */
 .feed-card {
-  background: var(--el-bg-color);
-  border-radius: 1rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  height: calc(100vh - 120px);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px);
-  max-height: calc(100vh - 180px);
-  overflow: hidden;
-  transition: all var(--feed-transition-duration) ease;
+  background: var(--card-bg, #ffffff);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   margin: 0;
-  border: 1px solid var(--el-border-color-lighter);
-  opacity: 0;
-  animation: cardFadeIn 0.3s ease-out 0.2s forwards;
-  will-change: opacity, transform;
-}
-
-@keyframes cardFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* ---------- 卡片头部 ---------- */
