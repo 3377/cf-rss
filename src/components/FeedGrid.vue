@@ -763,102 +763,45 @@ const calcMobileCardHeight = computed(() => {
   }
 
   .card-header {
-    padding: 0.75rem;
-    border-radius: 0.85rem 0.85rem 0 0 !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 3.5rem;
+    padding: 0.5rem;
+    border-radius: 0 !important;
+    min-height: 2.5rem;
+    margin: 0;
+    background: transparent;
   }
 
   .card-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
     margin: 0;
     padding: 0;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .mobile-card-content {
-    border-radius: 0 0 0.85rem 0.85rem !important;
+    line-height: 1.3;
   }
 
   .feed-link-item-mobile {
-    padding: 10px 0;
+    padding: 6px 0;
     border-bottom: 1px solid var(--el-border-color-lighter);
     touch-action: pan-y;
-    min-height: 44px;
-  }
-
-  .feed-link-item-mobile:last-child {
-    border-bottom: none;
+    min-height: 32px;
   }
 
   .feed-link-mobile {
-    display: block;
-    color: var(--el-text-color-primary);
-    text-decoration: none;
-    overflow: hidden;
-    white-space: normal;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    font-size: 1rem;
-    line-height: 1.4;
-    touch-action: pan-y;
-  }
-
-  .card-content {
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  .mobile-card {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.3s ease-out;
-    padding: 12px 15px;
-    box-sizing: border-box;
-    background: var(--el-bg-color);
-    border-radius: 1.2rem !important;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    border: 1px solid var(--el-border-color-lighter);
+    font-size: 0.95rem;
+    line-height: 1.3;
   }
 
   .mobile-card .card-header {
-    margin: -12px -15px 0;
-    padding: 0.75rem;
-    border-radius: 1.2rem 1.2rem 0 0 !important;
-    background: var(--el-bg-color);
-    border-bottom: none;
-    min-height: 3.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin: 0;
+    padding: 0.5rem;
+    border-radius: 0 !important;
+    background: transparent;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+    min-height: 2.5rem;
   }
 
   .mobile-card-content {
-    margin: 0 -15px;
-    padding: 0.5rem 15px;
-    border-radius: 0 0 1.2rem 1.2rem !important;
-    background: var(--el-bg-color);
-  }
-
-  /* 在亮色模式下确保滚动 */
-  html body .app-container:not(.dark) .card-content,
-  html body .app-container:not(.dark) .mobile-card-content {
-    overflow-y: auto !important;
+    border-radius: 0 !important;
+    margin: 0;
+    padding: 0.25rem 15px;
   }
 }
 
