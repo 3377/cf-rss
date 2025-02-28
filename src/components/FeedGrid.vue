@@ -998,29 +998,20 @@ body,
   background: var(--el-bg-color);
 }
 
-/* 确保全局所有卡片组件都有圆角 */
-.card-content,
-.mobile-card-content,
-.feed-card,
-.mobile-card {
-  border-radius: 1rem !important;
-}
+/* 桌面端卡片圆角设置 */
+@media (min-width: 769px) {
+  .card-content,
+  .feed-card {
+    border-radius: 1rem;
+  }
 
-/* 明确设置卡片头部和内容区域的圆角 */
-.card-header,
-.mobile-card .card-header {
-  border-top-left-radius: 1rem !important;
-  border-top-right-radius: 1rem !important;
-  border-bottom-left-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-}
+  .card-header {
+    border-radius: 1rem 1rem 0 0;
+  }
 
-.card-content,
-.mobile-card-content {
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
-  border-bottom-left-radius: 1rem !important;
-  border-bottom-right-radius: 1rem !important;
+  .card-content {
+    border-radius: 0 0 1rem 1rem;
+  }
 }
 
 /* ---------- 滑动指示器 ---------- */
