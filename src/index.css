@@ -318,12 +318,12 @@ body {
 /* 全局确保网格区域可以滚动 */
 .feed-grid {
     display: grid;
-    gap: 16px;
+    gap: 24px;
     /* 减小间距从24px到16px */
-    padding: 1.5%;
+    padding: 1%;
     /* 减小内边距 */
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
     align-items: start;
-    margin-top: -20px;
+    margin-top: -30px;
     /* 添加负边距来减少顶部空间 */
 }
