@@ -743,266 +743,61 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 移动设备适配 ---------- */
 @media (max-width: 768px) {
-  .desktop-only {
-    display: none !important;
-  }
-
   .feed-container {
-    height: calc(100vh - 55px);
-    padding: 0;
-    margin: 0;
-    background: var(--el-bg-color);
-  }
-
-  .feed-grid {
-    padding-bottom: 1rem;
-  }
-
-  .feed-card {
-    height: auto;
-    min-height: 350px;
-    max-height: none;
-  }
-
-  .card-header {
-    padding: 0.4rem !important;
-    border-radius: 0 !important;
-    min-height: 2.5rem !important;
-    margin: 0 !important;
-  }
-
-  .card-title {
-    font-size: 1rem !important;
-    margin: 0 !important;
+    height: 100vh !important;
     padding: 0 !important;
-    line-height: 1.2 !important;
-  }
-
-  .mobile-card-content {
-    border-radius: 0 !important;
-    padding: 0.25rem 15px !important;
-  }
-
-  .feed-link-item-mobile {
-    padding: 6px 0 !important;
-    border-bottom: 1px solid var(--el-border-color-lighter);
-    touch-action: pan-y;
-    min-height: 32px !important;
-  }
-
-  .feed-link-mobile {
-    display: block;
-    color: var(--el-text-color-primary);
-    text-decoration: none;
-    overflow: hidden;
-    white-space: normal;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    font-size: 0.95rem !important;
-    line-height: 1.3 !important;
-    touch-action: pan-y;
-  }
-
-  .mobile-card {
-    padding: 0 !important;
-    border-radius: 0 !important;
-  }
-
-  .mobile-card .card-header {
     margin: 0 !important;
-    padding: 0.4rem !important;
-    border-radius: 0 !important;
-    background: var(--el-bg-color);
-    border-bottom: 1px solid var(--el-border-color-lighter) !important;
-    min-height: 2.5rem !important;
+    background: var(--el-bg-color) !important;
   }
 
-  .mobile-card-content {
-    margin: 0 !important;
-    padding: 0.25rem 15px !important;
-    border-radius: 0 !important;
-    background: var(--el-bg-color);
-  }
-
-  /* 移除所有圆角设置 */
-  .card-content,
-  .mobile-card-content,
-  .feed-card,
-  .mobile-card,
-  .card-header,
-  .mobile-card .card-header {
-    border-radius: 0 !important;
-  }
-
-  /* 确保标题容器也没有圆角 */
-  .mobile-card .card-header,
-  .card-header {
-    border-top-left-radius: 0 !important;
-    border-top-right-radius: 0 !important;
-  }
-
-  /* 移动端卡片容器样式重置 */
   .feed-grid-mobile {
-    border-radius: 0 !important;
+    width: 100% !important;
+    height: calc(100vh - 50px) !important;
+    position: relative !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
     background: var(--el-bg-color) !important;
   }
 
   .mobile-cards-container {
-    border-radius: 0 !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
     background: var(--el-bg-color) !important;
   }
 
   .mobile-card {
-    border-radius: 0 !important;
-    background: var(--el-bg-color) !important;
-  }
-
-  /* 标题区域样式重置 */
-  .mobile-card .card-header,
-  .card-header {
-    border-radius: 0 !important;
-    border-top-left-radius: 0 !important;
-    border-top-right-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    background: var(--el-bg-color) !important;
-  }
-
-  /* 内容区域样式重置 */
-  .mobile-card-content {
-    border-radius: 0 !important;
-    background: var(--el-bg-color) !important;
-  }
-
-  /* 覆盖任何可能的圆角样式 */
-  *[class*="card"],
-  *[class*="header"],
-  *[class*="content"] {
-    border-radius: 0 !important;
-  }
-
-  /* 移动端基础样式重置 */
-  .feed-grid-mobile,
-  .mobile-cards-container,
-  .mobile-card,
-  .mobile-card-content,
-  .mobile-card .card-header,
-  .card-header {
-    border-radius: 0 !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
     margin: 0 !important;
-    background: var(--el-bg-color) !important;
-  }
-
-  /* 移动端卡片头部样式 */
-  .mobile-card .card-header {
-    padding: 0.4rem !important;
-    min-height: 2.5rem !important;
-    border-bottom: 1px solid var(--el-border-color-lighter) !important;
+    padding: 0 !important;
     display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    flex-direction: column !important;
+    background: var(--el-bg-color) !important;
   }
 
-  /* 移动端卡片内容样式 */
   .mobile-card-content {
-    padding: 0.25rem 15px !important;
+    flex: 1 !important;
     margin: 0 !important;
+    padding: 0.25rem 15px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    background: var(--el-bg-color) !important;
   }
 
-  /* 移除所有可能的圆角设置 */
-  *[class*="card"],
-  *[class*="header"],
-  *[class*="content"] {
-    border-radius: 0 !important;
+  .items-list {
+    padding-bottom: 30px !important;
   }
 }
 
-/* ---------- 移动设备滑动卡片 ---------- */
-.feed-grid-mobile {
-  width: 100%;
-  height: calc(100vh - 70px);
-  position: relative;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border-radius: 0 !important;
-  background: var(--el-bg-color);
-}
-
-.mobile-cards-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  touch-action: none;
-  border-radius: 0 !important;
-  background: var(--el-bg-color);
-}
-
-.mobile-card {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease-out;
-  box-sizing: border-box;
-  background: var(--el-bg-color);
-  border-radius: 0 !important;
-  box-shadow: none;
-  overflow: hidden;
-  border: none;
-}
-
-.dark .mobile-card {
-  background: var(--el-fill-color-darker);
-}
-
-/* 移动端卡片头部基础样式 */
-.mobile-card .card-header {
-  padding: 0.4rem;
-  min-height: 2.5rem;
-  background: var(--el-bg-color);
-  border-bottom: 1px solid var(--el-border-color-lighter);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0 !important;
-  margin: 0 !important;
-}
-
-/* ---------- 错误和空数据提示 ---------- */
-.error-message {
-  color: #ef4444;
-  padding: 1rem;
-}
-
-.empty-message {
-  text-align: center;
-  padding: 1rem;
-}
-
-/* ---------- 全局设置 ---------- */
-html,
-body,
-#app,
-.app-container {
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
-  background: var(--el-bg-color);
-}
-
-/* 桌面端卡片圆角设置 */
+/* ---------- 桌面端卡片圆角设置 */
 @media (min-width: 769px) {
   .card-content,
   .feed-card {
@@ -1020,28 +815,34 @@ body,
 
 /* ---------- 滑动指示器 ---------- */
 .swipe-indicator {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 4px 0;
-  margin: 0;
-  background: var(--el-bg-color);
-  z-index: 10;
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 30px !important;
+  padding: 4px 0 !important;
+  margin: 0 !important;
+  background: var(--el-bg-color) !important;
+  z-index: 100 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 8px !important;
+  border-top: 1px solid var(--el-border-color-lighter) !important;
 }
 
 .indicator-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--el-text-color-disabled);
-  transition: all 0.2s ease;
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background-color: var(--el-text-color-disabled) !important;
+  transition: all 0.2s ease !important;
 }
 
 .indicator-dot.active {
-  width: 12px;
-  height: 12px;
-  background-color: var(--el-color-primary);
+  width: 12px !important;
+  height: 12px !important;
+  background-color: var(--el-color-primary) !important;
 }
 
 /* ---------- 卡片标题 ---------- */
