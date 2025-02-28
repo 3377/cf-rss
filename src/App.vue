@@ -571,58 +571,21 @@ button {
   background: var(--card-bg, rgba(180, 210, 240, 0.95)) !important;
 }
 
-/* 移动端优化样式 */
+/* 移动端样式优化 */
 @media (max-width: 768px) {
-  .header {
-    padding: 0.5rem 0.75rem 0.25rem;
-  }
-
-  .header-title {
-    font-size: 1.5rem !important;
-    margin-bottom: 0.5rem;
-  }
-
-  .status-text {
-    font-size: 0.8rem;
-    gap: 0.5rem !important;
-  }
-
   .footer {
-    padding: 0.25rem 0;
+    background: var(--el-bg-color) !important;
+    border-top: 1px solid var(--el-border-color-lighter) !important;
+    margin: 0 !important;
+    padding: 8px 0 !important;
   }
 
-  .footer-text {
-    font-size: 0.75rem;
-  }
-
-  button.bg-green-500 {
-    padding: 0.35rem 0.75rem !important;
-    font-size: 0.8rem !important;
-  }
-
-  button:not(.bg-green-500) {
-    padding: 0.35rem !important;
-  }
-
-  button svg {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
-  /* 字体选择器移动端优化 */
-  .font-selector {
-    margin-right: 0.25rem;
-  }
-
-  .font-selector select {
-    padding: 0.35rem 0.5rem !important;
-    font-size: 0.75rem !important;
-    max-width: 85px;
-  }
-
-  /* 移动端内容区域样式优化 */
   .content-area {
-    margin-bottom: 0.5rem;
+    background: var(--el-bg-color) !important;
+  }
+
+  .mobile-footer {
+    padding: 0 15px !important;
   }
 }
 

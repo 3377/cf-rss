@@ -751,6 +751,7 @@ const calcMobileCardHeight = computed(() => {
     height: calc(100vh - 55px);
     padding: 0;
     margin: 0;
+    background: var(--el-bg-color);
   }
 
   .feed-grid {
@@ -822,6 +823,17 @@ const calcMobileCardHeight = computed(() => {
     margin: 0 !important;
     padding: 0.25rem 15px !important;
     border-radius: 0 !important;
+    background: var(--el-bg-color);
+  }
+
+  /* 移除所有圆角设置 */
+  .card-content,
+  .mobile-card-content,
+  .feed-card,
+  .mobile-card,
+  .card-header,
+  .mobile-card .card-header {
+    border-radius: 0 !important;
   }
 }
 
@@ -832,7 +844,8 @@ const calcMobileCardHeight = computed(() => {
   position: relative;
   margin-top: 0;
   overflow: hidden;
-  border-radius: 0.75rem;
+  border-radius: 0 !important;
+  background: var(--el-bg-color);
 }
 
 .mobile-cards-container {
@@ -841,7 +854,8 @@ const calcMobileCardHeight = computed(() => {
   height: 100%;
   overflow: hidden;
   touch-action: none;
-  border-radius: 0.75rem;
+  border-radius: 0 !important;
+  background: var(--el-bg-color);
 }
 
 .mobile-card {
@@ -853,13 +867,13 @@ const calcMobileCardHeight = computed(() => {
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease-out;
-  padding: 12px 15px;
+  padding: 0;
   box-sizing: border-box;
   background: var(--el-bg-color);
-  border-radius: 1.2rem !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 0 !important;
+  box-shadow: none;
   overflow: hidden;
-  border: 1px solid var(--el-border-color-lighter);
+  border: none;
 }
 
 .dark .mobile-card {
