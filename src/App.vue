@@ -350,8 +350,7 @@ html body .app-container.bg-gray-50 {
   overflow: visible !important;
   display: flex;
   flex-direction: column;
-  margin-top: 0;
-  margin-bottom: 5px;
+  margin: 0.5rem 0;
 }
 
 html body .app-container.bg-gray-50 .content-area {
@@ -425,10 +424,10 @@ html body .app-container.dark .mobile-card-content {
 }
 
 .header {
-  padding: 0.75rem 1rem 0.25rem;
+  padding: 0.5rem 1rem;
   flex-shrink: 0;
   border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 0;
+  margin-bottom: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -467,9 +466,9 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
   flex-shrink: 0;
   border-top: 1px solid #e5e7eb;
   backdrop-filter: blur(8px);
-  padding-top: 0.25rem;
+  padding: 0.5rem 0;
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
-  margin-top: 0;
+  margin-top: 0.5rem;
 }
 
 html body .app-container.bg-gray-50 .footer {
@@ -574,7 +573,7 @@ button {
 /* 移动端优化样式 */
 @media (max-width: 768px) {
   .header {
-    padding: 0.5rem 0.75rem 0.25rem;
+    padding: 0.4rem 0.75rem;
   }
 
   .header-title {
@@ -588,7 +587,7 @@ button {
   }
 
   .footer {
-    padding: 0.25rem 0;
+    padding: 0.4rem 0;
   }
 
   .footer-text {
@@ -622,7 +621,7 @@ button {
 
   /* 移动端内容区域样式优化 */
   .content-area {
-    margin-bottom: 0.5rem;
+    margin: 0.4rem 0;
   }
 }
 
@@ -682,7 +681,7 @@ button {
   }
 
   .content-area {
-    margin-bottom: 0.25rem;
+    margin: 0.4rem 0;
   }
 }
 
@@ -855,8 +854,7 @@ html body .app-container.bg-gray-50 .font-selector select:hover {
   overflow: visible !important;
   display: flex;
   flex-direction: column;
-  margin-top: 0;
-  margin-bottom: 5px;
+  margin: 0.5rem 0;
 }
 
 /* 重置可能阻止滚动的全局设置 */
