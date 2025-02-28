@@ -425,7 +425,7 @@ html body .app-container.dark .mobile-card-content {
 }
 
 .header {
-  padding: 0.375rem 1rem 0.25rem;
+  padding: 0.75rem 1rem 0.25rem;
   flex-shrink: 0;
   border-bottom: 1px solid #e5e7eb;
   margin-bottom: 0;

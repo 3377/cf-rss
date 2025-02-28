@@ -628,7 +628,7 @@ const calcMobileCardHeight = computed(() => {
   gap: 0.6rem;
   flex: 1;
   overflow-y: auto;
-  padding: -0.5rem 0.2rem 1.5rem 0.2rem;
+  padding: 0.2rem 0.2rem 1.5rem 0.2rem;
   height: 100%;
   -webkit-overflow-scrolling: touch;
   opacity: 0;
