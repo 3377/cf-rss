@@ -320,7 +320,7 @@ body {
     display: grid;
     gap: 24px;
     /* 减小间距从24px到16px */
-    padding: 1%;
+    padding: 2%;
     /* 减小内边距 */
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
     align-items: start;
