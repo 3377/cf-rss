@@ -879,17 +879,6 @@ const calcMobileCardHeight = computed(() => {
   justify-content: center;
 }
 
-/* 修改底部版权信息样式 */
-.footer {
-  background: var(--el-bg-color) !important;
-  border-top: 1px solid var(--el-border-color-lighter) !important;
-}
-
-.footer-text {
-  background: var(--el-bg-color) !important;
-  opacity: 1 !important;
-}
-
 /* ---------- 错误和空数据提示 ---------- */
 .error-message {
   color: #ef4444;
