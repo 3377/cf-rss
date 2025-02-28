@@ -835,6 +835,53 @@ const calcMobileCardHeight = computed(() => {
   .mobile-card .card-header {
     border-radius: 0 !important;
   }
+
+  /* 确保标题容器也没有圆角 */
+  .mobile-card .card-header,
+  .card-header {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
+
+  /* 移动端卡片容器样式重置 */
+  .feed-grid-mobile {
+    border-radius: 0 !important;
+    background: var(--el-bg-color) !important;
+  }
+
+  .mobile-cards-container {
+    border-radius: 0 !important;
+    background: var(--el-bg-color) !important;
+  }
+
+  .mobile-card {
+    border-radius: 0 !important;
+    background: var(--el-bg-color) !important;
+  }
+
+  /* 标题区域样式重置 */
+  .mobile-card .card-header,
+  .card-header {
+    border-radius: 0 !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    background: var(--el-bg-color) !important;
+  }
+
+  /* 内容区域样式重置 */
+  .mobile-card-content {
+    border-radius: 0 !important;
+    background: var(--el-bg-color) !important;
+  }
+
+  /* 覆盖任何可能的圆角样式 */
+  *[class*="card"],
+  *[class*="header"],
+  *[class*="content"] {
+    border-radius: 0 !important;
+  }
 }
 
 /* ---------- 移动设备滑动卡片 ---------- */
