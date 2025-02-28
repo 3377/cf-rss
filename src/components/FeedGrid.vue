@@ -635,6 +635,7 @@ const calcMobileCardHeight = computed(() => {
   animation: fadeIn 0.3s ease-out 0.1s forwards;
   will-change: opacity, transform;
   margin-top: -30px;
+  margin-bottom: -30px;
 }
 
 /* ---------- 卡片样式 ---------- */
