@@ -331,6 +331,7 @@ body,
   height: 100vh;
   display: flex;
   flex-direction: column;
+  gap: 0.15rem;
 }
 
 /* 亮色模式样式 - 更高优先级 */
@@ -350,7 +351,8 @@ html body .app-container.bg-gray-50 {
   overflow: visible !important;
   display: flex;
   flex-direction: column;
-  margin: 0.25rem 0;
+  margin: 0.15rem 0 !important;
+  padding: 0 !important;
 }
 
 html body .app-container.bg-gray-50 .content-area {
@@ -424,10 +426,10 @@ html body .app-container.dark .mobile-card-content {
 }
 
 .header {
-  padding: 0.25rem 1rem;
+  padding: 0.15rem 1rem !important;
   flex-shrink: 0;
   border-bottom: 1px solid #e5e7eb;
-  margin: 0;
+  margin: 0 !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -466,9 +468,9 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
   flex-shrink: 0;
   border-top: 1px solid #e5e7eb;
   backdrop-filter: blur(8px);
-  padding: 0.25rem 0;
+  padding: 0.15rem 0 !important;
+  margin: 0 !important;
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
-  margin: 0;
 }
 
 html body .app-container.bg-gray-50 .footer {
@@ -573,121 +575,38 @@ button {
 /* 移动端优化样式 */
 @media (max-width: 768px) {
   .header {
-    padding: 0.2rem 0.75rem;
-  }
-
-  .header-title {
-    font-size: 1.5rem !important;
-    margin-bottom: 0.15rem;
+    padding: 0.15rem 0.75rem !important;
   }
 
   .mobile-title-container {
-    margin-bottom: 0.15rem !important;
+    margin-bottom: 0.1rem !important;
   }
 
   .mobile-header {
-    margin-bottom: 0.15rem !important;
+    margin-bottom: 0.1rem !important;
   }
 
   .content-area {
-    margin: 0.2rem 0;
+    margin: 0.15rem 0 !important;
   }
 
   .footer {
-    padding: 0.2rem 0;
-  }
-
-  .footer-text {
-    font-size: 0.75rem;
-  }
-
-  button.bg-green-500 {
-    padding: 0.35rem 0.75rem !important;
-    font-size: 0.8rem !important;
-  }
-
-  button:not(.bg-green-500) {
-    padding: 0.35rem !important;
-  }
-
-  button svg {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
-  /* 字体选择器移动端优化 */
-  .font-selector {
-    margin-right: 0.25rem;
-  }
-
-  .font-selector select {
-    padding: 0.35rem 0.5rem !important;
-    font-size: 0.75rem !important;
-    max-width: 85px;
+    padding: 0.15rem 0 !important;
   }
 }
 
 /* 小型移动设备优化 */
 @media (max-width: 480px) {
-  .app-container {
-    overflow-x: hidden;
-  }
-
   .header {
-    padding: 0.2rem 0.5rem;
-  }
-
-  .header-title {
-    font-size: 1.25rem !important;
-    margin-bottom: 0.15rem;
+    padding: 0.15rem 0.5rem !important;
   }
 
   .content-area {
-    margin: 0.2rem 0;
+    margin: 0.15rem 0 !important;
   }
 
   .footer {
-    padding: 0.2rem 0;
-  }
-
-  .footer-text {
-    font-size: 0.7rem;
-    padding: 0.25rem 0;
-    display: flex;
-    flex-direction: column;
-    line-height: 1.4;
-  }
-
-  .status-text {
-    font-size: 0.75rem;
-    flex-direction: column;
-    gap: 0.1rem !important;
-    line-height: 1.3;
-  }
-
-  /* 移动端状态显示优化 */
-  .flex.justify-between.items-center {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .flex.justify-between.items-center > div {
-    width: 100%;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .flex.items-center.gap-4.flex-1.justify-end {
-    justify-content: center;
-    margin-top: 0.2rem;
-    gap: 0.5rem !important;
-  }
-
-  /* 更紧凑的字体选择器 */
-  .font-selector select {
-    padding: 0.25rem 0.35rem !important;
-    font-size: 0.7rem !important;
-    max-width: 75px;
+    padding: 0.15rem 0 !important;
   }
 }
 
