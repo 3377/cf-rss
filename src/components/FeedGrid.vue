@@ -600,7 +600,7 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 主容器样式 ---------- */
 .feed-container {
-  height: calc(100vh - 65px);
+  height: calc(100vh - 45px);
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -628,7 +628,7 @@ const calcMobileCardHeight = computed(() => {
   gap: 0.6rem;
   flex: 1;
   overflow-y: auto;
-  padding: 0.2rem 0.2rem 1.5rem 0.2rem;
+  padding: 0.1rem 0.2rem 1.5rem 0.2rem;
   height: 100%;
   -webkit-overflow-scrolling: touch;
   opacity: 0;
@@ -643,8 +643,8 @@ const calcMobileCardHeight = computed(() => {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px);
-  max-height: calc(100vh - 180px);
+  height: calc(100vh - 160px);
+  max-height: calc(100vh - 160px);
   overflow: hidden;
   transition: all var(--feed-transition-duration) ease;
   margin: 0;
@@ -746,7 +746,7 @@ const calcMobileCardHeight = computed(() => {
   }
 
   .feed-container {
-    height: calc(100vh - 55px);
+    height: calc(100vh - 35px);
     padding: 0;
     margin: 0;
   }
@@ -858,6 +858,10 @@ const calcMobileCardHeight = computed(() => {
   html body .app-container:not(.dark) .card-content,
   html body .app-container:not(.dark) .mobile-card-content {
     overflow-y: auto !important;
+  }
+
+  .feed-grid-mobile {
+    height: calc(100vh - 50px);
   }
 }
 
