@@ -425,7 +425,7 @@ html body .app-container.dark .mobile-card-content {
 }
 
 .header {
-  padding: 0.15rem 0.5rem 0.1rem;
+  padding: 0.75rem 1rem 0.25rem;
   flex-shrink: 0;
   border-bottom: 1px solid #e5e7eb;
   margin-bottom: 0;
@@ -574,17 +574,17 @@ button {
 /* 移动端优化样式 */
 @media (max-width: 768px) {
   .header {
-    padding: 0.15rem 0.5rem 0.1rem;
+    padding: 0.5rem 0.75rem 0.25rem;
   }
 
   .header-title {
     font-size: 1.5rem !important;
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.5rem;
   }
 
   .status-text {
     font-size: 0.8rem;
-    gap: 0.25rem !important;
+    gap: 0.5rem !important;
   }
 
   .footer {
@@ -633,19 +633,19 @@ button {
   }
 
   .header {
-    padding: 0.15rem 0.5rem 0.1rem;
+    padding: 0.4rem 0.5rem 0.2rem;
   }
 
   .header-title {
     font-size: 1.25rem !important;
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.4rem;
   }
 
   .status-text {
     font-size: 0.75rem;
     flex-direction: column;
     gap: 0.1rem !important;
-    line-height: 1.2;
+    line-height: 1.3;
   }
 
   /* 移动端状态显示优化 */
@@ -966,34 +966,4 @@ body,
 .dark .card-content::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
 }
-
-/* ---------- 主容器样式 ---------- */
-.feed-container {
-  height: calc(100vh - 32px);
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  margin: 0;
-  opacity: 0;
-  animation: fadeIn 0.3s ease-out forwards;
-  will-change: opacity;
-}
-
-.header {
-  padding: 0.15rem 0.5rem 0.1rem;
-}
-
-.header-title {
-  font-size: 1.5rem !important;
-  margin-bottom: 0.15rem;
-}
-
-.status-text {
-  font-size: 0.875rem;
-  gap: 0.25rem !important;
-}
-
-/* ---------- 网格布局 ---------- */
-// ... existing code ...
 </style>
