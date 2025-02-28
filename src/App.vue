@@ -351,8 +351,7 @@ html body .app-container.bg-gray-50 {
   display: flex;
   flex-direction: column;
   margin-top: 0;
-  margin-bottom: 0;
-  background-color: var(--el-bg-color);
+  margin-bottom: 5px;
 }
 
 html body .app-container.bg-gray-50 .content-area {
@@ -465,9 +464,11 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 }
 
 .footer {
-  background-color: var(--el-bg-color);
-  padding: 0.5rem 0;
-  border-top: 1px solid var(--el-border-color-lighter);
+  flex-shrink: 0;
+  border-top: 1px solid #e5e7eb;
+  backdrop-filter: blur(8px);
+  padding-top: 0.25rem;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
   margin-top: 0;
 }
 
@@ -621,12 +622,7 @@ button {
 
   /* 移动端内容区域样式优化 */
   .content-area {
-    margin-bottom: 0;
-  }
-
-  .footer {
-    margin-top: 0;
-    background-color: var(--el-bg-color);
+    margin-bottom: 0.5rem;
   }
 }
 

@@ -832,7 +832,7 @@ const calcMobileCardHeight = computed(() => {
   position: relative;
   margin-top: 0;
   overflow: hidden;
-  border-radius: 0 !important;
+  border-radius: 0.75rem;
 }
 
 .mobile-cards-container {
@@ -841,7 +841,7 @@ const calcMobileCardHeight = computed(() => {
   height: 100%;
   overflow: hidden;
   touch-action: none;
-  border-radius: 0 !important;
+  border-radius: 0.75rem;
 }
 
 .mobile-card {
@@ -853,13 +853,13 @@ const calcMobileCardHeight = computed(() => {
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease-out;
-  padding: 0;
+  padding: 12px 15px;
   box-sizing: border-box;
   background: var(--el-bg-color);
-  border-radius: 0 !important;
-  box-shadow: none;
+  border-radius: 1.2rem !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  border: none;
+  border: 1px solid var(--el-border-color-lighter);
 }
 
 .dark .mobile-card {
@@ -868,12 +868,12 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 移动端卡片头部 ---------- */
 .mobile-card .card-header {
-  margin: 0;
-  padding: 0.4rem;
-  border-radius: 0 !important;
+  margin: -12px -15px 0;
+  padding: 0.75rem;
+  border-radius: 1.2rem 1.2rem 0 0 !important;
   background: var(--el-bg-color);
-  border-bottom: 1px solid var(--el-border-color-lighter);
-  min-height: 2.5rem;
+  border-bottom: none;
+  min-height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
