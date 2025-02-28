@@ -587,8 +587,8 @@ onMounted(() => {
 const calcMobileCardHeight = computed(() => {
   // 计算合适的高度，确保卡片底部位于适当位置
   const viewportHeight = window.innerHeight;
-  // 减去顶部导航栏高度，不再减去额外的底部间距
-  return viewportHeight - 70 + "px";
+  // 减去顶部导航栏、标题和底部间距，为内容区域预留空间
+  return viewportHeight - 120 + "px";
 });
 </script>
 
@@ -752,8 +752,6 @@ const calcMobileCardHeight = computed(() => {
     padding: 0;
     margin: 0;
     background: var(--el-bg-color);
-    display: flex;
-    flex-direction: column;
   }
 
   .feed-grid {
@@ -781,12 +779,8 @@ const calcMobileCardHeight = computed(() => {
   }
 
   .mobile-card-content {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    border-radius: 0 !important;
     padding: 0.25rem 15px !important;
-    margin: 0 !important;
-    background: var(--el-bg-color);
   }
 
   .feed-link-item-mobile {
@@ -851,12 +845,8 @@ const calcMobileCardHeight = computed(() => {
 
   /* 移动端卡片容器样式重置 */
   .feed-grid-mobile {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    padding: 0;
-    background: var(--el-bg-color);
+    border-radius: 0 !important;
+    background: var(--el-bg-color) !important;
   }
 
   .mobile-cards-container {
@@ -934,21 +924,16 @@ const calcMobileCardHeight = computed(() => {
   width: 100%;
   height: calc(100vh - 70px);
   position: relative;
-  margin: 0;
-  padding: 0;
+  margin-top: 0;
   overflow: hidden;
   border-radius: 0 !important;
   background: var(--el-bg-color);
-  display: flex;
-  flex-direction: column;
 }
 
 .mobile-cards-container {
   position: relative;
   width: 100%;
-  flex: 1;
-  margin: 0;
-  padding: 0;
+  height: 100%;
   overflow: hidden;
   touch-action: none;
   border-radius: 0 !important;
@@ -961,11 +946,10 @@ const calcMobileCardHeight = computed(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  margin: 0;
-  padding: 0;
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease-out;
+  padding: 0;
   box-sizing: border-box;
   background: var(--el-bg-color);
   border-radius: 0 !important;
@@ -1023,24 +1007,32 @@ body,
 
   .card-header {
     border-radius: 1rem 1rem 0 0;
+    border-bottom: 1px solid #94a3b8 !important;
   }
 
   .card-content {
     border-radius: 0 0 1rem 1rem;
   }
+
+  /* 亮色模式下的分隔线颜色 */
+  html body .app-container:not(.dark) .feed-item {
+    border-bottom: 1px solid #94a3b8;
+  }
+
+  html body .app-container:not(.dark) .feed-item:last-child {
+    border-bottom: none;
+  }
 }
 
 /* ---------- 滑动指示器 ---------- */
 .swipe-indicator {
-  position: relative;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 4px 0;
-  margin: 0;
-  background: var(--el-bg-color);
-  z-index: 10;
-  border-top: 1px solid var(--el-border-color-lighter);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+  margin: 5px 0;
+  gap: 8px;
+  touch-action: none;
 }
 
 .indicator-dot {
