@@ -587,8 +587,8 @@ onMounted(() => {
 const calcMobileCardHeight = computed(() => {
   // 计算合适的高度，确保卡片底部位于适当位置
   const viewportHeight = window.innerHeight;
-  // 减去顶部导航栏、标题和底部间距，为内容区域预留空间
-  return viewportHeight - 120 + "px";
+  // 减去顶部导航栏高度，不再减去额外的底部间距
+  return viewportHeight - 70 + "px";
 });
 </script>
 
@@ -924,7 +924,8 @@ const calcMobileCardHeight = computed(() => {
   width: 100%;
   height: calc(100vh - 70px);
   position: relative;
-  margin-top: 0;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   border-radius: 0 !important;
   background: var(--el-bg-color);
@@ -934,6 +935,8 @@ const calcMobileCardHeight = computed(() => {
   position: relative;
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   touch-action: none;
   border-radius: 0 !important;
@@ -946,10 +949,11 @@ const calcMobileCardHeight = computed(() => {
   left: 0;
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease-out;
-  padding: 0;
   box-sizing: border-box;
   background: var(--el-bg-color);
   border-radius: 0 !important;
@@ -1016,13 +1020,14 @@ body,
 
 /* ---------- 滑动指示器 ---------- */
 .swipe-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 0;
-  margin: 5px 0;
-  gap: 8px;
-  touch-action: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 0;
+  margin: 0;
+  background: var(--el-bg-color);
+  z-index: 10;
 }
 
 .indicator-dot {
