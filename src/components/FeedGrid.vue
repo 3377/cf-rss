@@ -882,6 +882,41 @@ const calcMobileCardHeight = computed(() => {
   *[class*="content"] {
     border-radius: 0 !important;
   }
+
+  /* 移动端基础样式重置 */
+  .feed-grid-mobile,
+  .mobile-cards-container,
+  .mobile-card,
+  .mobile-card-content,
+  .mobile-card .card-header,
+  .card-header {
+    border-radius: 0 !important;
+    margin: 0 !important;
+    background: var(--el-bg-color) !important;
+  }
+
+  /* 移动端卡片头部样式 */
+  .mobile-card .card-header {
+    padding: 0.4rem !important;
+    min-height: 2.5rem !important;
+    border-bottom: 1px solid var(--el-border-color-lighter) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* 移动端卡片内容样式 */
+  .mobile-card-content {
+    padding: 0.25rem 15px !important;
+    margin: 0 !important;
+  }
+
+  /* 移除所有可能的圆角设置 */
+  *[class*="card"],
+  *[class*="header"],
+  *[class*="content"] {
+    border-radius: 0 !important;
+  }
 }
 
 /* ---------- 移动设备滑动卡片 ---------- */
@@ -927,17 +962,17 @@ const calcMobileCardHeight = computed(() => {
   background: var(--el-fill-color-darker);
 }
 
-/* ---------- 移动端卡片头部 ---------- */
+/* 移动端卡片头部基础样式 */
 .mobile-card .card-header {
-  margin: -12px -15px 0;
-  padding: 0.75rem;
-  border-radius: 1.2rem 1.2rem 0 0 !important;
+  padding: 0.4rem;
+  min-height: 2.5rem;
   background: var(--el-bg-color);
-  border-bottom: none;
-  min-height: 3.5rem;
+  border-bottom: 1px solid var(--el-border-color-lighter);
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 0 !important;
+  margin: 0 !important;
 }
 
 /* ---------- 错误和空数据提示 ---------- */
