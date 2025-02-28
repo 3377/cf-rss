@@ -623,17 +623,18 @@ const calcMobileCardHeight = computed(() => {
 /* ---------- 网格布局 ---------- */
 .feed-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: minmax(min-content, auto);
-  gap: 0.6rem;
+  gap: 16px;
   flex: 1;
   overflow-y: auto;
-  padding: 0.2rem 0.2rem 1.5rem 0.2rem;
+  padding: 1.5%;
   height: 100%;
   -webkit-overflow-scrolling: touch;
   opacity: 0;
   animation: fadeIn 0.3s ease-out 0.1s forwards;
   will-change: opacity, transform;
+  margin-top: -20px;
 }
 
 /* ---------- 卡片样式 ---------- */

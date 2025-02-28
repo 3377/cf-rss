@@ -314,3 +314,16 @@ body {
 .app-container:not(.dark) .tooltip-date {
     color: #2563eb !important;
 }
+
+/* 全局确保网格区域可以滚动 */
+.feed-grid {
+    display: grid;
+    gap: 16px;
+    /* 减小间距从24px到16px */
+    padding: 1.5%;
+    /* 减小内边距 */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+    align-items: start;
+    margin-top: -20px;
+    /* 添加负边距来减少顶部空间 */
+}
