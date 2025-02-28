@@ -763,45 +763,64 @@ const calcMobileCardHeight = computed(() => {
   }
 
   .card-header {
-    padding: 0.5rem;
+    padding: 0.4rem !important;
     border-radius: 0 !important;
-    min-height: 2.5rem;
-    margin: 0;
-    background: transparent;
+    min-height: 2.5rem !important;
+    margin: 0 !important;
   }
 
   .card-title {
-    font-size: 1rem;
-    margin: 0;
-    padding: 0;
-    line-height: 1.3;
-  }
-
-  .feed-link-item-mobile {
-    padding: 6px 0;
-    border-bottom: 1px solid var(--el-border-color-lighter);
-    touch-action: pan-y;
-    min-height: 32px;
-  }
-
-  .feed-link-mobile {
-    font-size: 0.95rem;
-    line-height: 1.3;
-  }
-
-  .mobile-card .card-header {
-    margin: 0;
-    padding: 0.5rem;
-    border-radius: 0 !important;
-    background: transparent;
-    border-bottom: 1px solid var(--el-border-color-lighter);
-    min-height: 2.5rem;
+    font-size: 1rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important;
   }
 
   .mobile-card-content {
     border-radius: 0 !important;
-    margin: 0;
-    padding: 0.25rem 15px;
+    padding: 0.25rem 15px !important;
+  }
+
+  .feed-link-item-mobile {
+    padding: 6px 0 !important;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+    touch-action: pan-y;
+    min-height: 32px !important;
+  }
+
+  .feed-link-mobile {
+    display: block;
+    color: var(--el-text-color-primary);
+    text-decoration: none;
+    overflow: hidden;
+    white-space: normal;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 0.95rem !important;
+    line-height: 1.3 !important;
+    touch-action: pan-y;
+  }
+
+  .mobile-card {
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .mobile-card .card-header {
+    margin: 0 !important;
+    padding: 0.4rem !important;
+    border-radius: 0 !important;
+    background: var(--el-bg-color);
+    border-bottom: 1px solid var(--el-border-color-lighter) !important;
+    min-height: 2.5rem !important;
+  }
+
+  .mobile-card-content {
+    margin: 0 !important;
+    padding: 0.25rem 15px !important;
+    border-radius: 0 !important;
   }
 }
 
