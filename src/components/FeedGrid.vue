@@ -625,7 +625,7 @@ const calcMobileCardHeight = computed(() => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: minmax(min-content, auto);
-  gap: 16px;
+  gap: 24px;
   flex: 1;
   overflow-y: auto;
   padding: 1.5%;
@@ -634,7 +634,7 @@ const calcMobileCardHeight = computed(() => {
   opacity: 0;
   animation: fadeIn 0.3s ease-out 0.1s forwards;
   will-change: opacity, transform;
-  margin-top: -20px;
+  margin-top: -30px;
 }
 
 /* ---------- 卡片样式 ---------- */
@@ -822,6 +822,37 @@ const calcMobileCardHeight = computed(() => {
     padding: 0.25rem 15px !important;
     border-radius: 0 !important;
   }
+
+  /* 确保所有可能带有圆角的元素都被覆盖 */
+  .feed-grid-mobile,
+  .mobile-cards-container,
+  .mobile-card,
+  .card-header,
+  .mobile-card .card-header,
+  .card-content,
+  .mobile-card-content,
+  .feed-card {
+    border-radius: 0 !important;
+  }
+
+  .mobile-card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .mobile-card .card-header {
+    border-radius: 0 !important;
+  }
+
+  /* 移除全局圆角设置 */
+  .card-content,
+  .mobile-card-content,
+  .feed-card,
+  .mobile-card,
+  .card-header,
+  .mobile-card .card-header {
+    border-radius: 0 !important;
+  }
 }
 
 /* ---------- 移动设备滑动卡片 ---------- */
@@ -831,7 +862,7 @@ const calcMobileCardHeight = computed(() => {
   position: relative;
   margin-top: 0;
   overflow: hidden;
-  border-radius: 0.75rem;
+  border-radius: 0 !important;
 }
 
 .mobile-cards-container {
@@ -840,7 +871,7 @@ const calcMobileCardHeight = computed(() => {
   height: 100%;
   overflow: hidden;
   touch-action: none;
-  border-radius: 0.75rem;
+  border-radius: 0 !important;
 }
 
 .mobile-card {
