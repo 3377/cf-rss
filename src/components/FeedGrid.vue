@@ -648,24 +648,13 @@ const calcMobileCardHeight = computed(() => {
   height: calc(100vh - 180px);
   max-height: calc(100vh - 180px);
   overflow: hidden;
-  transition: all var(--feed-transition-duration) ease;
+  transition: all 0.3s ease;
   margin: 0;
   border: 1px solid var(--el-border-color-lighter);
-  opacity: 0;
-  animation: cardFadeIn 0.3s ease-out 0.2s forwards;
-  will-change: opacity, transform;
   position: relative;
-}
-
-@keyframes cardFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  transform: translateY(0);
+  opacity: 1;
+  will-change: transform, background-color;
 }
 
 /* ---------- 卡片头部 ---------- */
@@ -680,7 +669,7 @@ const calcMobileCardHeight = computed(() => {
   align-items: center;
   justify-content: center;
   min-height: 3.5rem;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition: all 0.3s ease;
   margin: 0;
   border-bottom: 1px solid var(--el-border-color-lighter);
 }
@@ -1001,7 +990,7 @@ body,
   overflow: hidden;
   overscroll-behavior: none;
   background: var(--el-bg-color);
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 /* 桌面端卡片圆角设置 */
@@ -1010,20 +999,25 @@ body,
   .feed-card {
     border-radius: 1rem;
     background: var(--el-bg-color);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: all 0.3s ease;
   }
 
   .card-header {
     border-radius: 1rem 1rem 0 0;
     border-bottom: 1px solid #94a3b8 !important;
     background: var(--el-bg-color);
-    margin: -1px -1px 0 -1px;
+    margin: -1px;
     width: calc(100% + 2px);
+    position: relative;
+    z-index: 1;
   }
 
   .card-content {
     border-radius: 0 0 1rem 1rem;
     background: var(--el-bg-color);
+    margin-top: -1px;
+    position: relative;
+    z-index: 0;
   }
 
   /* 亮色模式下的分隔线颜色 */
