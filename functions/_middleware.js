@@ -1,17 +1,5 @@
 import { getRSSConfig } from "../src/config/rss.config.js";
 
-// 判断请求是否为API请求
-function isApiRequest(context) {
-  const url = new URL(context.request.url);
-  return url.pathname.startsWith("/api/");
-}
-
-// 判断响应是否为HTML响应
-function isHtmlResponse(response) {
-  const contentType = response.headers.get("Content-Type") || "";
-  return contentType.includes("text/html");
-}
-
 // 添加获取 RSS 内容的函数
 async function fetchRSSFeed(url) {
   try {
@@ -110,169 +98,81 @@ async function fetchRSSFeed(url) {
 
 export async function onRequest(context) {
   try {
-    console.log("中间件开始处理请求:", context.request.url);
-    console.log("环境变量状态:", {
-      REFRESH_INTERVAL: {
-        value: context.env.REFRESH_INTERVAL,
-        type: typeof context.env.REFRESH_INTERVAL,
-      },
-      CACHE_DURATION: {
-        value: context.env.CACHE_DURATION,
-        type: typeof context.env.CACHE_DURATION,
-      },
+    // 打印环境变量，用于调试
+    console.log("Environment variables:", {
+      RSS_FEEDS: context.env.RSS_FEEDS,
+      REFRESH_INTERVAL: context.env.REFRESH_INTERVAL,
+      CACHE_DURATION: context.env.CACHE_DURATION,
     });
 
-    // 从环境变量中获取配置
-    const configWithDefaults = {
-      feeds: JSON.parse(
-        context.env.RSS_FEEDS ||
-          JSON.stringify([
-            { title: "V2EX", url: "https://www.v2ex.com/index.xml" },
-            { title: "NodeSeek", url: "https://rss.nodeseek.com" },
-            { title: "Linux DO", url: "https://linux.do/latest.rss" },
-          ])
-      ),
-      refresh: {
-        interval: context.env.REFRESH_INTERVAL
-          ? parseInt(context.env.REFRESH_INTERVAL, 10)
-          : 60,
-        cache: context.env.CACHE_DURATION
-          ? parseInt(context.env.CACHE_DURATION, 10)
-          : 0,
-      },
-      display: {
-        // 其他显示属性...
-        appTitle: context.env.APP_TITLE || "FY Pages RSS", // 应用标题
-        defaultDarkMode:
-          context.env.DEFAULT_DARK_MODE === "false" ? false : true, // 确保默认使用暗色模式
-        itemsPerFeed: parseInt(context.env.ITEMS_PER_FEED || "15", 10), // 每个卡片显示的条目数
-      },
-    };
-
-    // 打印调试信息，确认环境变量是否被正确读取
-    console.log("初始化配置 (中间件):", {
-      refreshInterval: {
-        envValue: context.env.REFRESH_INTERVAL,
-        envType: typeof context.env.REFRESH_INTERVAL,
-        parsedValue: configWithDefaults.refresh?.interval,
-        parsedType: typeof configWithDefaults.refresh?.interval,
-      },
-      cacheTime: {
-        envValue: context.env.CACHE_DURATION,
-        envType: typeof context.env.CACHE_DURATION,
-        parsedValue: configWithDefaults.refresh?.cache,
-        parsedType: typeof configWithDefaults.refresh?.cache,
-      },
-    });
-
-    // 初始化响应
-    let response = await context.next();
+    // 获取配置
+    const config = getRSSConfig(context.env);
+    console.log("Generated config:", config);
 
     const url = new URL(context.request.url);
 
-    // 如果是API请求，处理API逻辑
-    if (isApiRequest(context)) {
-      // 处理/api/feeds路径请求，忽略查询参数
-      if (url.pathname === "/api/feeds") {
-        console.log("处理/api/feeds请求:", url.toString());
-        // 获取所有 RSS 源的内容
-        const feedsWithContent = await Promise.all(
-          configWithDefaults.feeds.map(async (feed) => {
-            const { items, error } = await fetchRSSFeed(feed.url);
-            return {
-              ...feed,
-              lastUpdate: new Date().toISOString(),
-              items,
-              error,
-            };
-          })
-        );
+    // 如果是 /api/feeds 路径，返回所有 feeds 数据
+    if (url.pathname === "/api/feeds") {
+      // 获取所有 RSS 源的内容
+      const feedsWithContent = await Promise.all(
+        config.feeds.map(async (feed) => {
+          const { items, error } = await fetchRSSFeed(feed.url);
+          return {
+            ...feed,
+            lastUpdate: new Date().toISOString(),
+            items,
+            error,
+          };
+        })
+      );
 
-        return new Response(JSON.stringify(feedsWithContent), {
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        });
-      }
+      return new Response(JSON.stringify(feedsWithContent), {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    }
 
-      // 如果是其他API请求，直接返回原始响应
+    // 获取原始响应
+    const response = await context.next();
+
+    // 检查是否是 HTML 请求
+    const contentType = response.headers.get("Content-Type") || "";
+    if (!contentType.includes("text/html")) {
+      // 如果不是 HTML，直接返回原始响应
       return response;
     }
 
-    // 非API请求，检查是否是HTML请求
-    if (isHtmlResponse(response)) {
-      try {
-        // 处理HTML页面，注入配置
-        const html = await response.text();
+    // 处理 HTML 页面
+    const html = await response.text();
 
-        // 确保注入时，数值类型得到保留
-        const stringifiedConfig = JSON.stringify(configWithDefaults);
+    // 注入配置到全局变量，同时确保 feeds 有正确的数据结构
+    const configWithDefaults = {
+      ...config,
+      feeds: config.feeds.map((feed) => ({
+        ...feed,
+        lastUpdate: new Date().toISOString(),
+        items: [],
+        error: null,
+      })),
+    };
 
-        // 打印详细调试信息，确保环境变量正确传递
-        console.log("注入到前端的配置:", {
-          refreshInterval: configWithDefaults.refresh?.interval,
-          refreshIntervalType: typeof configWithDefaults.refresh?.interval,
-          cacheTime: configWithDefaults.refresh?.cache,
-          cacheTimeType: typeof configWithDefaults.refresh?.cache,
-          configType: typeof configWithDefaults,
-        });
+    const injectedHtml = html.replace(
+      "</head>",
+      `<script>window.__RSS_CONFIG__ = ${JSON.stringify(
+        configWithDefaults
+      )};</script></head>`
+    );
 
-        // 检查数值是否为预期值
-        if (
-          context.env.REFRESH_INTERVAL &&
-          configWithDefaults.refresh?.interval !==
-            parseInt(context.env.REFRESH_INTERVAL, 10)
-        ) {
-          console.warn("警告: 刷新间隔与环境变量不匹配", {
-            envValue: context.env.REFRESH_INTERVAL,
-            envValueType: typeof context.env.REFRESH_INTERVAL,
-            configValue: configWithDefaults.refresh?.interval,
-            configValueType: typeof configWithDefaults.refresh?.interval,
-          });
-        }
+    // 保持原始响应头，只修改 HTML 内容
+    const headers = new Headers(response.headers);
+    headers.set("Content-Type", "text/html;charset=UTF-8");
 
-        // 检查JSON转换是否正确保留了数值类型
-        try {
-          const parsedBack = JSON.parse(stringifiedConfig);
-          console.log("验证JSON转换后类型:", {
-            refreshInterval: parsedBack.refresh?.interval,
-            refreshIntervalType: typeof parsedBack.refresh?.interval,
-            cacheTime: parsedBack.refresh?.cache,
-            cacheTimeType: typeof parsedBack.refresh?.cache,
-          });
-        } catch (e) {
-          console.error("JSON解析测试失败:", e);
-        }
-
-        console.log(
-          "配置JSON字符串示例(前60字符):",
-          stringifiedConfig.substring(0, 60)
-        );
-
-        // 执行HTML注入
-        const injectedHtml = html.replace(
-          "</head>",
-          `<script>window.__RSS_CONFIG__ = ${stringifiedConfig};</script></head>`
-        );
-
-        // 保持原始响应头，只修改 HTML 内容
-        const headers = new Headers(response.headers);
-        headers.set("Content-Type", "text/html;charset=UTF-8");
-
-        return new Response(injectedHtml, {
-          status: response.status,
-          headers: headers,
-        });
-      } catch (injectionError) {
-        console.error("HTML注入过程出错:", injectionError);
-        // 如果HTML注入过程出错，返回原始响应
-        return response;
-      }
-    }
-
-    // 如果不是HTML响应，直接返回原始响应
-    return response;
+    return new Response(injectedHtml, {
+      status: response.status,
+      headers: headers,
+    });
   } catch (error) {
     console.error("Middleware error:", error);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
