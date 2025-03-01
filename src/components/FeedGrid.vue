@@ -606,18 +606,9 @@ const calcMobileCardHeight = computed(() => {
   flex-direction: column;
   overflow: hidden;
   margin: 0;
-  opacity: 0;
-  animation: fadeIn 0.3s ease-out forwards;
-  will-change: opacity;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  opacity: 1;
+  background: var(--el-bg-color);
+  transition: all 0.3s ease;
 }
 
 /* ---------- 网格布局 ---------- */
@@ -631,9 +622,9 @@ const calcMobileCardHeight = computed(() => {
   padding: 1%;
   height: 100%;
   -webkit-overflow-scrolling: touch;
-  opacity: 0;
-  animation: fadeIn 0.3s ease-out 0.1s forwards;
-  will-change: opacity, transform;
+  opacity: 1;
+  background: var(--el-bg-color);
+  transition: all 0.3s ease;
   margin-top: -30px;
   margin-bottom: -30px;
 }
@@ -654,7 +645,6 @@ const calcMobileCardHeight = computed(() => {
   position: relative;
   transform: translateY(0);
   opacity: 1;
-  will-change: transform, background-color;
 }
 
 /* ---------- 卡片头部 ---------- */
@@ -1010,6 +1000,7 @@ body,
     width: calc(100% + 2px);
     position: relative;
     z-index: 1;
+    transition: all 0.3s ease;
   }
 
   .card-content {
@@ -1018,6 +1009,7 @@ body,
     margin-top: -1px;
     position: relative;
     z-index: 0;
+    transition: all 0.3s ease;
   }
 
   /* 亮色模式下的分隔线颜色 */
@@ -1229,22 +1221,8 @@ html body .app-container .feed-grid {
   -ms-overflow-style: none;
 }
 
-/* 预加载状态 */
+/* 移除预加载状态的透明效果 */
 .feed-container::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--el-bg-color);
-  z-index: 9999;
-  opacity: 1;
-  transition: opacity 0.3s ease-out;
-  pointer-events: none;
-}
-
-.feed-container.loaded::before {
-  opacity: 0;
+  display: none;
 }
 </style>
