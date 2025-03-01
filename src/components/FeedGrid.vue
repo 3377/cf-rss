@@ -1048,7 +1048,7 @@ body,
 
   .card-header {
     border-radius: 1rem 1rem 0 0;
-    border-bottom: 1px solid #94a3b8 !important;
+    border-bottom: 1px solid #64748b !important;
     background: var(--el-bg-color) !important;
     margin: -1px;
     width: calc(100% + 2px);
@@ -1062,11 +1062,12 @@ body,
     margin-top: -1px;
     position: relative;
     z-index: 0;
+    border-bottom: 1px solid #64748b !important;
   }
 
   /* 亮色模式下的分隔线颜色 */
   html body .app-container:not(.dark) .feed-item {
-    border-bottom: 1px solid #94a3b8;
+    border-bottom: 1px solid #64748b;
   }
 
   html body .app-container:not(.dark) .feed-item:last-child {
@@ -1276,5 +1277,14 @@ html body .app-container .feed-grid {
 /* 移除预加载状态的透明效果 */
 .feed-container::before {
   display: none !important;
+}
+
+/* 增加亮色模式下的边框颜色 */
+html body .app-container:not(.dark) .card-header {
+  border-bottom-color: #64748b !important;
+}
+
+html body .app-container:not(.dark) .feed-item {
+  border-bottom-color: #64748b !important;
 }
 </style>
