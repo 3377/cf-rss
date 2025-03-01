@@ -271,6 +271,8 @@ const fetchFeeds = async () => {
     loading.value = true;
     error.value = null;
     const timestamp = new Date().getTime();
+    console.log("开始获取RSS源数据...");
+
     const response = await fetch(`/api/feeds?t=${timestamp}`, {
       headers: {
         "Cache-Control": "no-cache",
@@ -279,14 +281,26 @@ const fetchFeeds = async () => {
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        `HTTP error! status: ${response.status}, response:`,
+        errorText
+      );
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    feeds.value = await response.json();
-    countdown.value = RSS_CONFIG.refresh?.interval || 300;
+    const data = await response.json();
+    console.log("获取到RSS源数据:", data);
+
+    if (Array.isArray(data)) {
+      feeds.value = data;
+      countdown.value = RSS_CONFIG.refresh?.interval || 300;
+    } else {
+      throw new Error("返回数据格式不正确");
+    }
   } catch (err) {
     console.error("Error fetching feeds:", err);
-    error.value = "加载失败，请稍后重试";
+    error.value = `加载失败，请稍后重试。Error: ${err.message}`;
   } finally {
     loading.value = false;
   }

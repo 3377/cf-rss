@@ -5,12 +5,22 @@ async function fetchRSSFeed(url) {
   try {
     // 通用的请求头
     const headers = new Headers({
-      "User-Agent": "RSS Reader Bot/1.0",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       Accept:
         "application/rss+xml, application/xml, application/atom+xml, text/xml, */*",
+      "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
     });
 
-    const response = await fetch(url, { headers });
+    console.log(`Fetching RSS from: ${url}`);
+    const response = await fetch(url, {
+      headers,
+      cf: {
+        cacheTtl: 60,
+        cacheEverything: true,
+      },
+    });
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -113,25 +123,59 @@ export async function onRequest(context) {
 
     // 如果是 /api/feeds 路径，返回所有 feeds 数据
     if (url.pathname === "/api/feeds") {
-      // 获取所有 RSS 源的内容
-      const feedsWithContent = await Promise.all(
-        config.feeds.map(async (feed) => {
-          const { items, error } = await fetchRSSFeed(feed.url);
-          return {
-            ...feed,
-            lastUpdate: new Date().toISOString(),
-            items,
-            error,
-          };
-        })
-      );
+      try {
+        // 获取所有 RSS 源的内容
+        const feedsWithContent = await Promise.all(
+          config.feeds.map(async (feed) => {
+            console.log(`Processing feed: ${feed.title} (${feed.url})`);
+            try {
+              const { items, error } = await fetchRSSFeed(feed.url);
+              return {
+                ...feed,
+                lastUpdate: new Date().toISOString(),
+                items,
+                error,
+              };
+            } catch (feedError) {
+              console.error(`Error processing feed ${feed.title}:`, feedError);
+              return {
+                ...feed,
+                lastUpdate: new Date().toISOString(),
+                items: [],
+                error: `Failed to load: ${feedError.message}`,
+              };
+            }
+          })
+        );
 
-      return new Response(JSON.stringify(feedsWithContent), {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      });
+        return new Response(JSON.stringify(feedsWithContent), {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Cache-Control": "public, max-age=60",
+          },
+        });
+      } catch (apiError) {
+        console.error("API error:", apiError);
+        return new Response(
+          JSON.stringify({
+            error: "Failed to fetch feeds",
+            message: apiError.message,
+            stack: apiError.stack,
+          }),
+          {
+            status: 500,
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET, OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type",
+            },
+          }
+        );
+      }
     }
 
     // 获取原始响应

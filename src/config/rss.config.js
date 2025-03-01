@@ -2,8 +2,8 @@
 const defaultConfig = {
   feeds: [
     {
-      title: "V2EX",
-      url: "https://www.v2ex.com/index.xml",
+      title: "36kr",
+      url: "https://36kr.com/feed",
     },
     {
       title: "NodeSeek",
@@ -11,7 +11,11 @@ const defaultConfig = {
     },
     {
       title: "Linux DO",
-      url: "https://linux.do/latest.rss",
+      url: "https://api.dbot.pp.ua/v1/rss/linuxdo",
+    },
+    {
+      title: "人人都是产品经理",
+      url: "https://www.woshipm.com/feed",
     },
   ],
   refresh: {
