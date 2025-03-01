@@ -596,11 +596,11 @@ const calcMobileCardHeight = computed(() => {
   --feed-transition-duration: 0.3s;
 }
 
-/* 强制背景色不透明 */
+/* 平滑主题切换 */
 .app-container,
 .app-container * {
-  transition: background-color 0.3s ease, color 0.3s ease,
-    border-color 0.3s ease !important;
+  transition: background-color 0.5s ease, color 0.5s ease,
+    border-color 0.5s ease !important;
 }
 
 /* 确保背景色始终不透明 */
@@ -624,7 +624,6 @@ const calcMobileCardHeight = computed(() => {
   margin: 0;
   opacity: 1;
   background: var(--el-bg-color) !important;
-  transition: none !important;
 }
 
 /* ---------- 网格布局 ---------- */
@@ -640,7 +639,6 @@ const calcMobileCardHeight = computed(() => {
   -webkit-overflow-scrolling: touch;
   opacity: 1;
   background: var(--el-bg-color) !important;
-  transition: none !important;
   margin-top: -30px;
   margin-bottom: -30px;
 }
@@ -655,7 +653,6 @@ const calcMobileCardHeight = computed(() => {
   height: calc(100vh - 180px);
   max-height: calc(100vh - 180px);
   overflow: hidden;
-  transition: none !important;
   margin: 0;
   border: 1px solid var(--el-border-color-lighter);
   position: relative;
@@ -675,7 +672,6 @@ const calcMobileCardHeight = computed(() => {
   align-items: center;
   justify-content: center;
   min-height: 3.5rem;
-  transition: none !important;
   margin: 0;
   border-bottom: 1px solid var(--el-border-color-lighter);
 }
@@ -692,7 +688,6 @@ const calcMobileCardHeight = computed(() => {
   -webkit-overflow-scrolling: touch;
   height: calc(100% - 60px);
   background: var(--el-bg-color) !important;
-  transition: none !important;
 }
 
 /* ---------- 链接区域 ---------- */
@@ -959,7 +954,7 @@ const calcMobileCardHeight = computed(() => {
 }
 
 .dark .mobile-card {
-  background: var(--el-fill-color-darker);
+  background: var(--el-fill-color-darker) !important;
 }
 
 /* 移动端卡片头部基础样式 */
@@ -996,7 +991,6 @@ body,
   overflow: hidden;
   overscroll-behavior: none;
   background: var(--el-bg-color) !important;
-  transition: none !important;
 }
 
 /* 桌面端卡片圆角设置 */
@@ -1005,7 +999,6 @@ body,
   .feed-card {
     border-radius: 1rem;
     background: var(--el-bg-color) !important;
-    transition: none !important;
   }
 
   .card-header {
@@ -1016,7 +1009,6 @@ body,
     width: calc(100% + 2px);
     position: relative;
     z-index: 1;
-    transition: none !important;
   }
 
   .card-content {
@@ -1025,7 +1017,6 @@ body,
     margin-top: -1px;
     position: relative;
     z-index: 0;
-    transition: none !important;
   }
 
   /* 亮色模式下的分隔线颜色 */
@@ -1235,6 +1226,49 @@ html body .app-container .feed-grid {
 .feed-links {
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/* 移除预加载状态的透明效果 */
+.feed-container::before {
+  display: none !important;
+}
+
+/* 确保暗色模式下的背景色正确 */
+.dark .feed-card,
+.dark .card-header,
+.dark .card-content,
+.dark .feed-container,
+.dark .feed-grid {
+  background: var(--el-bg-color) !important;
+}
+
+/* 修复移动端卡片背景色 */
+.mobile-card,
+.feed-grid-mobile,
+.mobile-cards-container {
+  background: var(--el-bg-color) !important;
+}
+
+.dark .mobile-card {
+  background: var(--el-fill-color-darker) !important;
+}
+
+/* 平滑主题切换 */
+.app-container,
+.app-container * {
+  transition: background-color 0.5s ease, color 0.5s ease,
+    border-color 0.5s ease !important;
+}
+
+/* 确保背景色始终不透明 */
+.app-container,
+.feed-container,
+.feed-grid,
+.feed-card,
+.card-header,
+.card-content,
+.items-list {
+  background: var(--el-bg-color) !important;
 }
 
 /* 移除预加载状态的透明效果 */
