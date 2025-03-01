@@ -136,9 +136,27 @@ RSS_FEEDS: [{"title":"36氪","url":"https://36kr.com/feed"},{"title":"少数派"
 
 ## 部署步骤
 
+### 一键部署到 Cloudflare Pages
+
+1. 点击下方按钮，一键部署到 Cloudflare Pages：
+
+[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/3377/cf-rss)
+
+2. 登录你的 Cloudflare 账号（如果还没有，请先注册）
+3. 选择或创建要部署的项目
+4. 设置你的环境变量（可选，参见上方"环境变量配置"部分）
+5. 等待构建和部署完成
+6. 访问分配的 \*.pages.dev 域名查看你的 RSS 阅读器
+
+### 手动部署到 Cloudflare Pages
+
 1. 准备工作
 
 ```bash
+# 克隆仓库
+git clone https://github.com/3377/cf-rss.git
+cd cf-rss
+
 # 安装依赖
 npm install
 
@@ -148,16 +166,66 @@ npm run build
 
 2. Cloudflare Pages 设置
 
-- 登录 Cloudflare Dashboard
-- 进入 Pages 页面
-- 创建新项目并连接 GitHub 仓库
-- 设置构建配置:
-  - Framework preset: Vue
-  - Build command: `npm run build`
-  - Build output directory: `dist`
-  - Node.js version: 16
-  - 添加环境变量（如上表所示）
-- 点击部署
+- 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+- 在左侧菜单中选择 **Pages**
+- 点击 **创建应用程序** 按钮
+- 选择 **连接到 Git** 选项
+- 授权并选择你的 GitHub/GitLab 仓库
+- 配置构建设置:
+  - **项目名称**: 输入你喜欢的名称（例如：my-rss-reader）
+  - **生产分支**: main（或者你的主分支名称）
+  - **框架预设**: Vue
+  - **构建命令**: `npm run build`
+  - **构建输出目录**: `dist`
+  - **Node.js 版本**: 18（或更高）
+  - **环境变量**: 添加自定义环境变量（可选，见上方"环境变量配置"部分）
+
+3. 高级设置（可选）
+
+- **自定义域名**: 在项目部署后，可以在 Pages 项目设置中添加自定义域名
+- **访问控制**: 可以设置基本身份验证或 Cloudflare Access 保护你的 RSS 阅读器
+- **环境分支**: 可以设置预览环境的分支规则
+
+4. 点击 **保存并部署** 按钮
+
+5. 等待构建和部署完成（通常需要 1-2 分钟）
+
+6. 构建完成后，点击分配的 \*.pages.dev 域名查看你的 RSS 阅读器
+
+### 持续集成/持续部署 (CI/CD)
+
+完成上述设置后，每当你推送更改到 Git 仓库，Cloudflare Pages 将自动构建和部署最新版本：
+
+- 推送到主分支（如 main）的更改将部署到生产环境
+- 推送到其他分支的更改将创建预览部署（可在 Cloudflare Pages 仪表板中查看）
+
+### 通过 Wrangler 部署（高级）
+
+如果你更喜欢使用命令行，可以使用 Cloudflare Wrangler CLI：
+
+1. 安装 Wrangler CLI
+
+```bash
+npm install -g wrangler
+```
+
+2. 登录 Cloudflare 账号
+
+```bash
+wrangler login
+```
+
+3. 构建项目
+
+```bash
+npm run build
+```
+
+4. 部署到 Cloudflare Pages
+
+```bash
+wrangler pages publish dist --project-name=my-rss-reader
+```
 
 ## 开发命令
 
