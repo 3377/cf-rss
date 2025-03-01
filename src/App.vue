@@ -284,13 +284,14 @@ const fetchFeeds = async () => {
 
     feeds.value = await response.json();
 
-    // 使用最新配置的刷新间隔
+    // 获取和使用最新配置的刷新间隔
     const latestConfig = reinitConfig();
     console.log(
-      "获取feeds完成，使用最新配置刷新间隔:",
+      "获取feeds完成，配置的刷新间隔:",
       latestConfig.refresh?.interval,
       "秒"
     );
+    console.log("window.__RSS_CONFIG__:", window.__RSS_CONFIG__?.refresh);
     countdown.value = latestConfig.refresh?.interval || 300;
 
     // 检查是否需要更新定时器
@@ -299,11 +300,9 @@ const fetchFeeds = async () => {
       const newInterval = (latestConfig.refresh?.interval || 300) * 1000;
       console.log("更新定时器间隔为:", newInterval / 1000, "秒");
       refreshTimer = setInterval(() => {
-        const currentConfig = reinitConfig();
         console.log(
-          "定时器触发，当前配置刷新间隔:",
-          currentConfig.refresh?.interval,
-          "秒"
+          "定时器触发，当前window.__RSS_CONFIG__:",
+          window.__RSS_CONFIG__?.refresh
         );
         fetchFeeds();
       }, newInterval);
@@ -322,10 +321,11 @@ const updateCountdown = () => {
     // 使用最新配置的刷新间隔
     const latestConfig = reinitConfig();
     console.log(
-      "倒计时重置，使用最新配置，刷新间隔:",
+      "倒计时重置，配置刷新间隔:",
       latestConfig.refresh?.interval,
       "秒"
     );
+    console.log("window.__RSS_CONFIG__:", window.__RSS_CONFIG__?.refresh);
     countdown.value = latestConfig.refresh?.interval || 300;
   }
 };
@@ -336,36 +336,36 @@ onMounted(async () => {
   selectedFont.value = savedFont;
   loadFont(savedFont);
 
-  // 确保使用最新的配置
+  // 检查全局配置是否存在
+  console.log("应用初始化 - 检查全局配置:", window.__RSS_CONFIG__);
+
+  // 使用最新的配置
   const latestConfig = reinitConfig();
   console.log(
     "应用初始化配置，刷新间隔:",
     latestConfig.refresh?.interval,
     "秒"
   );
+
   // 更新倒计时初始值
   countdown.value = latestConfig.refresh?.interval || 300;
+  console.log("初始倒计时设置为:", countdown.value, "秒");
 
   await fetchFeeds();
 
-  // 输出当前配置的刷新间隔，用于调试
-  console.log("当前配置的刷新间隔:", latestConfig.refresh?.interval, "秒");
-
-  // 设置定时刷新，确保使用最新的配置
+  // 设置定时刷新
   if (refreshTimer) {
     clearInterval(refreshTimer);
   }
 
-  // 使用配置中的刷新间隔，而不是固定值
+  // 使用配置中的刷新间隔设置定时器
   const refreshInterval = (latestConfig.refresh?.interval || 300) * 1000;
   console.log("设置定时刷新间隔为:", refreshInterval / 1000, "秒");
+
   refreshTimer = setInterval(() => {
-    // 每次定时调用前重新获取最新配置
-    const currentConfig = reinitConfig();
     console.log(
-      "定时器触发，当前配置刷新间隔:",
-      currentConfig.refresh?.interval,
-      "秒"
+      "定时器触发，当前window.__RSS_CONFIG__:",
+      window.__RSS_CONFIG__?.refresh
     );
     fetchFeeds();
   }, refreshInterval);
