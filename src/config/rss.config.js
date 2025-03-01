@@ -79,10 +79,25 @@ export function getRSSConfig(env) {
 
     // 处理刷新配置
     if (env.REFRESH_INTERVAL) {
-      config.refresh.interval = parseInt(env.REFRESH_INTERVAL);
+      // 确保将字符串转换为整数
+      const interval = parseInt(env.REFRESH_INTERVAL);
+      if (!isNaN(interval) && interval > 0) {
+        config.refresh.interval = interval;
+        console.log("设置刷新间隔为:", interval, "秒");
+      } else {
+        console.warn("REFRESH_INTERVAL 解析失败:", env.REFRESH_INTERVAL);
+      }
     }
+
     if (env.CACHE_DURATION) {
-      config.refresh.cache = parseInt(env.CACHE_DURATION);
+      // 确保将字符串转换为整数
+      const cache = parseInt(env.CACHE_DURATION);
+      if (!isNaN(cache) && cache >= 0) {
+        config.refresh.cache = cache;
+        console.log("设置缓存时间为:", cache, "秒");
+      } else {
+        console.warn("CACHE_DURATION 解析失败:", env.CACHE_DURATION);
+      }
     }
 
     // 处理显示配置
@@ -139,3 +154,22 @@ export const RSS_CONFIG = getRSSConfig(
     ? window.__RSS_CONFIG__
     : null
 );
+
+// 添加一个重新初始化配置的函数，用于前端动态更新配置
+export function reinitConfig() {
+  // 检查是否有新的配置数据
+  if (typeof window !== "undefined" && window.__RSS_CONFIG__) {
+    // 将更新的配置应用到 RSS_CONFIG
+    const newConfig = getRSSConfig(window.__RSS_CONFIG__);
+
+    // 打印配置信息用于调试
+    console.log("重新初始化配置，刷新间隔:", newConfig.refresh?.interval, "秒");
+
+    // 更新本模块导出的 RSS_CONFIG
+    Object.assign(RSS_CONFIG, newConfig);
+
+    return newConfig;
+  }
+
+  return RSS_CONFIG;
+}

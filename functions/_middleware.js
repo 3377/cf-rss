@@ -105,6 +105,17 @@ export async function onRequest(context) {
       CACHE_DURATION: context.env.CACHE_DURATION,
     });
 
+    // 确保数字类型的环境变量被正确解析
+    if (context.env.REFRESH_INTERVAL) {
+      context.env.REFRESH_INTERVAL = parseInt(context.env.REFRESH_INTERVAL);
+      console.log("Parsed REFRESH_INTERVAL:", context.env.REFRESH_INTERVAL);
+    }
+
+    if (context.env.CACHE_DURATION) {
+      context.env.CACHE_DURATION = parseInt(context.env.CACHE_DURATION);
+      console.log("Parsed CACHE_DURATION:", context.env.CACHE_DURATION);
+    }
+
     // 获取配置
     const config = getRSSConfig(context.env);
     console.log("Generated config:", config);

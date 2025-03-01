@@ -140,7 +140,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
-import { getRSSConfig, RSS_CONFIG } from "./config/rss.config";
+import { getRSSConfig, RSS_CONFIG, reinitConfig } from "./config/rss.config";
 
 const feeds = ref([]);
 const loading = ref(true);
@@ -283,7 +283,10 @@ const fetchFeeds = async () => {
     }
 
     feeds.value = await response.json();
-    countdown.value = RSS_CONFIG.refresh?.interval || 300;
+
+    // 使用最新配置的刷新间隔
+    const latestConfig = reinitConfig();
+    countdown.value = latestConfig.refresh?.interval || 300;
   } catch (err) {
     console.error("Error fetching feeds:", err);
     error.value = "加载失败，请稍后重试";
@@ -295,7 +298,9 @@ const fetchFeeds = async () => {
 const updateCountdown = () => {
   countdown.value--;
   if (countdown.value <= 0) {
-    countdown.value = RSS_CONFIG.refresh?.interval || 300;
+    // 使用最新配置的刷新间隔
+    const latestConfig = reinitConfig();
+    countdown.value = latestConfig.refresh?.interval || 300;
   }
 };
 
@@ -305,12 +310,25 @@ onMounted(async () => {
   selectedFont.value = savedFont;
   loadFont(savedFont);
 
-  await fetchFeeds();
-  // 设置定时刷新
-  refreshTimer = setInterval(
-    fetchFeeds,
-    (RSS_CONFIG.refresh?.interval || 300) * 1000
+  // 确保使用最新的配置
+  const latestConfig = reinitConfig();
+  console.log(
+    "应用初始化配置，刷新间隔:",
+    latestConfig.refresh?.interval,
+    "秒"
   );
+  // 更新倒计时初始值
+  countdown.value = latestConfig.refresh?.interval || 300;
+
+  await fetchFeeds();
+
+  // 输出当前配置的刷新间隔，用于调试
+  console.log("当前配置的刷新间隔:", latestConfig.refresh?.interval, "秒");
+
+  // 设置定时刷新，确保使用最新的配置
+  const refreshInterval = (latestConfig.refresh?.interval || 300) * 1000;
+  refreshTimer = setInterval(fetchFeeds, refreshInterval);
+
   // 设置倒计时更新
   countdownTimer = setInterval(updateCountdown, 1000);
 });
