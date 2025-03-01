@@ -253,8 +253,36 @@ const formatLastUpdate = computed(() => {
 });
 
 const toggleTheme = () => {
-  isDark.value = !isDark.value;
+  // 先设置一个标记，表示正在切换主题
+  document.body.classList.add("theme-switching");
+
+  // 立即应用背景色，防止闪烁
+  const newTheme = !isDark.value;
+  const bgColor = newTheme
+    ? getComputedStyle(document.documentElement).getPropertyValue(
+        "--el-bg-color-darker"
+      )
+    : getComputedStyle(document.documentElement).getPropertyValue(
+        "--el-bg-color"
+      );
+
+  // 预先设置背景色
+  const containers = document.querySelectorAll(
+    ".app-container, .feed-container, .feed-grid, .feed-card, .card-header, .card-content, .items-list, .mobile-card, .feed-grid-mobile, .mobile-cards-container, .header, .footer"
+  );
+  containers.forEach((container) => {
+    container.style.backgroundColor = bgColor;
+    container.style.background = bgColor;
+  });
+
+  // 切换主题状态
+  isDark.value = newTheme;
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
+
+  // 短暂延迟后移除标记
+  setTimeout(() => {
+    document.body.classList.remove("theme-switching");
+  }, 300);
 };
 
 const fetchFeeds = async () => {
@@ -433,14 +461,17 @@ html body .app-container.dark .mobile-card-content {
 }
 
 html body .app-container.bg-gray-50 .header {
-  background-color: rgba(235, 242, 250, 0.9) !important;
-  backdrop-filter: blur(8px) !important;
-  border-bottom: 1px solid rgba(200, 215, 235, 0.6) !important;
+  background-color: var(--el-bg-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 1px solid var(--el-border-color-lighter) !important;
 }
 
 .dark .header {
   border-color: #374151;
-  background-color: rgba(17, 24, 39, 0.6);
+  background-color: var(--el-bg-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 html body .app-container.bg-gray-50 .header-title {
@@ -473,13 +504,17 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 }
 
 html body .app-container.bg-gray-50 .footer {
-  background-color: rgba(235, 242, 250, 0.9) !important;
-  border-top: 1px solid rgba(200, 215, 235, 0.6) !important;
+  background-color: var(--el-bg-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-top: 1px solid var(--el-border-color-lighter) !important;
 }
 
 .dark .footer {
   border-color: #374151;
-  background-color: rgba(17, 24, 39, 0.6);
+  background-color: var(--el-bg-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* 移除全局滚动条 */
@@ -575,18 +610,59 @@ button {
 @media (max-width: 768px) {
   .footer {
     background: var(--el-bg-color) !important;
+    background-color: var(--el-bg-color) !important;
     border-top: 1px solid var(--el-border-color-lighter) !important;
     margin: 0 !important;
     padding: 8px 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   .content-area {
     background: var(--el-bg-color) !important;
+    background-color: var(--el-bg-color) !important;
   }
 
   .mobile-footer {
     padding: 0 15px !important;
   }
+
+  .header {
+    background: var(--el-bg-color) !important;
+    background-color: var(--el-bg-color) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* 确保亮色模式下没有透明效果 */
+html body .app-container.bg-gray-50 .header {
+  background-color: var(--el-bg-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: 1px solid var(--el-border-color-lighter) !important;
+}
+
+html body .app-container.bg-gray-50 .footer {
+  background-color: var(--el-bg-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-top: 1px solid var(--el-border-color-lighter) !important;
+}
+
+/* 确保暗色模式下没有透明效果 */
+.dark .header,
+.dark .footer {
+  background-color: var(--el-bg-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 优化主题切换过渡效果 */
+.app-container,
+.app-container * {
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease !important;
 }
 
 /* 小型移动设备优化 */

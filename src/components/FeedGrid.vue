@@ -291,6 +291,19 @@ onMounted(() => {
   // 立即设置加载完成状态，不使用延迟
   isLoaded.value = true;
 
+  // 确保所有容器都有正确的背景色
+  const containers = document.querySelectorAll(
+    ".feed-container, .feed-grid, .feed-card, .card-header, .card-content, .mobile-card, .feed-grid-mobile, .mobile-cards-container"
+  );
+  containers.forEach((container) => {
+    container.style.backgroundColor = getComputedStyle(
+      document.documentElement
+    ).getPropertyValue("--el-bg-color");
+    container.style.background = getComputedStyle(
+      document.documentElement
+    ).getPropertyValue("--el-bg-color");
+  });
+
   checkMobile();
   window.addEventListener("resize", checkMobile);
 
@@ -596,22 +609,88 @@ const calcMobileCardHeight = computed(() => {
   --feed-transition-duration: 0.3s;
 }
 
-/* 平滑主题切换 */
+/* 平滑主题切换 - 使用更短的过渡时间 */
 .app-container,
 .app-container * {
-  transition: background-color 0.5s ease, color 0.5s ease,
-    border-color 0.5s ease !important;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease !important;
 }
 
-/* 确保背景色始终不透明 */
+/* 确保背景色始终不透明 - 增加更多选择器和更高优先级 */
 .app-container,
 .feed-container,
 .feed-grid,
 .feed-card,
 .card-header,
 .card-content,
-.items-list {
+.items-list,
+.mobile-card,
+.feed-grid-mobile,
+.mobile-cards-container,
+.mobile-card-content,
+html body .app-container .feed-container,
+html body .app-container .feed-grid,
+html body .app-container .feed-card,
+html body .app-container .card-header,
+html body .app-container .card-content,
+html body .app-container .items-list {
+  background-color: var(--el-bg-color) !important;
   background: var(--el-bg-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 确保暗色模式下的背景色正确 - 增加更高优先级 */
+html body .app-container.dark .feed-card,
+html body .app-container.dark .card-header,
+html body .app-container.dark .card-content,
+html body .app-container.dark .feed-container,
+html body .app-container.dark .feed-grid,
+html body .app-container.dark .mobile-card,
+html body .app-container.dark .feed-grid-mobile,
+html body .app-container.dark .mobile-cards-container {
+  background: var(--el-bg-color) !important;
+  background-color: var(--el-bg-color) !important;
+}
+
+/* 修复移动端卡片背景色 - 增加更高优先级 */
+html body .app-container .mobile-card,
+html body .app-container .feed-grid-mobile,
+html body .app-container .mobile-cards-container {
+  background: var(--el-bg-color) !important;
+  background-color: var(--el-bg-color) !important;
+}
+
+html body .app-container.dark .mobile-card {
+  background: var(--el-fill-color-darker) !important;
+  background-color: var(--el-fill-color-darker) !important;
+}
+
+/* 移除预加载状态的透明效果 */
+.feed-container::before,
+.feed-container::after {
+  display: none !important;
+  opacity: 0 !important;
+  background: transparent !important;
+}
+
+/* 移除所有可能导致透明效果的样式 */
+html body .app-container.bg-gray-50 .header,
+html body .app-container.bg-gray-50 .footer {
+  background-color: var(--el-bg-color) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 确保在主题切换过程中不出现透明效果 */
+.app-container.bg-gray-50,
+.app-container.dark {
+  transition: background-color 0.3s ease !important;
+}
+
+/* 确保所有元素在过渡期间保持不透明 */
+.app-container * {
+  opacity: 1 !important;
 }
 
 /* ---------- 主容器样式 ---------- */
