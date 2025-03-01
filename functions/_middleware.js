@@ -25,10 +25,13 @@ async function fetchRSSFeed(url) {
     // 提取标签内容的通用方法
     const getTagContent = (xml, tag) => {
       const patterns = [
+        // 带CDATA的内容（极客公园RSS使用这种格式）
+        new RegExp(
+          `<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${tag}>`,
+          "i"
+        ),
         // 普通标签内容
         new RegExp(`<${tag}[^>]*>([^<]+)</${tag}>`, "i"),
-        // 带CDATA的内容
-        new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([^\\]]+)\\]\\]></${tag}>`, "i"),
         // 带属性的标签
         new RegExp(`<${tag}[^>]*?\\s*/?>(.*?)</${tag}>`, "i"),
       ];
@@ -43,27 +46,29 @@ async function fetchRSSFeed(url) {
     };
 
     matches.forEach((itemStr, index) => {
-      // 通用标题匹配
-      const title = itemStr.match(
-        /<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/i
-      );
+      // 通用标题匹配（改进处理CDATA的能力）
+      const title = getTagContent(itemStr, "title");
 
       // 通用链接匹配
-      let link = itemStr.match(
-        /<link[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/link>/i
-      );
-      if (!link) {
+      let link = "";
+      const linkContent = getTagContent(itemStr, "link");
+      if (linkContent) {
+        link = linkContent;
+      } else {
         // 匹配自闭合的 link 标签
         const hrefMatch = itemStr.match(/<link[^>]*href="([^"]*)"[^>]*\/?>/i);
         if (hrefMatch) {
-          link = hrefMatch;
+          link = hrefMatch[1];
         }
       }
 
       // 通用日期匹配
-      const dateRegex =
-        /<(pubDate|published|updated|date)[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/\1>/i;
-      const pubDate = itemStr.match(dateRegex);
+      const pubDate =
+        getTagContent(itemStr, "pubDate") ||
+        getTagContent(itemStr, "published") ||
+        getTagContent(itemStr, "updated") ||
+        getTagContent(itemStr, "date") ||
+        new Date().toISOString();
 
       // 获取内容描述
       const description = getTagContent(itemStr, "description");
@@ -74,12 +79,12 @@ async function fetchRSSFeed(url) {
 
       items.push({
         id: index,
-        title: title ? title[1].trim() : "",
-        link: link ? link[1].trim() : "",
-        pubDate: pubDate ? pubDate[2].trim() : new Date().toISOString(),
-        description: description,
-        content: content,
-        summary: summary,
+        title: title || "",
+        link: link || "",
+        pubDate: pubDate,
+        description: description || "",
+        content: content || "",
+        summary: summary || "",
       });
     });
 
