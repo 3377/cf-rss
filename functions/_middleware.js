@@ -5,7 +5,8 @@ async function fetchRSSFeed(url) {
   try {
     // 通用的请求头
     const headers = new Headers({
-      "User-Agent": "RSS Reader Bot/1.0",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
       Accept:
         "application/rss+xml, application/xml, application/atom+xml, text/xml, */*",
     });
@@ -16,8 +17,87 @@ async function fetchRSSFeed(url) {
     }
     const text = await response.text();
 
-    // 通用的 RSS/Atom 解析
+    // 初始化items数组
     const items = [];
+
+    // 极客公园RSS特殊处理
+    if (url.includes("geekpark.net")) {
+      console.log("处理极客公园RSS，原始内容长度:", text.length);
+
+      // 移除所有HTML注释，有时会干扰XML解析
+      let cleanedText = text.replace(/<!--[\s\S]*?-->/g, "");
+
+      // 尝试修复错误的XML格式
+      // 有时CDATA标签会写错，如 <![CDATA[ 应该是 <![CDATA[
+      cleanedText = cleanedText.replace(/<!?\[CDATA\[/g, "<![CDATA[");
+      cleanedText = cleanedText.replace(/\]\]>/g, "]]>");
+
+      try {
+        // 提取所有item节点
+        const itemMatches = [];
+        let currentIndex = 0;
+        let itemStartIndex;
+
+        // 使用简单的字符串搜索提取item节点
+        while (
+          (itemStartIndex = cleanedText.indexOf("<item>", currentIndex)) !== -1
+        ) {
+          const itemEndIndex = cleanedText.indexOf("</item>", itemStartIndex);
+          if (itemEndIndex === -1) break;
+
+          const itemXML = cleanedText.substring(
+            itemStartIndex,
+            itemEndIndex + 7
+          ); // +7 是"</item>"的长度
+          itemMatches.push(itemXML);
+          currentIndex = itemEndIndex + 7;
+        }
+
+        console.log(`极客公园RSS - 找到 ${itemMatches.length} 个item节点`);
+
+        // 处理每个item节点
+        const items = itemMatches.map((itemXML, index) => {
+          // 提取标题
+          let title = extractNodeContent(itemXML, "title");
+
+          // 提取链接
+          let link = extractNodeContent(itemXML, "link");
+
+          // 提取描述
+          let description = extractNodeContent(itemXML, "description");
+
+          // 提取日期
+          let pubDate =
+            extractNodeContent(itemXML, "pubDate") || new Date().toISOString();
+
+          if (index < 2) {
+            console.log(
+              `极客公园item #${index}: title=${title?.substring(
+                0,
+                30
+              )}..., desc=${description?.substring(0, 30)}...`
+            );
+          }
+
+          return {
+            id: index,
+            title: title || "无标题",
+            link: link || "",
+            pubDate: pubDate,
+            description: description || "无描述",
+            content: description || "",
+            summary: "",
+          };
+        });
+
+        if (items.length > 0) {
+          return { items, error: null };
+        }
+      } catch (e) {
+        console.error("极客公园RSS解析错误:", e);
+      }
+    }
+
     // 匹配所有可能的条目标签
     const itemRegex = /<(item|entry)[\s\S]*?<\/\1>/g;
     const matches = text.match(itemRegex) || [];
@@ -99,6 +179,31 @@ async function fetchRSSFeed(url) {
       error: error.message,
     };
   }
+}
+
+// 辅助函数：提取节点内容，处理CDATA和普通文本
+function extractNodeContent(xml, nodeName) {
+  // 处理CDATA包装的内容
+  const cdataPattern = new RegExp(
+    `<${nodeName}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${nodeName}>`,
+    "i"
+  );
+  const cdataMatch = xml.match(cdataPattern);
+  if (cdataMatch && cdataMatch[1]) {
+    return cdataMatch[1].trim();
+  }
+
+  // 处理普通文本内容
+  const textPattern = new RegExp(
+    `<${nodeName}[^>]*>([^<]*)</${nodeName}>`,
+    "i"
+  );
+  const textMatch = xml.match(textPattern);
+  if (textMatch && textMatch[1]) {
+    return textMatch[1].trim();
+  }
+
+  return "";
 }
 
 export async function onRequest(context) {
