@@ -286,7 +286,28 @@ const fetchFeeds = async () => {
 
     // 使用最新配置的刷新间隔
     const latestConfig = reinitConfig();
+    console.log(
+      "获取feeds完成，使用最新配置刷新间隔:",
+      latestConfig.refresh?.interval,
+      "秒"
+    );
     countdown.value = latestConfig.refresh?.interval || 300;
+
+    // 检查是否需要更新定时器
+    if (refreshTimer) {
+      clearInterval(refreshTimer);
+      const newInterval = (latestConfig.refresh?.interval || 300) * 1000;
+      console.log("更新定时器间隔为:", newInterval / 1000, "秒");
+      refreshTimer = setInterval(() => {
+        const currentConfig = reinitConfig();
+        console.log(
+          "定时器触发，当前配置刷新间隔:",
+          currentConfig.refresh?.interval,
+          "秒"
+        );
+        fetchFeeds();
+      }, newInterval);
+    }
   } catch (err) {
     console.error("Error fetching feeds:", err);
     error.value = "加载失败，请稍后重试";
@@ -300,6 +321,11 @@ const updateCountdown = () => {
   if (countdown.value <= 0) {
     // 使用最新配置的刷新间隔
     const latestConfig = reinitConfig();
+    console.log(
+      "倒计时重置，使用最新配置，刷新间隔:",
+      latestConfig.refresh?.interval,
+      "秒"
+    );
     countdown.value = latestConfig.refresh?.interval || 300;
   }
 };
@@ -326,10 +352,28 @@ onMounted(async () => {
   console.log("当前配置的刷新间隔:", latestConfig.refresh?.interval, "秒");
 
   // 设置定时刷新，确保使用最新的配置
+  if (refreshTimer) {
+    clearInterval(refreshTimer);
+  }
+
+  // 使用配置中的刷新间隔，而不是固定值
   const refreshInterval = (latestConfig.refresh?.interval || 300) * 1000;
-  refreshTimer = setInterval(fetchFeeds, refreshInterval);
+  console.log("设置定时刷新间隔为:", refreshInterval / 1000, "秒");
+  refreshTimer = setInterval(() => {
+    // 每次定时调用前重新获取最新配置
+    const currentConfig = reinitConfig();
+    console.log(
+      "定时器触发，当前配置刷新间隔:",
+      currentConfig.refresh?.interval,
+      "秒"
+    );
+    fetchFeeds();
+  }, refreshInterval);
 
   // 设置倒计时更新
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+  }
   countdownTimer = setInterval(updateCountdown, 1000);
 });
 

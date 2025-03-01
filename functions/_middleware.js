@@ -105,19 +105,27 @@ export async function onRequest(context) {
       CACHE_DURATION: context.env.CACHE_DURATION,
     });
 
-    // 确保数字类型的环境变量被正确解析
-    if (context.env.REFRESH_INTERVAL) {
-      context.env.REFRESH_INTERVAL = parseInt(context.env.REFRESH_INTERVAL);
-      console.log("Parsed REFRESH_INTERVAL:", context.env.REFRESH_INTERVAL);
+    // 预处理：确保数字类型的环境变量被正确解析为数字
+    let processedEnv = { ...context.env };
+
+    if (processedEnv.REFRESH_INTERVAL) {
+      const parsedInterval = parseInt(processedEnv.REFRESH_INTERVAL);
+      if (!isNaN(parsedInterval)) {
+        processedEnv.REFRESH_INTERVAL = parsedInterval;
+        console.log("Processed REFRESH_INTERVAL as number:", parsedInterval);
+      }
     }
 
-    if (context.env.CACHE_DURATION) {
-      context.env.CACHE_DURATION = parseInt(context.env.CACHE_DURATION);
-      console.log("Parsed CACHE_DURATION:", context.env.CACHE_DURATION);
+    if (processedEnv.CACHE_DURATION) {
+      const parsedCache = parseInt(processedEnv.CACHE_DURATION);
+      if (!isNaN(parsedCache)) {
+        processedEnv.CACHE_DURATION = parsedCache;
+        console.log("Processed CACHE_DURATION as number:", parsedCache);
+      }
     }
 
-    // 获取配置
-    const config = getRSSConfig(context.env);
+    // 获取配置 - 使用处理过的环境变量
+    const config = getRSSConfig(processedEnv);
     console.log("Generated config:", config);
 
     const url = new URL(context.request.url);
@@ -168,6 +176,15 @@ export async function onRequest(context) {
         error: null,
       })),
     };
+
+    // 输出注入到前端的配置，用于调试
+    console.log(
+      "Injecting config to frontend:",
+      JSON.stringify({
+        refresh: configWithDefaults.refresh,
+        display: { appTitle: configWithDefaults.display.appTitle },
+      })
+    );
 
     const injectedHtml = html.replace(
       "</head>",
