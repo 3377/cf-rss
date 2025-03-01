@@ -37,7 +37,7 @@
         <div class="flex items-center gap-4 flex-1 justify-end">
           <button
             @click="toggleTheme"
-            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+            class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-0 active:bg-transparent dark:active:bg-transparent"
             :title="isDark ? '切换到亮色模式' : '切换到暗色模式'"
           >
             <svg
@@ -928,5 +928,23 @@ body,
 /* 暗色模式下的滚动条 */
 .dark .card-content::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 主题切换按钮样式 */
+button:focus {
+  outline: none !important;
+}
+
+button:active {
+  background-color: transparent !important;
+}
+
+.dark button:active {
+  background-color: transparent !important;
+}
+
+/* 确保点击效果不会持续 */
+button {
+  -webkit-tap-highlight-color: transparent;
 }
 </style>

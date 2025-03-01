@@ -199,13 +199,13 @@ watch(
   (newVal, oldVal) => {
     if (newVal !== oldVal && isLoaded.value) {
       // 主题切换时，添加禁用过渡的类
-      isThemeSwitching.ref = true;
+      isThemeSwitching.value = true;
       document.body.classList.add("theme-switching");
 
       // 300ms后移除类，恢复过渡效果
       setTimeout(() => {
         document.body.classList.remove("theme-switching");
-        isThemeSwitching.ref = false;
+        isThemeSwitching.value = false;
       }, 300);
     }
   }
