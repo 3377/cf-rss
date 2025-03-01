@@ -16,7 +16,7 @@ const defaultConfig = {
   ],
   refresh: {
     interval: 120, // 默认刷新间隔为60秒
-    cache: 100,
+    cache: 0,
   },
   display: {
     appTitle: "FY Pages RSS", // 应用标题
