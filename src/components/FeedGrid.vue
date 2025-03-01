@@ -1056,10 +1056,6 @@ body,
     z-index: 1;
   }
 
-  /* 亮色模式下的边框颜色 */
-  html body .app-container:not(.dark) .card-header {
-    border-bottom: 2px solid rgba(120, 150, 200, 0.9) !important;
-  }
 
   .card-content {
     border-radius: 0 0 1rem 1rem;
