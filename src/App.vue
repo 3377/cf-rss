@@ -118,10 +118,17 @@
             target="_blank"
             rel="noopener noreferrer"
             class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
-            >RSS Reader</a
+            >cf-rss</a
           >
           <span>&nbsp;</span>
-          <span>Powered by Drfy & ll.sd</span>
+          <span>Powered by Drfy & 
+          <a
+            href="https://ll.sd"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
+            >ll.sd</a
+          </span>
         </div>
       </div>
     </footer>
