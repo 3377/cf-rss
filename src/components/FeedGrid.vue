@@ -525,16 +525,28 @@ const showTooltip = (event, date, content) => {
     const rect = event.target.getBoundingClientRect();
     const tooltipRect = tooltip.value.getBoundingClientRect();
 
-    // 计算最佳位置（优先显示在元素下方）
-    let top = rect.bottom + 8;
-    const left = Math.min(
-      Math.max(rect.left, 20),
-      window.innerWidth - tooltipRect.width - 20
-    );
+    // 修改定位逻辑，将提示框放在元素的左侧
+    let left = rect.left - tooltipRect.width - 8; // 默认放在左侧，并留出8px间距
+    let top = rect.top;
 
-    // 检查是否超出屏幕底部，如果是则显示在元素上方
+    // 如果左侧空间不足，则显示在右侧
+    if (left < 20) {
+      left = rect.right + 8; // 放在右侧，并留出8px间距
+
+      // 如果右侧也没有足够空间，则居中显示在下方
+      if (left + tooltipRect.width > window.innerWidth - 20) {
+        left = Math.max(20, rect.left + (rect.width - tooltipRect.width) / 2);
+        top = rect.bottom + 8;
+      }
+    }
+
+    // 确保提示框不超出屏幕顶部和底部
     if (top + tooltipRect.height > window.innerHeight - 20) {
-      top = rect.top - tooltipRect.height - 8;
+      top = Math.max(20, window.innerHeight - tooltipRect.height - 20);
+    }
+
+    if (top < 20) {
+      top = 20;
     }
 
     tooltipStyle.value = {
