@@ -435,7 +435,7 @@ html body .app-container.dark .mobile-card-content {
 html body .app-container.bg-gray-50 .header {
   background-color: rgba(235, 242, 250, 0.9) !important;
   backdrop-filter: blur(8px) !important;
-  border-bottom: 1px solid rgba(200, 215, 235, 0.6) !important;
+  border-bottom: 2px solid rgba(120, 150, 200, 0.8) !important;
 }
 
 .dark .header {
@@ -474,7 +474,7 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 
 html body .app-container.bg-gray-50 .footer {
   background-color: rgba(235, 242, 250, 0.9) !important;
-  border-top: 1px solid rgba(200, 215, 235, 0.6) !important;
+  border-top: 2px solid rgba(120, 150, 200, 0.8) !important;
 }
 
 .dark .footer {
