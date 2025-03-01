@@ -654,6 +654,7 @@ const calcMobileCardHeight = computed(() => {
   opacity: 0;
   animation: cardFadeIn 0.3s ease-out 0.2s forwards;
   will-change: opacity, transform;
+  position: relative;
 }
 
 @keyframes cardFadeIn {
@@ -679,6 +680,9 @@ const calcMobileCardHeight = computed(() => {
   align-items: center;
   justify-content: center;
   min-height: 3.5rem;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  margin: 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
 /* ---------- 卡片内容区域 ---------- */
@@ -693,6 +697,7 @@ const calcMobileCardHeight = computed(() => {
   -webkit-overflow-scrolling: touch;
   height: calc(100% - 60px);
   background: var(--el-bg-color);
+  transition: background-color 0.3s ease;
 }
 
 /* ---------- 链接区域 ---------- */
@@ -996,6 +1001,7 @@ body,
   overflow: hidden;
   overscroll-behavior: none;
   background: var(--el-bg-color);
+  transition: background-color 0.3s ease;
 }
 
 /* 桌面端卡片圆角设置 */
@@ -1003,15 +1009,21 @@ body,
   .card-content,
   .feed-card {
     border-radius: 1rem;
+    background: var(--el-bg-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 
   .card-header {
     border-radius: 1rem 1rem 0 0;
     border-bottom: 1px solid #94a3b8 !important;
+    background: var(--el-bg-color);
+    margin: -1px -1px 0 -1px;
+    width: calc(100% + 2px);
   }
 
   .card-content {
     border-radius: 0 0 1rem 1rem;
+    background: var(--el-bg-color);
   }
 
   /* 亮色模式下的分隔线颜色 */
