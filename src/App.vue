@@ -560,7 +560,7 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 
 .footer {
   flex-shrink: 0;
-  border-top: 1px solid #e5e7eb;
+  border-top: 0.5px solid #e5e7eb;
   backdrop-filter: blur(8px);
   padding-top: 0.25rem;
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
@@ -570,11 +570,12 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 html body .app-container.bg-gray-50 .footer {
   background-color: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(10px) !important;
-  border-top: 2px solid rgba(161, 140, 209, 0.5) !important;
+  border-top: 1px solid rgba(161, 140, 209, 0.5) !important;
 }
 
 .dark .footer {
   border-color: #374151;
+  border-top-width: 0.5px;
   background-color: rgba(17, 24, 39, 0.6);
 }
 
