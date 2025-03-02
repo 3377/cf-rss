@@ -1199,16 +1199,20 @@ body,
   border: 1px solid var(--el-border-color-lighter);
 }
 
-/* 暗色模式下的提示框样式 */
+/* 添加暗色模式下的提示框紫色渐变背景 */
 .dark .title-tooltip {
-  background-image: linear-gradient(
-    120deg,
-    #a6c0fe 0%,
-    #f68084 100%
+  background: linear-gradient(
+    135deg,
+    rgba(81, 45, 168, 0.95) 0%,
+    rgba(120, 70, 190, 0.9) 100%
   ) !important;
-  border: 2px solid rgba(246, 128, 132, 0.8) !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
   backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(161, 140, 209, 0.3) !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+.dark .tooltip-content {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 .tooltip-date {
@@ -1228,11 +1232,8 @@ html body .app-container:not(.dark) .tooltip-date {
 }
 
 .dark .tooltip-date {
-  color: #ffffff !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.5px !important;
+  color: #3b82f6 !important;
+  border-bottom-color: rgba(75, 85, 105, 0.5);
 }
 
 .tooltip-content {
@@ -1245,13 +1246,6 @@ html body .app-container:not(.dark) .tooltip-date {
   text-indent: 0;
   padding: 0.25rem 0;
   color: var(--el-text-color-primary);
-}
-
-.dark .tooltip-content {
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  font-weight: 500 !important;
-  line-height: 1.5 !important;
 }
 
 /* ---------- 卡片内的项目 ---------- */
@@ -1270,37 +1264,46 @@ html body .app-container:not(.dark) .tooltip-date {
 
 /* 修改卡片内容的样式 */
 html body .app-container:not(.dark) .card-header {
-  border-bottom: 2px solid rgba(225, 190, 235, 0.9) !important;
   background: linear-gradient(
     to right,
-    rgba(250, 240, 255, 0.95),
-    rgba(251, 194, 235, 0.7)
+    rgba(161, 140, 209, 0.8) 0%,
+    rgba(251, 194, 235, 0.8) 100%
   ) !important;
+  backdrop-filter: blur(8px) !important;
+  border-bottom: 2px solid rgba(161, 140, 209, 0.8) !important;
+  color: #5a4a8a !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
 html body .app-container:not(.dark) .feed-card {
-  border: 1px solid rgba(225, 190, 235, 0.8) !important;
-  box-shadow: 0 6px 16px rgba(225, 190, 235, 0.3),
-    0 3px 6px rgba(225, 190, 235, 0.2) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(161, 140, 209, 0.8) !important;
+  box-shadow: 0 6px 16px rgba(161, 140, 209, 0.2),
+    0 3px 6px rgba(161, 140, 209, 0.1) !important;
 }
 
-html body .app-container:not(.dark) .feed-item {
-  border-bottom: 1px dashed rgba(225, 190, 235, 0.5) !important;
-}
-
-html body .app-container:not(.dark) .feed-item:hover {
-  background-color: rgba(251, 194, 235, 0.15) !important;
-}
-
-/* 光标悬停在链接上时的样式 */
-html body .app-container:not(.dark) .feed-item a:hover {
-  color: #ad8cd1 !important;
-}
-
-/* 链接样式 */
-html body .app-container:not(.dark) .feed-item a {
+html body .app-container:not(.dark) .item-link:hover {
+  background: linear-gradient(
+    to right,
+    rgba(251, 194, 235, 0.15),
+    rgba(161, 140, 209, 0.15)
+  ) !important;
   color: #8566c9 !important;
-  transition: color 0.2s ease-in-out;
+  transition: all 0.3s ease;
+}
+
+html body .app-container:not(.dark) .item-title {
+  color: #5a4a8a !important;
+  transition: color 0.3s ease;
+}
+
+html body .app-container:not(.dark) .item-link:hover .item-title {
+  color: #8566c9 !important;
+}
+
+html body .app-container:not(.dark) .tooltip-date {
+  color: #8566c9 !important;
+  border-bottom: 1px dashed rgba(161, 140, 209, 0.5) !important;
 }
 
 /* 移除所有特定于亮色模式的样式覆盖 */

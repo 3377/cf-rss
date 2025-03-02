@@ -5,11 +5,13 @@
       !isDark
         ? {
             '--card-bg': 'rgba(255, 255, 255, 0.85)',
-            '--card-header-bg': 'rgba(250, 240, 255, 0.9)',
+            '--card-header-bg': 'rgba(240, 230, 255, 0.9)',
             '--card-content-bg': 'rgba(255, 255, 255, 0.85)',
-            '--card-border': 'rgba(225, 190, 235, 0.8)',
-            '--text-primary': '#8566c9',
-            '--text-secondary': '#ad8cd1',
+            '--card-border': 'rgba(180, 160, 220, 0.8)',
+            '--text-primary': '#5a4a8a',
+            '--text-secondary': '#7d6ca5',
+            '--link-color': '#8566c9',
+            '--link-hover-color': '#6f4ebf',
           }
         : {}
     "
@@ -116,7 +118,7 @@
             href="https://github.com/3377/cf-rss"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
+            class="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300"
             >cf-rss</a
           >
           <span>&nbsp;</span>
@@ -126,7 +128,7 @@
               href="https://ll.sd"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-500"
+              class="text-purple-500 hover:text-purple-600 dark:text-purple-400 dark:hover:text-purple-300"
               >ll.sd</a
             >
           </span>
@@ -537,18 +539,18 @@ html body .app-container.bg-gray-50 .header {
 }
 
 html body .app-container.bg-gray-50 .header-title {
-  color: #8566c9 !important;
+  color: #5a4a8a !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
 html body .app-container.bg-gray-50 button:not(.bg-green-500) {
-  background-color: rgba(250, 240, 255, 0.7) !important;
-  border: 1px solid rgba(225, 190, 235, 0.5) !important;
+  background-color: rgba(230, 220, 255, 0.7) !important;
+  border: 1px solid rgba(161, 140, 209, 0.5) !important;
 }
 
 html body .app-container.bg-gray-50 button.bg-green-500 {
-  background-color: #ad8cd1 !important;
-  box-shadow: 0 2px 4px rgba(225, 190, 235, 0.3) !important;
+  background-color: #9d7ee1 !important;
+  box-shadow: 0 2px 4px rgba(161, 140, 209, 0.3) !important;
 }
 
 html body .app-container.bg-gray-50 button.bg-green-500:hover {
@@ -624,11 +626,11 @@ body {
 }
 
 html body .app-container.bg-gray-50 .text-gray-600 {
-  color: #8566c9 !important;
+  color: #5a4a8a !important;
 }
 
 html body .app-container.bg-gray-50 .text-gray-500 {
-  color: #ad8cd1 !important;
+  color: #7d6ca5 !important;
 }
 
 button {
@@ -800,56 +802,13 @@ button {
 
 /* 暗色模式下的提示框样式 */
 .dark .tooltip-date {
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.5px !important;
+  color: #3b82f6 !important;
+  border-bottom: 1px dashed rgba(75, 85, 105, 0.5) !important;
 }
 
 /* 提示框内容居中 */
 .tooltip-content {
   text-align: center !important;
-}
-
-/* 暗色模式下提示框内容样式 */
-.dark .tooltip-content {
-  color: white !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  font-weight: 500 !important;
-  line-height: 1.5 !important;
-}
-
-/* 暗色模式下的提示框背景样式 */
-.dark [class*="tooltip"],
-.dark [class*="popper"],
-.dark [class*="popover"],
-.dark .el-tooltip__popper,
-.dark .v-tooltip__content {
-  background: linear-gradient(120deg, #a6c0fe 0%, #f68084 100%) !important;
-  border: 2px solid rgba(246, 128, 132, 0.8) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
-  backdrop-filter: blur(10px) !important;
-}
-
-/* 暗色模式下的提示框箭头样式 */
-.dark [class*="tooltip"]::after,
-.dark [class*="popper"]::after,
-.dark [class*="popover"]::after,
-.dark .el-tooltip__popper::after,
-.dark .v-tooltip__content::after {
-  border-color: rgba(246, 128, 132, 0.8) !important;
-}
-
-/* 暗色模式下提示框内容样式 */
-.dark [class*="tooltip"] *,
-.dark [class*="popper"] *,
-.dark [class*="popover"] *,
-.dark .el-tooltip__popper *,
-.dark .v-tooltip__content * {
-  color: white !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
 }
 
 /* 字体选择器样式 - 调整间距 */
@@ -1019,7 +978,7 @@ body,
 
 .card-header {
   background: var(--card-header-bg, #f8fafc);
-  border-bottom: 1px solid var(--card-border, #e2e8f0);
+  border-bottom: 1px solid var(--card-border-color, #e2e8f0);
   flex-shrink: 0; /* 防止头部被压缩 */
 }
 
@@ -1066,5 +1025,21 @@ body,
 /* 暗色模式下的滚动条 */
 .dark .card-content::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+.app-container:not(.dark) .item-link {
+  color: var(--text-primary, #5a4a8a) !important;
+}
+
+.app-container:not(.dark) .item-link:hover {
+  color: var(--link-color, #8566c9) !important;
+}
+
+.app-container:not(.dark) a:not(.item-link) {
+  color: var(--link-color, #8566c9) !important;
+}
+
+.app-container:not(.dark) a:not(.item-link):hover {
+  color: var(--link-hover-color, #6f4ebf) !important;
 }
 </style>
