@@ -26,13 +26,11 @@
         <div
           class="flex justify-center flex-1 text-base text-gray-600 status-text gap-8"
         >
-          <div v-if="loading" class="text-gray-600 font-medium status-text">
-            加载中...
-          </div>
-          <template v-else>
-            <div>下次刷新: {{ formatCountdown }}</div>
-            <div>最后更新: {{ formatLastUpdate }}</div>
-          </template>
+          <FeedCountdown
+            :refresh-countdown="countdown"
+            :from-cache="isFromCache"
+            @refresh="handleRefreshClick"
+          />
         </div>
         <div class="flex items-center gap-4 flex-1 justify-end">
           <button
@@ -88,7 +86,7 @@
           </div>
 
           <button
-            @click="fetchFeeds"
+            @click="handleRefreshClick"
             class="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
             :disabled="loading"
           >
@@ -141,9 +139,10 @@
 import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import FeedGrid from "./components/FeedGrid.vue";
 import { getRSSConfig, RSS_CONFIG } from "./config/rss.config";
+import FeedCountdown from "./components/FeedCountdown.vue";
 
 const feeds = ref([]);
-const loading = ref(true);
+const loading = ref(false);
 const error = ref(null);
 const countdown = ref(RSS_CONFIG.refresh?.interval || 300);
 const isDark = ref(
@@ -152,13 +151,12 @@ const isDark = ref(
     : localStorage.getItem("theme") === "dark"
 );
 const appTitle = ref(RSS_CONFIG.display?.appTitle || "CF RSS");
+const selectedFont = ref("");
+const lastUpdateTime = ref(new Date());
 let refreshTimer = null;
 let countdownTimer = null;
 
 // 添加字体选择相关状态
-const selectedFont = ref(
-  localStorage.getItem("selectedFont") || "DingTalk JinBuTi"
-);
 const fontLoaded = ref({
   "DingTalk JinBuTi": false,
   Yozai: false,
@@ -241,24 +239,19 @@ watch(selectedFont, () => {
   changeFont();
 });
 
+// 格式化时间的计算属性
+const formatLastUpdate = computed(() => {
+  const date = lastUpdateTime.value;
+  return `${date.getHours().toString().padStart(2, "0")}:${date
+    .getMinutes()
+    .toString()
+    .padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
+});
+
 const formatCountdown = computed(() => {
   const minutes = Math.floor(countdown.value / 60);
   const seconds = countdown.value % 60;
-  return `${minutes}分${seconds.toString().padStart(2, "0")}秒`;
-});
-
-const formatLastUpdate = computed(() => {
-  if (!feeds.value.length) return "暂无";
-  const date = new Date(feeds.value[0].lastUpdate || new Date());
-  return date.toLocaleString("zh-CN", {
-    hour12: false,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 });
 
 const toggleTheme = () => {
@@ -266,41 +259,72 @@ const toggleTheme = () => {
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
 };
 
-const fetchFeeds = async () => {
-  try {
-    loading.value = true;
-    error.value = null;
-    const timestamp = new Date().getTime();
-    console.log("开始获取RSS源数据...");
+// 在script setup部分添加缓存状态变量
+const isFromCache = ref(false);
 
-    const response = await fetch(`/api/feeds?t=${timestamp}`, {
-      headers: {
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
-      },
-    });
+// 修改fetchFeeds函数，检查并更新缓存状态
+const fetchFeeds = async (forceRefresh = false) => {
+  if (loading.value) return;
+
+  loading.value = true;
+  error.value = null;
+
+  try {
+    console.log(`开始获取RSS内容，强制刷新: ${forceRefresh}`);
+    const timestamp = new Date().getTime();
+
+    // 构建请求URL
+    const url = `/api/feeds?t=${timestamp}${
+      forceRefresh ? "&forceRefresh=true" : ""
+    }`;
+
+    // 设置请求头
+    const headers = {
+      Accept: "application/json",
+    };
+
+    // 如果强制刷新，添加no-cache头
+    if (forceRefresh) {
+      headers["Cache-Control"] = "no-cache";
+      headers["Pragma"] = "no-cache";
+    }
+
+    const response = await fetch(url, { headers });
+
+    // 检查缓存状态
+    const cacheStatus = response.headers.get("X-Cache");
+    isFromCache.value = cacheStatus === "HIT";
+
+    if (isFromCache.value) {
+      const cacheTime = response.headers.get("X-Cache-Timestamp");
+      if (cacheTime) {
+        console.log(
+          "内容来自缓存，缓存时间:",
+          new Date(parseInt(cacheTime)).toLocaleString()
+        );
+      }
+    } else {
+      console.log("获取了新内容");
+    }
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(
-        `HTTP error! status: ${response.status}, response:`,
-        errorText
-      );
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log("获取到RSS源数据:", data);
+    console.log("获取的RSS数据:", data);
 
-    if (Array.isArray(data)) {
-      feeds.value = data;
-      countdown.value = RSS_CONFIG.refresh?.interval || 300;
-    } else {
-      throw new Error("返回数据格式不正确");
+    // 验证数据是否为数组
+    if (!Array.isArray(data)) {
+      console.error("API返回的数据不是数组:", data);
+      throw new Error("无效的数据格式");
     }
+
+    feeds.value = data;
+    countdown.value = RSS_CONFIG.refresh?.interval || 300;
   } catch (err) {
-    console.error("Error fetching feeds:", err);
-    error.value = `加载失败，请稍后重试。Error: ${err.message}`;
+    console.error("获取RSS内容失败:", err);
+    error.value = `获取内容失败: ${err.message}`;
   } finally {
     loading.value = false;
   }
@@ -319,15 +343,50 @@ onMounted(async () => {
   selectedFont.value = savedFont;
   loadFont(savedFont);
 
-  await fetchFeeds();
-  // 设置定时刷新
+  // 首次加载时，尝试使用缓存
+  await fetchFeeds(false);
+
+  // 如果配置了缓存时间，创建一个自动更新缓存的定时器
+  // 这个定时器负责在后台定期更新缓存，但不会更新UI
+  if (RSS_CONFIG.refresh?.cache > 0) {
+    console.log(`设置缓存自动更新，间隔: ${RSS_CONFIG.refresh.cache}秒`);
+    const cacheUpdateTimer = setInterval(async () => {
+      try {
+        console.log("后台自动更新缓存中...");
+        // 使用fetch直接请求API更新缓存
+        const timestamp = new Date().getTime();
+        await fetch(`/api/feeds?t=${timestamp}&forceRefresh=true`, {
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        });
+        console.log("缓存更新完成");
+      } catch (err) {
+        console.error("缓存自动更新失败:", err);
+      }
+    }, RSS_CONFIG.refresh.cache * 1000);
+
+    // 在组件卸载时清除定时器
+    onUnmounted(() => {
+      if (cacheUpdateTimer) clearInterval(cacheUpdateTimer);
+    });
+  }
+
+  // 设置UI显示的定时刷新 - 这个刷新会更新UI
   refreshTimer = setInterval(
-    fetchFeeds,
+    () => fetchFeeds(true), // 强制刷新，不使用缓存
     (RSS_CONFIG.refresh?.interval || 300) * 1000
   );
+
   // 设置倒计时更新
   countdownTimer = setInterval(updateCountdown, 1000);
 });
+
+// 修改刷新按钮点击函数，使用强制刷新
+const handleRefreshClick = () => {
+  fetchFeeds(true); // 强制刷新，不使用缓存
+};
 
 onUnmounted(() => {
   if (refreshTimer) {

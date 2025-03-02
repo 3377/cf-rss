@@ -246,3 +246,77 @@ npm run preview
 ## License
 
 MIT
+
+# CF-RSS 缓存功能更新
+
+## 新增功能：RSS 缓存机制
+
+最新版本添加了 RSS 缓存机制，使用户在首次访问时可以立即看到之前缓存的内容，而不需要等待刷新。
+
+### 主要特性
+
+1. **自动缓存**: 系统会自动缓存 RSS 内容，默认缓存时间为 1 小时
+2. **缓存状态显示**: 界面会显示内容是否来自缓存
+3. **强制刷新**: 用户仍然可以通过刷新按钮强制获取最新内容
+4. **后台缓存更新**: 系统会在后台定期更新缓存，不影响用户体验
+
+### 配置选项
+
+在`src/config/rss.config.js`中，可以通过以下配置项控制缓存行为：
+
+```js
+refresh: {
+  interval: 120, // UI自动刷新间隔（秒）
+  cache: 3600,   // 缓存更新间隔（秒）
+}
+```
+
+也可以通过环境变量设置：
+
+- `REFRESH_INTERVAL`: UI 自动刷新间隔
+- `CACHE_DURATION`: 缓存更新间隔
+
+## 部署说明
+
+1. 确保代码已提交到 Git 仓库：
+
+   ```bash
+   git add .
+   git commit -m "添加RSS缓存功能"
+   git push
+   ```
+
+2. 在本地构建项目：
+
+   ```bash
+   npm install
+   npm run build
+   ```
+
+3. 部署到 Cloudflare Pages：
+
+   - 确保 Cloudflare Pages 项目配置正确
+   - 构建命令: `npm run build`
+   - 输出目录: `dist`
+
+4. 如果需要本地测试：
+   ```bash
+   npx wrangler pages dev dist
+   ```
+
+## 故障排除
+
+如果遇到缓存相关问题：
+
+1. 检查浏览器控制台是否有错误信息
+2. 确认 Cloudflare Workers 是否正常运行
+3. 尝试使用强制刷新按钮绕过缓存
+4. 检查网络请求中的`X-Cache`头信息，确认缓存状态
+
+## 技术实现
+
+缓存机制使用了 Cloudflare Workers 的 Cache API 实现，主要包括：
+
+1. 在`functions/_middleware.js`中实现缓存逻辑
+2. 在`src/App.vue`中添加缓存状态处理
+3. 新增`FeedCountdown.vue`组件显示缓存状态
