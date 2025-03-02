@@ -1208,9 +1208,6 @@ body,
   ) !important;
   border: 2px solid rgba(246, 128, 132, 0.8) !important;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
-  color: white !important;
-  font-weight: 500 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
   backdrop-filter: blur(10px) !important;
 }
 
@@ -1232,8 +1229,8 @@ html body .app-container:not(.dark) .tooltip-date {
 
 .dark .tooltip-date {
   color: #ffffff !important;
-  border-bottom-color: rgba(255, 255, 255, 0.5) !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
   font-weight: 600 !important;
   letter-spacing: 0.5px !important;
 }
@@ -1252,8 +1249,9 @@ html body .app-container:not(.dark) .tooltip-date {
 
 .dark .tooltip-content {
   color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
   font-weight: 500 !important;
+  line-height: 1.5 !important;
 }
 
 /* ---------- 卡片内的项目 ---------- */
