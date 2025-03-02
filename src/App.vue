@@ -1024,4 +1024,71 @@ body,
 .dark .card-content::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
 }
+
+/* 暗色模式卡片样式修改 */
+html body .app-container.dark .feed-card {
+  background-image: linear-gradient(
+    120deg,
+    #a6c0fe 0%,
+    #f68084 100%
+  ) !important;
+  background-size: cover !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), 0 3px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+html body .app-container.dark .card-header {
+  background: rgba(0, 20, 50, 0.6) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+html body .app-container.dark .card-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+html body .app-container.dark .card-content,
+html body .app-container.dark .mobile-card-content {
+  background: rgba(10, 20, 40, 0.7) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+html body .app-container.dark .item-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 500 !important;
+}
+
+html body .app-container.dark .item-date {
+  background: rgba(166, 192, 254, 0.25) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(166, 192, 254, 0.4) !important;
+}
+
+html body .app-container.dark .feed-item {
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.15) !important;
+}
+
+html body .app-container.dark .feed-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+html body .app-container.dark .feed-item a {
+  color: #e1ecfe !important;
+  transition: color 0.2s ease-in-out;
+}
+
+html body .app-container.dark .feed-item a:hover {
+  color: #ffcfd3 !important;
+  text-decoration: underline !important;
+}
+
+/* 调整暗色模式滚动条 */
+html body .app-container.dark .card-content::-webkit-scrollbar-thumb {
+  background: rgba(166, 192, 254, 0.5) !important;
+}
+
+html body .app-container.dark .card-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(166, 192, 254, 0.7) !important;
+}
 </style>

@@ -1306,4 +1306,62 @@ html body .app-container .feed-grid {
 .feed-container::before {
   display: none !important;
 }
+
+/* 暗色模式下卡片内容的增强样式 */
+html body .app-container.dark .card-header {
+  padding: 1rem 1.5rem;
+  background: rgba(0, 20, 50, 0.6) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+html body .app-container.dark .feed-item {
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+html body .app-container.dark .feed-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(166, 192, 254, 0.3),
+    rgba(246, 128, 132, 0.3),
+    transparent
+  );
+}
+
+html body .app-container.dark .feed-item:last-child::after {
+  display: none;
+}
+
+html body .app-container.dark .tooltip-date {
+  color: #a6c0fe !important;
+  border-bottom: 1px dashed rgba(166, 192, 254, 0.4) !important;
+}
+
+/* 暗色模式下的加载骨架屏样式 */
+html body .app-container.dark .loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(166, 192, 254, 0.15) 25%,
+    rgba(246, 128, 132, 0.15) 50%,
+    rgba(166, 192, 254, 0.15) 75%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: loading-skeleton-wave 1.5s infinite !important;
+}
+
+@keyframes loading-skeleton-wave {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
 </style>

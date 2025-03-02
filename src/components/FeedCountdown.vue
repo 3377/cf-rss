@@ -62,4 +62,18 @@ html body .app-container:not(.dark) .from-cache .animate-pulse {
 html body .app-container:not(.dark) .countdown {
   color: #7d6ca5 !important;
 }
+
+/* 暗色模式下从缓存加载的动画球 */
+html body .app-container.dark .from-cache {
+  color: #a6c0fe !important;
+}
+
+html body .app-container.dark .from-cache .animate-pulse {
+  background-color: #a6c0fe !important;
+}
+
+/* 暗色模式下刷新倒计时 */
+html body .app-container.dark .countdown {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
 </style>

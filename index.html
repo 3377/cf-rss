@@ -14,7 +14,7 @@
     />
     <meta
       name="theme-color"
-      content="#111827"
+      content="#a6c0fe"
       media="(prefers-color-scheme: dark)"
     />
     <meta
@@ -41,6 +41,15 @@
         transition: background 0.5s ease;
       }
 
+      /* 暗色模式下的加载背景 */
+      @media (prefers-color-scheme: dark) {
+        body:not(.loaded) {
+          background-image: linear-gradient(120deg, #a6c0fe 0%, #f68084 100%);
+          background-size: 100% 100%;
+          background-attachment: fixed;
+        }
+      }
+
       /* 应用加载动画 */
       #app:empty::before {
         content: "";
@@ -56,6 +65,13 @@
         left: 50%;
         margin-top: -25px;
         margin-left: -25px;
+      }
+
+      /* 暗色模式下的加载动画 */
+      @media (prefers-color-scheme: dark) {
+        #app:empty::before {
+          border-top-color: #a6c0fe;
+        }
       }
 
       @keyframes spinner {
