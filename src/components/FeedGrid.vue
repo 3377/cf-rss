@@ -731,7 +731,7 @@ const calcMobileCardHeight = computed(() => {
 .dark .card-header {
   background: rgba(50, 50, 60, 0.85) !important;
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(161, 140, 209, 0.5) !important;
+  border-bottom: none !important;
 }
 
 /* ---------- 卡片头部 ---------- */
@@ -1416,7 +1416,7 @@ html body .app-container.dark .card-header,
 html body .dark .card-header {
   background: rgba(50, 50, 60, 0.85) !important;
   backdrop-filter: blur(8px) !important;
-  border-bottom: 1px solid rgba(161, 140, 209, 0.5) !important;
+  border-bottom: none !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
