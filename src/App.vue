@@ -800,13 +800,48 @@ button {
 
 /* 暗色模式下的提示框样式 */
 .dark .tooltip-date {
-  color: #3b82f6 !important;
-  border-bottom: 1px dashed rgba(75, 85, 105, 0.5) !important;
+  color: #fff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.5) !important;
 }
 
 /* 提示框内容居中 */
 .tooltip-content {
   text-align: center !important;
+}
+
+/* 暗色模式下的提示框背景样式 */
+.dark [class*="tooltip"],
+.dark [class*="popper"],
+.dark [class*="popover"],
+.dark .el-tooltip__popper,
+.dark .v-tooltip__content {
+  background: linear-gradient(120deg, #a6c0fe 0%, #f68084 100%) !important;
+  border: 2px solid #f68084 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+  color: white !important;
+  font-weight: 500 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 暗色模式下的提示框箭头样式 */
+.dark [class*="tooltip"]::after,
+.dark [class*="popper"]::after,
+.dark [class*="popover"]::after,
+.dark .el-tooltip__popper::after,
+.dark .v-tooltip__content::after {
+  border-color: #f68084 !important;
+}
+
+/* 暗色模式下提示框内容样式 */
+.dark [class*="tooltip"] *,
+.dark [class*="popper"] *,
+.dark [class*="popover"] *,
+.dark .el-tooltip__popper *,
+.dark .v-tooltip__content * {
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* 字体选择器样式 - 调整间距 */
@@ -976,7 +1011,7 @@ body,
 
 .card-header {
   background: var(--card-header-bg, #f8fafc);
-  border-bottom: 1px solid var(--card-border-color, #e2e8f0);
+  border-bottom: 1px solid var(--card-border, #e2e8f0);
   flex-shrink: 0; /* 防止头部被压缩 */
 }
 

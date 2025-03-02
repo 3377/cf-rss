@@ -1206,8 +1206,12 @@ body,
     #a6c0fe 0%,
     #f68084 100%
   ) !important;
-  border: 1px solid rgba(246, 128, 132, 0.5) !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+  border: 2px solid rgba(246, 128, 132, 0.8) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+  color: white !important;
+  font-weight: 500 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
 }
 
 .tooltip-date {
@@ -1228,8 +1232,10 @@ html body .app-container:not(.dark) .tooltip-date {
 
 .dark .tooltip-date {
   color: #ffffff !important;
-  border-bottom-color: rgba(255, 255, 255, 0.3) !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.5) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
 }
 
 .tooltip-content {
@@ -1246,7 +1252,8 @@ html body .app-container:not(.dark) .tooltip-date {
 
 .dark .tooltip-content {
   color: #ffffff !important;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  font-weight: 500 !important;
 }
 
 /* ---------- 卡片内的项目 ---------- */
