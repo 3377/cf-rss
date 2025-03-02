@@ -8,13 +8,8 @@
         从缓存加载
       </span>
       <template v-if="refreshCountdown > 0">
+        <span class="mr-2">上次更新: {{ lastUpdateTime }}</span>
         {{ countdownText }}
-        <button
-          @click="$emit('refresh')"
-          class="ml-2 text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
-        >
-          立即刷新
-        </button>
       </template>
       <span v-else>刷新中...</span>
     </div>
@@ -32,6 +27,10 @@ const props = defineProps({
   fromCache: {
     type: Boolean,
     default: false,
+  },
+  lastUpdateTime: {
+    type: String,
+    default: "",
   },
 });
 

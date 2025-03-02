@@ -29,6 +29,7 @@
           <FeedCountdown
             :refresh-countdown="countdown"
             :from-cache="isFromCache"
+            :last-update-time="formatLastUpdate"
             @refresh="handleRefreshClick"
           />
         </div>
@@ -273,18 +274,24 @@ const fetchFeeds = async (forceRefresh = false) => {
     console.log(`开始获取RSS内容，强制刷新: ${forceRefresh}`);
     const timestamp = new Date().getTime();
 
-    // 构建请求URL
+    // 用户第一次访问页面时允许使用缓存，后续刷新均使用最新内容
+    const isInitialLoad = feeds.value.length === 0 && !forceRefresh;
+    const shouldUseCache = isInitialLoad;
+
+    // 构建请求URL，非初次加载时始终强制刷新
     const url = `/api/feeds?t=${timestamp}${
-      forceRefresh ? "&forceRefresh=true" : ""
+      !shouldUseCache ? "&forceRefresh=true" : ""
     }`;
+
+    console.log(`请求URL: ${url}, 是否使用缓存: ${shouldUseCache}`);
 
     // 设置请求头
     const headers = {
       Accept: "application/json",
     };
 
-    // 如果强制刷新，添加no-cache头
-    if (forceRefresh) {
+    // 如果不使用缓存，添加no-cache头
+    if (!shouldUseCache) {
       headers["Cache-Control"] = "no-cache";
       headers["Pragma"] = "no-cache";
     }
@@ -305,6 +312,8 @@ const fetchFeeds = async (forceRefresh = false) => {
       }
     } else {
       console.log("获取了新内容");
+      // 更新最后刷新时间
+      lastUpdateTime.value = new Date();
     }
 
     if (!response.ok) {

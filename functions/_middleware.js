@@ -224,7 +224,7 @@ export async function onRequest(context) {
           console.error("获取缓存时出错:", error);
         }
       } else {
-        console.log("强制刷新，跳过缓存");
+        console.log("强制刷新，跳过缓存，获取最新数据");
       }
 
       try {
