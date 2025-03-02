@@ -49,31 +49,18 @@ const countdownText = computed(() => {
   background-color: var(--el-bg-color-page);
 }
 .from-cache {
-  color: #8566c9;
+  color: #ad8cd1;
   font-weight: 500;
 }
 
 /* 亮色模式下从缓存加载的动画球 */
 html body .app-container:not(.dark) .from-cache .animate-pulse {
-  background-color: #a18cd1 !important;
+  background-color: #fbc2eb !important;
+  box-shadow: 0 0 5px rgba(251, 194, 235, 0.5) !important;
 }
 
 /* 亮色模式下刷新倒计时 */
 html body .app-container:not(.dark) .countdown {
-  color: #7d6ca5 !important;
-}
-
-/* 暗色模式下从缓存加载的动画球 */
-html body .app-container.dark .from-cache {
-  color: #a6c0fe !important;
-}
-
-html body .app-container.dark .from-cache .animate-pulse {
-  background-color: #a6c0fe !important;
-}
-
-/* 暗色模式下刷新倒计时 */
-html body .app-container.dark .countdown {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: #8566c9 !important;
 }
 </style>
