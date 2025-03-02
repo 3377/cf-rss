@@ -729,7 +729,7 @@ const calcMobileCardHeight = computed(() => {
 
 /* 暗色模式下调整卡片头部背景，使其半透明以便显示渐变背景 */
 .dark .card-header {
-  background: rgba(30, 20, 60, 0.85) !important;
+  background: rgba(50, 50, 60, 0.85) !important;
   backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(161, 140, 209, 0.5) !important;
 }
@@ -1149,9 +1149,6 @@ body,
 .dark .card-title {
   color: #ffffff !important;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
-  background: rgba(30, 20, 60, 0.85) !important;
-  padding: 0.5rem !important;
-  border-radius: 0.375rem !important;
 }
 
 /* ---------- 项目标题 ---------- */
@@ -1271,33 +1268,28 @@ body,
 /* 添加暗色模式下的提示框紫色渐变背景 */
 .dark .title-tooltip {
   background-image: none !important;
-  background-color: #3b82f6 !important; /* 蓝色背景 */
+  background-color: rgba(30, 30, 35, 0.85) !important; /* 暗灰色半透明背景 */
   backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(59, 130, 246, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35) !important;
   color: #ffffff !important;
 }
 
 .dark .tooltip-content {
   color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   padding: 0.5rem !important;
-  border-radius: 0 !important;
+  border-radius: 0.375rem !important;
   margin-top: 0.25rem !important;
-  background: transparent !important;
-  backdrop-filter: none !important;
+  backdrop-filter: blur(3px) !important;
 }
 
 .dark .tooltip-date {
   color: #ffffff !important;
-  background-color: transparent !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
-  padding: 0.5rem !important;
   padding-bottom: 0.5rem !important;
-  margin: -0.5rem -0.75rem 0.5rem -0.75rem !important;
-  border-radius: 0 !important;
   font-weight: bold !important;
   text-shadow: 0 1px 0px rgba(0, 0, 0, 0.3) !important;
-  text-align: center !important;
 }
 
 .tooltip-date {
