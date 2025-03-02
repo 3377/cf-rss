@@ -4,12 +4,12 @@
     :style="
       !isDark
         ? {
-            '--card-bg': 'rgba(210, 230, 250, 1)',
-            '--card-header-bg': 'rgba(200, 225, 248, 1)',
-            '--card-content-bg': 'rgba(210, 230, 250, 1)',
-            '--card-border': 'rgba(180, 205, 240, 0.85)',
-            '--text-primary': '#3a5075',
-            '--text-secondary': '#566a8c',
+            '--card-bg': 'rgba(255, 255, 255, 0.85)',
+            '--card-header-bg': 'rgba(240, 230, 255, 0.9)',
+            '--card-content-bg': 'rgba(255, 255, 255, 0.85)',
+            '--card-border': 'rgba(180, 160, 220, 0.8)',
+            '--text-primary': '#5a4a8a',
+            '--text-secondary': '#7d6ca5',
           }
         : {}
     "
@@ -426,13 +426,14 @@ body,
 
 /* 亮色模式样式 - 更高优先级 */
 html body .app-container.bg-gray-50 {
-  background-color: #f0f4fa !important;
-  background-image: linear-gradient(45deg, #e6ecf6 25%, transparent 25%),
-    linear-gradient(-45deg, #e6ecf6 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #e6ecf6 75%),
-    linear-gradient(-45deg, transparent 75%, #e6ecf6 75%) !important;
-  background-size: 10px 10px !important;
-  background-position: 0 0, 0 5px, 5px -5px, -5px 0 !important;
+  background-color: #f5ebff !important;
+  background-image: linear-gradient(
+    to top,
+    #a18cd1 0%,
+    #fbc2eb 100%
+  ) !important;
+  background-size: 100% 100% !important;
+  background-attachment: fixed !important;
 }
 
 /* 确保内容区域可以滚动 */
@@ -446,7 +447,8 @@ html body .app-container.bg-gray-50 {
 }
 
 html body .app-container.bg-gray-50 .content-area {
-  background-color: rgba(240, 245, 252, 0.4) !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(5px) !important;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
 
@@ -482,7 +484,7 @@ html body .app-container.bg-gray-50 .content-area {
 /* 确保亮色模式下卡片内容可以滚动 */
 html body .app-container:not(.dark) .card-content,
 html body .app-container:not(.dark) .mobile-card-content {
-  background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
+  background: var(--card-content-bg, rgba(255, 255, 255, 0.85)) !important;
   overflow-y: auto !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
@@ -524,9 +526,9 @@ html body .app-container.dark .mobile-card-content {
 }
 
 html body .app-container.bg-gray-50 .header {
-  background-color: rgba(235, 242, 250, 0.9) !important;
-  backdrop-filter: blur(8px) !important;
-  border-bottom: 2px solid rgba(120, 150, 200, 0.8) !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(10px) !important;
+  border-bottom: 2px solid rgba(161, 140, 209, 0.5) !important;
 }
 
 .dark .header {
@@ -535,23 +537,23 @@ html body .app-container.bg-gray-50 .header {
 }
 
 html body .app-container.bg-gray-50 .header-title {
-  color: #3a5075 !important;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  color: #5a4a8a !important;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
 html body .app-container.bg-gray-50 button:not(.bg-green-500) {
-  background-color: rgba(220, 230, 245, 0.6) !important;
-  border: 1px solid rgba(180, 200, 230, 0.6) !important;
+  background-color: rgba(230, 220, 255, 0.7) !important;
+  border: 1px solid rgba(161, 140, 209, 0.5) !important;
 }
 
 html body .app-container.bg-gray-50 button.bg-green-500 {
-  background-color: #4caf7d !important;
-  box-shadow: 0 2px 4px rgba(76, 175, 125, 0.15) !important;
+  background-color: #9d7ee1 !important;
+  box-shadow: 0 2px 4px rgba(161, 140, 209, 0.3) !important;
 }
 
 html body .app-container.bg-gray-50 button.bg-green-500:hover {
-  background-color: #3d9c6e !important;
-  box-shadow: 0 3px 6px rgba(76, 175, 125, 0.2) !important;
+  background-color: #8566c9 !important;
+  box-shadow: 0 3px 6px rgba(161, 140, 209, 0.4) !important;
 }
 
 .footer {
@@ -564,8 +566,9 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 }
 
 html body .app-container.bg-gray-50 .footer {
-  background-color: rgba(235, 242, 250, 0.9) !important;
-  border-top: 2px solid rgba(120, 150, 200, 0.8) !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(10px) !important;
+  border-top: 2px solid rgba(161, 140, 209, 0.5) !important;
 }
 
 .dark .footer {
@@ -621,11 +624,11 @@ body {
 }
 
 html body .app-container.bg-gray-50 .text-gray-600 {
-  color: #566a8c !important;
+  color: #5a4a8a !important;
 }
 
 html body .app-container.bg-gray-50 .text-gray-500 {
-  color: #6b7f9e !important;
+  color: #7d6ca5 !important;
 }
 
 button {
@@ -634,32 +637,33 @@ button {
 
 /* 应用CSS变量到卡片 */
 .app-container:not(.dark) .feed-card {
-  background: var(--card-bg, rgba(200, 225, 245, 1)) !important;
-  border: 1px solid var(--card-border, rgba(160, 190, 230, 0.9)) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05), 0 3px 6px rgba(0, 0, 0, 0.03) !important;
+  background: var(--card-bg, rgba(255, 255, 255, 0.85)) !important;
+  border: 1px solid var(--card-border, rgba(161, 140, 209, 0.8)) !important;
+  box-shadow: 0 6px 16px rgba(161, 140, 209, 0.2),
+    0 3px 6px rgba(161, 140, 209, 0.1) !important;
 }
 
 .app-container:not(.dark) .card-header {
-  background: var(--card-header-bg, rgba(180, 210, 240, 1)) !important;
-  border-bottom: 1px solid var(--card-border, rgba(160, 190, 230, 0.9)) !important;
+  background: var(--card-header-bg, rgba(240, 230, 255, 0.9)) !important;
+  border-bottom: 1px solid var(--card-border, rgba(161, 140, 209, 0.8)) !important;
 }
 
 .app-container:not(.dark) .card-body {
-  background: var(--card-content-bg, rgba(200, 225, 245, 1)) !important;
+  background: var(--card-content-bg, rgba(255, 255, 255, 0.85)) !important;
   overflow-y: auto !important;
 }
 
 .app-container:not(.dark) .card-title {
-  color: var(--text-primary, #2c4270) !important;
+  color: var(--text-primary, #5a4a8a) !important;
 }
 
 .app-container:not(.dark) .item-title {
-  color: var(--text-primary, #2c4270) !important;
+  color: var(--text-primary, #5a4a8a) !important;
 }
 
 .app-container:not(.dark) .item-date {
-  color: var(--text-secondary, #465a7c) !important;
-  background: var(--card-bg, rgba(180, 210, 240, 0.95)) !important;
+  color: var(--text-secondary, #7d6ca5) !important;
+  background: var(--card-bg, rgba(240, 230, 255, 0.7)) !important;
 }
 
 /* 移动端样式优化 */
@@ -744,19 +748,19 @@ button {
   :root {
     color-scheme: light;
     --app-background: #f0f4fa;
-    --card-background: rgba(200, 225, 245, 1);
-    --card-border: rgba(160, 190, 230, 0.9);
-    --card-header: rgba(180, 210, 240, 1);
-    --text-primary: #2c4270;
-    --text-secondary: #465a7c;
+    --card-background: rgba(255, 255, 255, 0.85);
+    --card-border: rgba(161, 140, 209, 0.8);
+    --card-header: rgba(240, 230, 255, 0.9);
+    --text-primary: #5a4a8a;
+    --text-secondary: #7d6ca5;
   }
 }
 
 /* 添加箭头圆角样式 */
 ::-webkit-scrollbar-button {
   border-radius: 12px !important;
-  background-color: rgba(200, 225, 245, 0.9);
-  border: 1px solid rgba(160, 190, 230, 0.8);
+  background-color: rgba(230, 220, 255, 0.9);
+  border: 1px solid rgba(161, 140, 209, 0.5);
   transition: all 0.2s ease;
 }
 
@@ -766,7 +770,7 @@ button {
 }
 
 ::-webkit-scrollbar-button:hover {
-  background-color: rgba(180, 210, 240, 1);
+  background-color: rgba(220, 200, 255, 1);
 }
 
 .dark ::-webkit-scrollbar-button:hover {
@@ -790,8 +794,8 @@ button {
 
 /* 亮色模式下的提示框样式 */
 .app-container:not(.dark) .tooltip-date {
-  color: #2563eb !important;
-  border-bottom: 1px dashed rgba(160, 190, 230, 0.5) !important;
+  color: #8566c9 !important;
+  border-bottom: 1px dashed rgba(161, 140, 209, 0.5) !important;
 }
 
 /* 暗色模式下的提示框样式 */
@@ -817,14 +821,14 @@ button {
 }
 
 html body .app-container.bg-gray-50 .font-selector select {
-  background-color: rgba(220, 230, 245, 0.8) !important;
-  border: 1px solid rgba(180, 200, 230, 0.6) !important;
-  color: #3a5075 !important;
+  background-color: rgba(230, 220, 255, 0.8) !important;
+  border: 1px solid rgba(161, 140, 209, 0.5) !important;
+  color: #5a4a8a !important;
 }
 
 html body .app-container.bg-gray-50 .font-selector select:hover {
-  background-color: rgba(210, 225, 245, 1) !important;
-  border: 1px solid rgba(160, 190, 230, 0.8) !important;
+  background-color: rgba(240, 230, 255, 1) !important;
+  border: 1px solid rgba(161, 140, 209, 0.8) !important;
 }
 
 .dark .font-selector select {

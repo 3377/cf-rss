@@ -49,7 +49,17 @@ const countdownText = computed(() => {
   background-color: var(--el-bg-color-page);
 }
 .from-cache {
-  color: #2563eb;
+  color: #8566c9;
   font-weight: 500;
+}
+
+/* 亮色模式下从缓存加载的动画球 */
+html body .app-container:not(.dark) .from-cache .animate-pulse {
+  background-color: #a18cd1 !important;
+}
+
+/* 亮色模式下刷新倒计时 */
+html body .app-container:not(.dark) .countdown {
+  color: #7d6ca5 !important;
 }
 </style>

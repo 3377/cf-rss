@@ -1056,7 +1056,6 @@ body,
     z-index: 1;
   }
 
-
   .card-content {
     border-radius: 0 0 1rem 1rem;
     background: var(--el-bg-color) !important;
@@ -1245,6 +1244,35 @@ html body .app-container:not(.dark) .tooltip-date {
 .feed-item:last-child {
   border-bottom: none;
   margin-bottom: 2rem;
+}
+
+/* 修改卡片内容的样式 */
+html body .app-container:not(.dark) .card-header {
+  border-bottom: 2px solid rgba(161, 140, 209, 0.9) !important;
+  background: linear-gradient(
+    to right,
+    rgba(240, 230, 255, 0.95),
+    rgba(245, 235, 255, 0.95)
+  ) !important;
+}
+
+html body .app-container:not(.dark) .feed-item {
+  border-bottom: 1px dashed rgba(161, 140, 209, 0.3) !important;
+}
+
+html body .app-container:not(.dark) .feed-item:hover {
+  background-color: rgba(240, 230, 255, 0.6) !important;
+}
+
+/* 光标悬停在链接上时的样式 */
+html body .app-container:not(.dark) .feed-item a:hover {
+  color: #8566c9 !important;
+}
+
+/* 链接样式 */
+html body .app-container:not(.dark) .feed-item a {
+  color: #5a4a8a !important;
+  transition: color 0.2s ease-in-out;
 }
 
 /* 移除所有特定于亮色模式的样式覆盖 */
