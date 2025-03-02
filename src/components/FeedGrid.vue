@@ -1149,6 +1149,9 @@ body,
 .dark .card-title {
   color: #ffffff !important;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  background: rgba(30, 20, 60, 0.85) !important;
+  padding: 0.5rem !important;
+  border-radius: 0.375rem !important;
 }
 
 /* ---------- 项目标题 ---------- */
@@ -1277,19 +1280,24 @@ body,
 
 .dark .tooltip-content {
   color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.15) !important;
   padding: 0.5rem !important;
-  border-radius: 0.375rem !important;
+  border-radius: 0 !important;
   margin-top: 0.25rem !important;
-  backdrop-filter: blur(3px) !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
 }
 
 .dark .tooltip-date {
   color: #ffffff !important;
+  background-color: transparent !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+  padding: 0.5rem !important;
   padding-bottom: 0.5rem !important;
+  margin: -0.5rem -0.75rem 0.5rem -0.75rem !important;
+  border-radius: 0 !important;
   font-weight: bold !important;
   text-shadow: 0 1px 0px rgba(0, 0, 0, 0.3) !important;
+  text-align: center !important;
 }
 
 .tooltip-date {
