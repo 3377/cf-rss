@@ -1267,29 +1267,33 @@ body,
 
 /* 添加暗色模式下的提示框紫色渐变背景 */
 .dark .title-tooltip {
-  background: linear-gradient(
-    135deg,
-    rgba(55, 30, 120, 0.95) 0%,
-    rgba(95, 55, 160, 0.9) 100%
+  background-image: linear-gradient(
+    to top,
+    #a18cd1 0%,
+    #fbc2eb 100%
   ) !important;
+  background-color: transparent !important;
   backdrop-filter: blur(10px) !important;
   border: 1px solid rgba(161, 140, 209, 0.5) !important;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35) !important;
+  color: #1a0a40 !important;
 }
 
 .dark .tooltip-content {
-  color: rgba(255, 255, 255, 0.95) !important;
-  background: rgba(40, 20, 80, 0.4) !important;
+  color: #1a0a40 !important;
+  background: rgba(255, 255, 255, 0.25) !important;
   padding: 0.5rem !important;
   border-radius: 0.375rem !important;
   margin-top: 0.25rem !important;
+  backdrop-filter: blur(3px) !important;
 }
 
 .dark .tooltip-date {
-  color: rgba(200, 180, 255, 1) !important;
-  border-bottom: 1px solid rgba(161, 140, 209, 0.5) !important;
+  color: #1a0a40 !important;
+  border-bottom: 1px solid rgba(30, 20, 60, 0.5) !important;
   padding-bottom: 0.5rem !important;
   font-weight: bold !important;
+  text-shadow: 0 1px 0px rgba(255, 255, 255, 0.5) !important;
 }
 
 .tooltip-date {
