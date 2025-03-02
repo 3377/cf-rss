@@ -703,6 +703,37 @@ const calcMobileCardHeight = computed(() => {
   transform: translateY(0);
 }
 
+/* 添加暗色模式下卡片的紫粉渐变背景 */
+.dark .feed-card {
+  background-image: linear-gradient(
+    to top,
+    #a18cd1 0%,
+    #fbc2eb 100%
+  ) !important;
+  background-color: transparent !important;
+  border: 1px solid rgba(200, 180, 255, 0.3) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s ease;
+}
+
+.dark .feed-card:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+/* 暗色模式下调整卡片内容区域背景，使其半透明以便显示渐变背景 */
+.dark .card-content {
+  background: rgba(30, 20, 60, 0.75) !important;
+  backdrop-filter: blur(5px);
+}
+
+/* 暗色模式下调整卡片头部背景，使其半透明以便显示渐变背景 */
+.dark .card-header {
+  background: rgba(30, 20, 60, 0.85) !important;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(161, 140, 209, 0.5) !important;
+}
+
 /* ---------- 卡片头部 ---------- */
 .card-header {
   padding: 0.75rem;
@@ -1116,7 +1147,8 @@ body,
 }
 
 .dark .card-title {
-  color: var(--el-text-color-primary);
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* ---------- 项目标题 ---------- */
@@ -1134,6 +1166,25 @@ body,
   color: var(--el-text-color-primary);
 }
 
+/* 暗色模式下调整项目标题颜色 */
+.dark .item-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 暗色模式下调整链接和悬停效果 */
+.dark .item-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.dark .item-link:hover {
+  color: #ffd1fb !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .item-link:hover .item-title {
+  color: #ffd1fb !important;
+}
+
 /* ---------- 项目日期 ---------- */
 .item-date {
   position: absolute;
@@ -1147,6 +1198,14 @@ body,
   white-space: nowrap;
   color: var(--el-text-color-secondary);
   background: var(--el-bg-color);
+}
+
+/* 暗色模式下调整日期样式 */
+.dark .item-date {
+  color: rgba(255, 255, 255, 0.75) !important;
+  background: rgba(30, 20, 60, 0.5) !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 0.25rem !important;
 }
 
 .item-link:hover .item-date {
@@ -1167,6 +1226,13 @@ body,
 .item-link:hover {
   color: var(--el-color-primary);
   background: transparent;
+}
+
+/* 暗色模式下的链接悬停效果 */
+.dark .item-link:hover .item-date {
+  color: #ffd1fb !important;
+  background: rgba(40, 30, 80, 0.7) !important;
+  opacity: 1;
 }
 
 /* ---------- 链接访问状态 ---------- */
