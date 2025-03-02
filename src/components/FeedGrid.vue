@@ -1410,4 +1410,22 @@ html body .app-container .feed-grid {
 .feed-container::before {
   display: none !important;
 }
+
+/* ---------- 暗色模式覆盖样式（强制执行） ---------- */
+html body .app-container.dark .card-header,
+html body .dark .card-header {
+  background: rgba(50, 50, 60, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+  border-bottom: 1px solid rgba(161, 140, 209, 0.5) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+html body .app-container.dark .title-tooltip,
+html body .dark .title-tooltip {
+  background-image: none !important;
+  background-color: rgba(30, 30, 35, 0.85) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35) !important;
+}
 </style>
