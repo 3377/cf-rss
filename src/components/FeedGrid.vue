@@ -677,7 +677,8 @@ const calcMobileCardHeight = computed(() => {
   -webkit-overflow-scrolling: touch;
   background: var(--el-bg-color) !important;
   margin-top: -30px;
-  margin-bottom: -30px;
+  margin-bottom: 0;
+  padding-bottom: 20px;
 }
 
 /* ---------- 卡片样式 ---------- */
@@ -687,8 +688,8 @@ const calcMobileCardHeight = computed(() => {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 170px);
-  max-height: calc(100vh - 170px);
+  height: calc(100vh - 180px);
+  max-height: calc(100vh - 180px);
   overflow: hidden;
   margin: 0;
   border: 1px solid var(--el-border-color-lighter);
@@ -755,7 +756,7 @@ const calcMobileCardHeight = computed(() => {
 .card-content {
   flex: 1;
   overflow-y: scroll;
-  padding: 0.3rem 0 1rem 0;
+  padding: 0.3rem 0 0 0;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -788,7 +789,7 @@ const calcMobileCardHeight = computed(() => {
   padding: 6px 0;
   margin-bottom: 6px;
   position: relative;
-  border-bottom: 0.5px solid var(--el-border-color-lighter);
+  border-bottom: 1px solid var(--el-border-color-lighter);
   cursor: pointer;
 }
 
@@ -1323,7 +1324,7 @@ html body .app-container:not(.dark) .tooltip-date {
 
 /* ---------- 卡片内的项目 ---------- */
 .feed-item {
-  border-bottom: 0.5px solid var(--el-border-color-lighter);
+  border-bottom: 1px solid rgba(161, 140, 209, 0.3) !important;
   margin-bottom: 0.5rem;
   position: relative;
   padding: 0 0.25rem;
@@ -1332,7 +1333,8 @@ html body .app-container:not(.dark) .tooltip-date {
 
 .feed-item:last-child {
   border-bottom: none;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem !important;
+  padding-bottom: 1rem !important;
 }
 
 /* 修改卡片内容的样式 */
@@ -1343,7 +1345,7 @@ html body .app-container:not(.dark) .card-header {
     rgba(251, 194, 235, 0.8) 100%
   ) !important;
   backdrop-filter: blur(8px) !important;
-  border-bottom: 2px solid rgba(161, 140, 209, 0.8) !important;
+  border-bottom: 1px solid rgba(161, 140, 209, 0.8) !important;
   color: #5a4a8a !important;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
@@ -1427,5 +1429,32 @@ html body .dark .title-tooltip {
   backdrop-filter: blur(10px) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* 确保亮色模式下grid有足够的底部空间 */
+html body .app-container:not(.dark) .feed-grid {
+  padding-bottom: 30px !important;
+  margin-bottom: 0 !important;
+}
+
+/* 确保亮色模式下卡片有足够的底部填充 */
+html body .app-container:not(.dark) .feed-card {
+  padding-bottom: 20px !important;
+}
+
+/* 确保亮色模式下feed-item的边框颜色更协调 */
+html body .app-container:not(.dark) .feed-item {
+  border-bottom: 1px solid rgba(161, 140, 209, 0.3) !important;
+}
+
+/* 确保最后一个项目有足够的底部间距 */
+html body .app-container:not(.dark) .feed-item:last-child {
+  margin-bottom: 30px !important;
+  padding-bottom: 15px !important;
+}
+
+/* 确保项目容器有足够的高度和底部间距 */
+html body .app-container:not(.dark) .items-list {
+  padding-bottom: 20px !important;
 }
 </style>
