@@ -687,8 +687,8 @@ const calcMobileCardHeight = computed(() => {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px);
-  max-height: calc(100vh - 180px);
+  height: calc(100vh - 170px);
+  max-height: calc(100vh - 170px);
   overflow: hidden;
   margin: 0;
   border: 1px solid var(--el-border-color-lighter);
@@ -755,7 +755,7 @@ const calcMobileCardHeight = computed(() => {
 .card-content {
   flex: 1;
   overflow-y: scroll;
-  padding: 0.3rem 0 0 0;
+  padding: 0.3rem 0 1rem 0;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -788,7 +788,7 @@ const calcMobileCardHeight = computed(() => {
   padding: 6px 0;
   margin-bottom: 6px;
   position: relative;
-  border-bottom: 1px solid var(--el-border-color-lighter);
+  border-bottom: 0.5px solid var(--el-border-color-lighter);
   cursor: pointer;
 }
 
@@ -1323,7 +1323,7 @@ html body .app-container:not(.dark) .tooltip-date {
 
 /* ---------- 卡片内的项目 ---------- */
 .feed-item {
-  border-bottom: 1px solid var(--el-border-color-lighter);
+  border-bottom: 0.5px solid var(--el-border-color-lighter);
   margin-bottom: 0.5rem;
   position: relative;
   padding: 0 0.25rem;
@@ -1332,7 +1332,7 @@ html body .app-container:not(.dark) .tooltip-date {
 
 .feed-item:last-child {
   border-bottom: none;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
 }
 
 /* 修改卡片内容的样式 */
