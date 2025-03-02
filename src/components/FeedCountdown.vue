@@ -4,7 +4,9 @@
       class="countdown flex items-center text-sm text-gray-500 dark:text-gray-400"
     >
       <span v-if="fromCache" class="mr-2 from-cache inline-flex items-center">
-        <div class="w-2 h-2 bg-blue-500 rounded-full mr-1 animate-pulse"></div>
+        <div
+          class="w-2 h-2 bg-purple-500 rounded-full mr-1 animate-pulse"
+        ></div>
         从缓存加载
       </span>
       <template v-if="refreshCountdown > 0">
@@ -53,11 +55,7 @@ const countdownText = computed(() => {
   font-weight: 500;
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.5rem;
-  background: rgba(161, 140, 209, 0.2);
-  border-radius: 1rem;
   margin-right: 0.5rem;
-  transition: all 0.3s ease;
 }
 
 /* 亮色模式下从缓存加载的动画球 */
@@ -69,12 +67,6 @@ html body .app-container:not(.dark) .from-cache .animate-pulse {
 /* 亮色模式下从缓存加载的文本 */
 html body .app-container:not(.dark) .from-cache {
   color: #8566c9 !important;
-  background: linear-gradient(
-    to right,
-    rgba(251, 194, 235, 0.25),
-    rgba(161, 140, 209, 0.25)
-  );
-  border: 1px solid rgba(161, 140, 209, 0.3);
 }
 
 /* 亮色模式下刷新倒计时 */
@@ -84,8 +76,6 @@ html body .app-container:not(.dark) .countdown {
 
 /* 暗色模式下从缓存加载的动画 */
 .dark .from-cache {
-  background: rgba(161, 140, 209, 0.3);
-  border: 1px solid rgba(161, 140, 209, 0.2);
   color: rgba(220, 200, 255, 0.9);
 }
 

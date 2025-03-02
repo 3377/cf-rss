@@ -1203,16 +1203,27 @@ body,
 .dark .title-tooltip {
   background: linear-gradient(
     135deg,
-    rgba(81, 45, 168, 0.95) 0%,
-    rgba(120, 70, 190, 0.9) 100%
+    rgba(55, 30, 120, 0.95) 0%,
+    rgba(95, 55, 160, 0.9) 100%
   ) !important;
   backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(161, 140, 209, 0.3) !important;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(161, 140, 209, 0.5) !important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35) !important;
 }
 
 .dark .tooltip-content {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(40, 20, 80, 0.4) !important;
+  padding: 0.5rem !important;
+  border-radius: 0.375rem !important;
+  margin-top: 0.25rem !important;
+}
+
+.dark .tooltip-date {
+  color: rgba(200, 180, 255, 1) !important;
+  border-bottom: 1px solid rgba(161, 140, 209, 0.5) !important;
+  padding-bottom: 0.5rem !important;
+  font-weight: bold !important;
 }
 
 .tooltip-date {
@@ -1228,12 +1239,8 @@ body,
 }
 
 html body .app-container:not(.dark) .tooltip-date {
-  color: #2563eb !important;
-}
-
-.dark .tooltip-date {
-  color: #3b82f6 !important;
-  border-bottom-color: rgba(75, 85, 105, 0.5);
+  color: #8566c9 !important;
+  border-bottom: 1px dashed rgba(161, 140, 209, 0.5) !important;
 }
 
 .tooltip-content {
