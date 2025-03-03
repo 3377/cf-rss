@@ -431,8 +431,7 @@ html body .app-container.bg-gray-50 {
   background-color: #f5ebff !important;
   background-image: linear-gradient(
     to top,
-    #a18cd1 0%,
-    #ba9de0 3%,
+    #e0d5f3 0%,
     #fbc2eb 100%
   ) !important;
   background-size: 100% 100% !important;
@@ -561,17 +560,18 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 
 .footer {
   flex-shrink: 0;
-  border-top: 0.5px solid #e5e7eb;
+  border-top: 0.5px solid rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(8px);
   padding-top: 0.25rem;
-  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.03);
+  box-shadow: none;
   margin-top: 0;
 }
 
 html body .app-container.bg-gray-50 .footer {
-  background-color: rgba(255, 255, 255, 0.7) !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: blur(10px) !important;
-  border-top: 0.5px solid rgba(161, 140, 209, 0.5) !important;
+  border-top: 0.5px solid rgba(161, 140, 209, 0.2) !important;
+  box-shadow: none !important;
 }
 
 .dark .footer {
