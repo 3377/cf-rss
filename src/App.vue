@@ -649,12 +649,13 @@ button {
   transition: all 0.2s ease-in-out;
 }
 
-/* 应用CSS变量到卡片 */
+/* 确保卡片本身无空白 */
 .app-container:not(.dark) .feed-card {
   background: var(--card-bg, rgba(255, 255, 255, 0.85)) !important;
   border: 1px solid var(--card-border, rgba(161, 140, 209, 0.8)) !important;
   box-shadow: 0 6px 16px rgba(161, 140, 209, 0.2),
     0 3px 6px rgba(161, 140, 209, 0.1) !important;
+  isolation: isolate; /* 创建新的层叠上下文 */
 }
 
 /* 亮色模式卡片头部特定样式 */
@@ -665,17 +666,50 @@ button {
   margin-bottom: 0;
   padding: 12px 16px;
   position: relative;
-  z-index: 1;
+  z-index: 3; /* 确保内容在最上层 */
+}
+
+/* 卡片标题内容应当在最上层 */
+.app-container:not(.dark) .card-header > * {
+  position: relative;
+  z-index: 4;
 }
 
 /* 修复亮色模式下卡片头部圆角空白问题 */
 .app-container:not(.dark) .feed-card::before {
   content: "";
   position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  height: 6px;
+  background: var(--card-header-bg, rgba(240, 230, 255, 0.9));
+  z-index: 2;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+/* 完全消除卡片头部圆角空白的辅助元素 */
+.app-container:not(.dark) .feed-card::after {
+  content: "";
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
+  width: 100%;
+  height: 8px;
+  background: var(--card-header-bg, rgba(240, 230, 255, 0.9));
+  z-index: 1;
+}
+
+/* 卡片顶部四角填充 */
+.app-container:not(.dark) .card-header::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  height: 10px;
   background: var(--card-header-bg, rgba(240, 230, 255, 0.9));
   z-index: 0;
   border-top-left-radius: 0.75rem;
