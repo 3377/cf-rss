@@ -478,6 +478,7 @@ html body .app-container.bg-gray-50 .content-area {
   flex-direction: column;
   background-clip: padding-box;
   position: relative;
+  isolation: isolate; /* 创建新的层叠上下文 */
 }
 
 /* 确保卡片内容区域有底部圆角和滚动功能 */
@@ -678,11 +679,15 @@ button {
   background: var(--card-header-bg, rgba(240, 230, 255, 0.9)) !important;
   border-bottom: 1px solid var(--card-border, rgba(161, 140, 209, 0.8)) !important;
   padding: 12px 16px;
+  margin-bottom: -1px; /* 消除标题底部与内容区域之间的间隙 */
 }
 
 .app-container:not(.dark) .card-body {
   background: var(--card-content-bg, rgba(255, 255, 255, 0.85)) !important;
   overflow-y: auto !important;
+  position: relative;
+  z-index: 5; /* 确保内容区域在正确的叠层顺序 */
+  border-top: none; /* 移除内容区域的顶部边框 */
 }
 
 .app-container:not(.dark) .card-title {
@@ -1072,5 +1077,17 @@ body,
 
 .app-container:not(.dark) a:not(.item-link):hover {
   color: var(--link-hover-color, #6f4ebf) !important;
+}
+
+/* 修复卡片内容与头部的连接问题 */
+.feed-card .card-header::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--card-header-bg, rgba(240, 230, 255, 0.9));
+  z-index: 6;
 }
 </style>
