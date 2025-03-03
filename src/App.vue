@@ -432,6 +432,7 @@ html body .app-container.bg-gray-50 {
   background-image: linear-gradient(
     to top,
     #a18cd1 0%,
+    #ba9de0 3%,
     #fbc2eb 100%
   ) !important;
   background-size: 100% 100% !important;
