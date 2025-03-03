@@ -493,7 +493,6 @@ html body .app-container.bg-gray-50 .content-area {
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
   width: 100%;
-  padding: 12px 16px;
   box-sizing: border-box;
   align-self: stretch;
 }
@@ -585,8 +584,8 @@ html body .app-container.bg-gray-50 .footer {
 }
 
 .dark .footer {
-  border-color: transparent;
-  border-top: none;
+  border-color: #374151;
+  border-top: 1px solid rgba(55, 65, 81, 0.5);
   background-color: rgba(17, 24, 39, 0.75);
   box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.1);
 }
@@ -658,11 +657,29 @@ button {
     0 3px 6px rgba(161, 140, 209, 0.1) !important;
 }
 
+/* 亮色模式卡片头部特定样式 */
 .app-container:not(.dark) .card-header {
   background: var(--card-header-bg, rgba(240, 230, 255, 0.9)) !important;
   border-bottom: 1px solid var(--card-border, rgba(161, 140, 209, 0.8)) !important;
-  margin: 0;
-  padding: 0;
+  margin: -1px;
+  margin-bottom: 0;
+  padding: 12px 16px;
+  position: relative;
+  z-index: 1;
+}
+
+/* 修复亮色模式下卡片头部圆角空白问题 */
+.app-container:not(.dark) .feed-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--card-header-bg, rgba(240, 230, 255, 0.9));
+  z-index: 0;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
 }
 
 .app-container:not(.dark) .card-body {
