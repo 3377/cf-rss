@@ -560,24 +560,25 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 
 .footer {
   flex-shrink: 0;
-  border-top: 0.5px solid rgba(0, 0, 0, 0.05);
+  border-top: none;
   backdrop-filter: blur(8px);
-  padding-top: 0.25rem;
-  box-shadow: none;
+  padding-top: 0.35rem;
+  box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.01);
   margin-top: 0;
 }
 
 html body .app-container.bg-gray-50 .footer {
-  background-color: rgba(255, 255, 255, 0.85) !important;
+  background-color: rgba(255, 255, 255, 0.92) !important;
   backdrop-filter: blur(10px) !important;
-  border-top: 0.5px solid rgba(161, 140, 209, 0.2) !important;
-  box-shadow: none !important;
+  border-top: none !important;
+  box-shadow: 0 -1px 1px rgba(161, 140, 209, 0.07) !important;
 }
 
 .dark .footer {
-  border-color: #374151;
-  border-top-width: 0.5px;
-  background-color: rgba(17, 24, 39, 0.6);
+  border-color: transparent;
+  border-top: none;
+  background-color: rgba(17, 24, 39, 0.75);
+  box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.1);
 }
 
 /* 移除全局滚动条 */
@@ -674,9 +675,10 @@ button {
 @media (max-width: 768px) {
   .footer {
     background: var(--el-bg-color) !important;
-    border-top: 0.5px solid var(--el-border-color-lighter) !important;
+    border-top: none !important;
+    box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.015) !important;
     margin: 0 !important;
-    padding: 8px 0 !important;
+    padding: 10px 0 !important;
   }
 
   .content-area {
