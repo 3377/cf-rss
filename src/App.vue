@@ -570,7 +570,7 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 html body .app-container.bg-gray-50 .footer {
   background-color: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(10px) !important;
-  border-top: 1px solid rgba(161, 140, 209, 0.5) !important;
+  border-top: 0.5px solid rgba(161, 140, 209, 0.5) !important;
 }
 
 .dark .footer {
@@ -673,7 +673,7 @@ button {
 @media (max-width: 768px) {
   .footer {
     background: var(--el-bg-color) !important;
-    border-top: 1px solid var(--el-border-color-lighter) !important;
+    border-top: 0.5px solid var(--el-border-color-lighter) !important;
     margin: 0 !important;
     padding: 8px 0 !important;
   }
