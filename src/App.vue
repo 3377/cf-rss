@@ -495,25 +495,6 @@ html body .app-container.bg-gray-50 .content-area {
   width: 100%;
   box-sizing: border-box;
   align-self: stretch;
-  min-height: unset;
-  max-height: 44px;
-  display: flex;
-  align-items: center;
-}
-
-.card-header h3,
-.card-header .card-title {
-  margin: 0;
-  padding: 0;
-  line-height: 1.3;
-  max-height: 2.6em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  width: 100%;
-  font-weight: 600;
 }
 
 /* 确保亮色模式下卡片内容可以滚动 */
@@ -668,119 +649,40 @@ button {
   transition: all 0.2s ease-in-out;
 }
 
-/* 确保卡片本身无空白 */
+/* 应用CSS变量到卡片 */
 .app-container:not(.dark) .feed-card {
   background: var(--card-bg, rgba(255, 255, 255, 0.85)) !important;
   border: 1px solid var(--card-border, rgba(161, 140, 209, 0.8)) !important;
   box-shadow: 0 6px 16px rgba(161, 140, 209, 0.2),
     0 3px 6px rgba(161, 140, 209, 0.1) !important;
-  isolation: isolate; /* 创建新的层叠上下文 */
 }
 
-/* 亮色模式卡片头部特定样式 */
-.app-container:not(.dark) .card-header {
-  background: var(--card-header-bg, rgba(240, 230, 255, 0.9)) !important;
-  border-bottom: 1px solid var(--card-border, rgba(161, 140, 209, 0.8)) !important;
-  margin: -1px;
-  margin-bottom: 0;
-  padding: 8px 16px;
-  position: relative;
-  z-index: 3; /* 确保内容在最上层 */
-  min-height: unset !important;
-  height: auto !important;
-  max-height: 44px; /* 限制最大高度 */
-  display: flex;
-  align-items: center;
-}
-
-/* 卡片标题内容应当在最上层 */
-.app-container:not(.dark) .card-header > * {
-  position: relative;
-  z-index: 4;
-}
-
-/* 修复亮色模式下卡片头部圆角空白问题 */
+/* 修复亮色模式下卡片头部圆角空白问题 - 重写解决方案 */
 .app-container:not(.dark) .feed-card::before {
-  content: "";
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  right: -1px;
-  height: 4px; /* 减小高度 */
-  background: var(--card-header-bg, rgba(240, 230, 255, 0.9));
-  z-index: 2;
-  border-top-left-radius: 0.75rem;
-  border-top-right-radius: 0.75rem;
-}
-
-/* 完全消除卡片头部圆角空白的辅助元素 */
-.app-container:not(.dark) .feed-card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 5px; /* 减小高度 */
-  background: var(--card-header-bg, rgba(240, 230, 255, 0.9));
-  z-index: 1;
-}
-
-/* 卡片顶部四角填充 */
-.app-container:not(.dark) .card-header::before {
   content: "";
   position: absolute;
   top: -2px;
   left: -2px;
   right: -2px;
-  height: 6px; /* 减小高度 */
+  height: 12px;
   background: var(--card-header-bg, rgba(240, 230, 255, 0.9));
-  z-index: 0;
+  z-index: 5;
   border-top-left-radius: 0.75rem;
   border-top-right-radius: 0.75rem;
 }
 
-/* 添加卡片标题内容区域的最大高度限制 */
-.app-container:not(.dark) .card-header h3,
-.app-container:not(.dark) .card-header .card-title {
-  margin: 0;
-  padding: 0;
-  line-height: 1.3;
-  max-height: 2.6em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  font-size: 0.95rem !important;
+/* 确保标题内容在伪元素上方 */
+.app-container:not(.dark) .card-header {
+  position: relative;
+  z-index: 6;
+  background: var(--card-header-bg, rgba(240, 230, 255, 0.9)) !important;
+  border-bottom: 1px solid var(--card-border, rgba(161, 140, 209, 0.8)) !important;
+  padding: 12px 16px;
 }
 
-/* 确保卡片内容正确显示 */
-.app-container:not(.dark) .card-content {
-  padding-top: 8px !important;
-  background: var(--card-content-bg, rgba(255, 255, 255, 0.85)) !important;
-  overflow-y: auto !important;
-}
-
-/* 确保卡片体正确显示 */
 .app-container:not(.dark) .card-body {
   background: var(--card-content-bg, rgba(255, 255, 255, 0.85)) !important;
   overflow-y: auto !important;
-}
-
-/* 针对移动设备的卡片标题优化 */
-@media (max-width: 768px) {
-  .app-container:not(.dark) .card-header {
-    padding: 6px 12px;
-    max-height: 40px;
-  }
-
-  .app-container:not(.dark) .card-header h3,
-  .app-container:not(.dark) .card-header .card-title {
-    font-size: 0.9rem !important;
-    line-height: 1.25;
-    max-height: 2.5em;
-  }
 }
 
 .app-container:not(.dark) .card-title {
@@ -1170,121 +1072,5 @@ body,
 
 .app-container:not(.dark) a:not(.item-link):hover {
   color: var(--link-hover-color, #6f4ebf) !important;
-}
-
-/* 全局确保卡片标题区样式统一 */
-.card-header {
-  flex-shrink: 0;
-  border-top-left-radius: inherit;
-  border-top-right-radius: inherit;
-  width: 100%;
-  box-sizing: border-box;
-  align-self: stretch;
-  min-height: unset;
-  max-height: 44px;
-  display: flex;
-  align-items: center;
-}
-
-.card-header h3,
-.card-header .card-title {
-  margin: 0;
-  padding: 0;
-  line-height: 1.3;
-  max-height: 2.6em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  width: 100%;
-  font-weight: 600;
-}
-
-/* 卡片标题字体大小和对齐样式 */
-.app-container .card-title {
-  font-size: 0.95rem !important;
-  text-align: center;
-}
-
-.app-container:not(.dark) .card-title {
-  color: var(--text-primary, #5a4a8a) !important;
-  font-weight: 600;
-}
-
-/* 修复卡片内容与标题之间的距离 */
-.app-container .card-content {
-  padding-top: 8px;
-}
-
-/* 添加最高优先级的卡片标题样式，覆盖所有现有样式 */
-html body .app-container .card-header {
-  padding: 8px 16px !important;
-  min-height: unset !important;
-  height: auto !important;
-  max-height: 38px !important;
-  display: flex !important;
-  align-items: center !important;
-  position: relative !important;
-  z-index: 3 !important;
-}
-
-html body .app-container .card-header h3,
-html body .app-container .card-header .card-title {
-  margin: 0 !important;
-  padding: 0 !important;
-  line-height: 1.25 !important;
-  max-height: 2.5em !important;
-  font-size: 0.925rem !important;
-  text-align: center !important;
-  width: 100% !important;
-  font-weight: 600 !important;
-  position: relative !important;
-  z-index: 4 !important;
-  white-space: normal !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  display: -webkit-box !important;
-  -webkit-box-orient: vertical !important;
-  -webkit-line-clamp: 2 !important;
-}
-
-/* 修复卡片头部圆角问题的最高优先级解决方案 */
-html body .app-container:not(.dark) .feed-card::before {
-  content: "" !important;
-  position: absolute !important;
-  top: -1px !important;
-  left: -1px !important;
-  right: -1px !important;
-  height: 3px !important; /* 减少高度 */
-  background: var(--card-header-bg, rgba(240, 230, 255, 0.9)) !important;
-  z-index: 2 !important;
-  border-top-left-radius: 0.75rem !important;
-  border-top-right-radius: 0.75rem !important;
-}
-
-html body .app-container:not(.dark) .feed-card::after {
-  content: "" !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
-  height: 3px !important; /* 减少高度 */
-  background: var(--card-header-bg, rgba(240, 230, 255, 0.9)) !important;
-  z-index: 1 !important;
-}
-
-html body .app-container:not(.dark) .card-header::before {
-  content: "" !important;
-  position: absolute !important;
-  top: -2px !important;
-  left: -2px !important;
-  right: -2px !important;
-  height: 5px !important; /* 减少高度 */
-  background: var(--card-header-bg, rgba(240, 230, 255, 0.9)) !important;
-  z-index: 0 !important;
-  border-top-left-radius: 0.75rem !important;
-  border-top-right-radius: 0.75rem !important;
 }
 </style>
