@@ -280,22 +280,25 @@ const fetchFeeds = async (forceRefresh = false) => {
     const isInitialLoad = feeds.value.length === 0 && !forceRefresh;
     const shouldUseCache = isInitialLoad;
 
-    // 构建请求URL，非初次加载时始终强制刷新
-    const url = `/api/feeds?t=${timestamp}${
-      !shouldUseCache ? "&forceRefresh=true" : ""
-    }`;
+    console.log(
+      `是否是首次加载: ${isInitialLoad}, 是否使用缓存: ${shouldUseCache}`
+    );
 
-    console.log(`请求URL: ${url}, 是否使用缓存: ${shouldUseCache}`);
+    // 构建请求URL
+    const url = `/api/feeds?t=${timestamp}`;
 
     // 设置请求头
     const headers = {
       Accept: "application/json",
     };
 
-    // 如果不使用缓存，添加no-cache头
-    if (!shouldUseCache) {
+    // 只有在强制刷新或非首次加载时才添加no-cache头
+    if (forceRefresh || !isInitialLoad) {
+      console.log("添加no-cache头");
       headers["Cache-Control"] = "no-cache";
       headers["Pragma"] = "no-cache";
+    } else {
+      console.log("使用缓存");
     }
 
     const response = await fetch(url, { headers });
