@@ -17,6 +17,10 @@ const defaultConfig = {
       title: "人人都是产品经理",
       url: "https://www.woshipm.com/feed",
     },
+    {
+      title: "极客优惠",
+      url: "https://jike.info/recent.rss",
+    },
   ],
   refresh: {
     interval: 120, // 默认UI自动刷新间隔为120秒
