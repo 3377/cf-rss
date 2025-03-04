@@ -284,8 +284,8 @@ const fetchFeeds = async (forceRefresh = false) => {
       `是否是首次加载: ${isInitialLoad}, 是否使用缓存: ${shouldUseCache}`
     );
 
-    // 构建请求URL
-    const url = `/api/feeds?t=${timestamp}`;
+    // 构建请求URL，添加forceRefresh参数
+    const url = `/api/feeds?t=${timestamp}&forceRefresh=${forceRefresh}`;
 
     // 设置请求头
     const headers = {

@@ -241,10 +241,10 @@ export async function onRequest(context) {
     return new Response(JSON.stringify(feedResults), {
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control":
-          "no-store, no-cache, must-revalidate, proxy-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+        "X-Cache": "MISS",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, OPTIONS",
       },
