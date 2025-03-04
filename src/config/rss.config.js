@@ -14,10 +14,6 @@ const defaultConfig = {
       url: "https://api.dbot.pp.ua/v1/rss/linuxdo",
     },
     {
-      title: "人人都是产品经理",
-      url: "https://www.woshipm.com/feed",
-    },
-    {
       title: "极客优惠",
       url: "https://jike.info/recent.rss",
     },
