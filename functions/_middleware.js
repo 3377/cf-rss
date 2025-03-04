@@ -256,6 +256,10 @@ export async function onRequest(context) {
                   title: "人人都是产品经理",
                   url: "https://www.woshipm.com/feed",
                 },
+                {
+                  title: "极客优惠",
+                  url: "https://jike.info/recent.rss",
+                },
               ];
 
         // 获取所有 RSS 源的内容
@@ -404,10 +408,10 @@ export async function onRequest(context) {
           JSON.stringify({ error: "Failed to fetch feeds" }),
           {
             status: 500,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+            },
           }
         );
       }
