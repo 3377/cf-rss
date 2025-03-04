@@ -666,10 +666,6 @@ const calcMobileCardHeight = computed(() => {
 
 /* ---------- 网格布局 ---------- */
 .feed-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: minmax(min-content, auto);
-  gap: 24px;
   flex: 1;
   overflow-y: auto;
   padding: 1%;

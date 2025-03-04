@@ -572,25 +572,31 @@ html body .app-container.bg-gray-50 button.bg-green-500:hover {
 
 .footer {
   flex-shrink: 0;
-  border-top: none;
-  backdrop-filter: blur(8px);
-  padding-top: 0.35rem;
-  box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.01);
-  margin-top: 0;
+  padding: 0.25rem 0;
+  position: relative;
+  z-index: 10;
 }
 
-html body .app-container.bg-gray-50 .footer {
-  background-color: rgba(255, 255, 255, 0.92) !important;
-  backdrop-filter: blur(10px) !important;
-  border-top: none !important;
-  box-shadow: 0 -1px 1px rgba(161, 140, 209, 0.07) !important;
-}
-
+/* 暗色模式下的底部样式 */
 .dark .footer {
-  border-color: #374151;
   border-top: 1px solid rgba(55, 65, 81, 0.5);
   background-color: rgba(17, 24, 39, 0.75);
-  box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+/* 亮色模式下的底部样式 */
+.app-container:not(.dark) .footer {
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-top: 0.5px solid rgba(161, 140, 209, 0.2);
+}
+
+.footer-text {
+  font-size: 0.75rem;
+  padding: 0.25rem 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
 }
 
 /* 移除全局滚动条 */
@@ -975,13 +981,42 @@ html body .app-container.dark .mobile-card-content {
   -webkit-overflow-scrolling: touch !important;
 }
 
-/* 全局确保网格区域可以滚动 */
+/* 修复网格布局样式 */
 .feed-grid {
   display: grid;
   gap: 24px;
-  padding: 2%;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+  padding: 1.5%;
+  grid-template-columns: repeat(5, 1fr) !important;
   align-items: start;
+  margin-top: -30px;
+  margin-bottom: -30px;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1600px) {
+  .feed-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  .feed-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .feed-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .feed-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* 全局滚动设置 */
@@ -1012,7 +1047,7 @@ body,
 
 .card-header {
   background: var(--card-header-bg, #f8fafc);
-  border-bottom: 1px solid var(--card-border-color, #e2e8f0);
+  border-bottom: 1px solid var(--card-border, #e2e8f0);
   flex-shrink: 0; /* 防止头部被压缩 */
 }
 
