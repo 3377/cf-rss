@@ -336,16 +336,56 @@ onUnmounted(() => {
 
 // 计算网格样式
 const gridStyle = computed(() => {
-  const layout = RSS_CONFIG.display?.layout || {};
-  const columns = layout.gridColumns || 3;
-  const gap = layout.cardGap || 24;
-  const sideMargin = layout.sideMargin || "2%";
+  // 根据 feeds 数量动态计算最佳列数
+  const feedCount = props.feeds.length;
+  let columns;
+
+  // 根据屏幕宽度和源数量动态计算最佳列数
+  const screenWidth = window.innerWidth;
+  if (screenWidth >= 1920) {
+    // 大屏幕
+    columns = Math.min(5, feedCount); // 最多5列
+  } else if (screenWidth >= 1440) {
+    // 中等大屏幕
+    columns = Math.min(4, feedCount); // 最多4列
+  } else if (screenWidth >= 1024) {
+    // 笔记本屏幕
+    columns = Math.min(3, feedCount); // 最多3列
+  } else if (screenWidth >= 768) {
+    // 平板屏幕
+    columns = Math.min(2, feedCount); // 最多2列
+  } else {
+    columns = 1; // 移动设备始终1列
+  }
+
+  // 根据列数调整间距
+  const gap = columns > 1 ? 24 : 16;
+  const sideMargin = columns > 1 ? "2%" : "0";
 
   return {
     gridTemplateColumns: `repeat(${columns}, 1fr)`,
     gap: `${gap}px`,
     margin: `0 ${sideMargin}`,
   };
+});
+
+// 监听窗口大小变化，更新布局
+onMounted(() => {
+  window.addEventListener("resize", () => {
+    checkMobile();
+    // 强制重新计算 gridStyle
+    nextTick(() => {
+      const grid = document.querySelector(".feed-grid");
+      if (grid) {
+        const style = gridStyle.value;
+        Object.assign(grid.style, style);
+      }
+    });
+  });
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", checkMobile);
 });
 
 // 处理日期格式化，添加更健壮的错误处理
