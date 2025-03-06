@@ -3,15 +3,17 @@
     <div
       class="countdown flex items-center text-sm text-gray-500 dark:text-gray-400"
     >
-      <span v-if="fromCache" class="mr-2 from-cache inline-flex items-center">
-        <div
-          class="w-2 h-2 bg-purple-500 rounded-full mr-1 animate-pulse"
-        ></div>
-        从缓存加载
-      </span>
       <template v-if="refreshCountdown > 0">
-        <span class="mr-2">上次更新: {{ lastUpdateTime }}</span>
-        {{ countdownText }}
+        <div class="flex items-center gap-4">
+          <div v-if="fromCache" class="from-cache inline-flex items-center">
+            <div
+              class="w-2 h-2 bg-purple-500 rounded-full mr-1 animate-pulse"
+            ></div>
+            <span class="mr-2">缓存时间: {{ cacheTimeFormatted }}</span>
+          </div>
+          <span class="mr-2">上次更新: {{ lastUpdateTime }}</span>
+          <span>{{ countdownText }}</span>
+        </div>
       </template>
       <span v-else>刷新中...</span>
     </div>
@@ -20,6 +22,7 @@
 
 <script setup>
 import { ref, computed, defineEmits, defineProps } from "vue";
+import { format } from "date-fns";
 
 const props = defineProps({
   refreshCountdown: {
@@ -34,6 +37,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  cacheTime: {
+    type: Date,
+    default: null,
+  },
 });
 
 const emit = defineEmits(["refresh"]);
@@ -42,6 +49,15 @@ const countdownText = computed(() => {
   const minutes = Math.floor(props.refreshCountdown / 60);
   const seconds = props.refreshCountdown % 60;
   return `${minutes}分${seconds < 10 ? "0" + seconds : seconds}秒后刷新`;
+});
+
+const formatTime = (date) => {
+  if (!date) return "";
+  return format(date, "HH:mm:ss");
+};
+
+const cacheTimeFormatted = computed(() => {
+  return props.cacheTime ? formatTime(props.cacheTime) : "";
 });
 </script>
 

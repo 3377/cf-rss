@@ -32,6 +32,7 @@
             :refresh-countdown="countdown"
             :from-cache="isFromCache"
             :last-update-time="formatLastUpdate"
+            :cache-time="cacheTime"
             @refresh="handleRefreshClick"
           />
         </div>
@@ -156,6 +157,7 @@ const isDark = ref(
 const appTitle = ref(RSS_CONFIG.display?.appTitle || "CF RSS");
 const selectedFont = ref("");
 const lastUpdateTime = ref(new Date());
+const cacheTime = ref(null);
 let refreshTimer = null;
 let countdownTimer = null;
 
@@ -302,17 +304,20 @@ const fetchFeeds = async (forceRefresh = false) => {
     isFromCache.value = cacheStatus === "HIT";
 
     if (isFromCache.value) {
-      const cacheTime = response.headers.get("X-Cache-Timestamp");
-      if (cacheTime) {
+      const cacheTsStr = response.headers.get("X-Cache-Timestamp");
+      if (cacheTsStr) {
+        const cacheTs = parseInt(cacheTsStr);
+        cacheTime.value = new Date(cacheTs);
         console.log(
           "内容来自缓存，缓存时间:",
-          new Date(parseInt(cacheTime)).toLocaleString()
+          cacheTime.value.toLocaleString()
         );
       }
     } else {
       console.log("获取了新内容");
       // 更新最后刷新时间
       lastUpdateTime.value = new Date();
+      cacheTime.value = null; // 清除缓存时间
     }
 
     if (!response.ok) {
