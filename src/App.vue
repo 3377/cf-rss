@@ -30,7 +30,7 @@
         >
           <FeedCountdown
             :refresh-countdown="countdown"
-            :from-cache="isFromCache"
+            :active-cache="activeCache"
             :last-update-time="formatLastUpdate"
             :server-cache-time="serverCacheTime"
             :local-cache-time="localCacheTime"
@@ -159,9 +159,10 @@ const appTitle = ref(RSS_CONFIG.display?.appTitle || "CF RSS");
 const selectedFont = ref("");
 const lastUpdateTime = ref(new Date());
 const serverCacheTime = ref(null);
-const localCacheTime = ref(new Date());
-const cacheTime = ref(null);
-const isFromCache = ref(false);
+const localCacheTime = ref(null);
+const activeCache = ref("none");
+const isFirstLoad = ref(true);
+let persistedCountdown = null;
 let refreshTimer = null;
 let countdownTimer = null;
 
@@ -268,7 +269,55 @@ const toggleTheme = () => {
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
 };
 
-// 修改fetchFeeds函数，检查并更新缓存状态
+// 在 formatLastUpdate 之后添加 persistCountdown 函数
+// 使用 localStorage 持久化倒计时，使其独立于页面刷新
+const persistCountdown = () => {
+  try {
+    localStorage.setItem("rss_countdown", countdown.value.toString());
+    localStorage.setItem("rss_countdown_timestamp", Date.now().toString());
+  } catch (e) {
+    console.error("无法保存倒计时状态:", e);
+  }
+};
+
+// 恢复倒计时状态
+const restoreCountdown = () => {
+  try {
+    const savedCountdown = localStorage.getItem("rss_countdown");
+    const savedTimestamp = localStorage.getItem("rss_countdown_timestamp");
+
+    if (savedCountdown && savedTimestamp) {
+      const elapsedSeconds = Math.floor(
+        (Date.now() - parseInt(savedTimestamp)) / 1000
+      );
+      let newCountdown = parseInt(savedCountdown) - elapsedSeconds;
+
+      // 如果倒计时已经过期或无效，重置为默认值
+      if (newCountdown <= 0 || isNaN(newCountdown)) {
+        newCountdown = RSS_CONFIG.refresh?.interval || 300;
+      }
+
+      countdown.value = newCountdown;
+      console.log(`恢复倒计时: ${countdown.value}秒`);
+    }
+  } catch (e) {
+    console.error("无法恢复倒计时状态:", e);
+  }
+};
+
+// 修改 updateCountdown 函数
+const updateCountdown = () => {
+  countdown.value--;
+  persistCountdown(); // 每次更新时保存倒计时状态
+
+  if (countdown.value <= 0) {
+    countdown.value = RSS_CONFIG.refresh?.interval || 300;
+    // 倒计时结束时刷新数据
+    fetchFeeds(true);
+  }
+};
+
+// 修改 fetchFeeds 函数的逻辑
 const fetchFeeds = async (forceRefresh = false) => {
   if (loading.value) return;
 
@@ -276,17 +325,36 @@ const fetchFeeds = async (forceRefresh = false) => {
   error.value = null;
 
   try {
-    console.log(`开始获取RSS内容，强制刷新: ${forceRefresh}`);
+    console.log(
+      `开始获取RSS内容，强制刷新: ${forceRefresh}, 首次加载: ${isFirstLoad}`
+    );
     const timestamp = new Date().getTime();
+
+    // 确定获取数据的策略
+    let shouldForceRefresh = forceRefresh;
+
+    // 如果是按F5刷新页面（非首次加载且非强制刷新）
+    if (!isFirstLoad && !forceRefresh) {
+      console.log("检测到浏览器刷新，使用本地缓存");
+
+      // 如果已有本地缓存，直接使用
+      if (localCacheTime.value) {
+        activeCache.value = "local";
+        loading.value = false;
+        console.log("使用本地缓存显示数据");
+        return; // 直接返回，不发起新请求
+      }
+    }
+
     const url = `/api/feeds?t=${timestamp}${
-      forceRefresh ? "&forceRefresh=true" : ""
+      shouldForceRefresh ? "&forceRefresh=true" : ""
     }`;
 
     const headers = {
       Accept: "application/json",
     };
 
-    if (forceRefresh) {
+    if (shouldForceRefresh) {
       console.log("添加no-cache头");
       headers["Cache-Control"] = "no-cache";
       headers["Pragma"] = "no-cache";
@@ -295,13 +363,18 @@ const fetchFeeds = async (forceRefresh = false) => {
     }
 
     const response = await fetch(url, { headers });
-    localCacheTime.value = new Date(); // 更新本地缓存时间
+
+    // 更新本地缓存时间
+    if (!localCacheTime.value) {
+      localCacheTime.value = new Date();
+    }
 
     // 检查服务器缓存状态
     const cacheStatus = response.headers.get("X-Cache");
-    isFromCache.value = cacheStatus === "HIT";
+    const isFromServerCache = cacheStatus === "HIT";
 
-    if (isFromCache.value) {
+    if (isFromServerCache) {
+      // 从服务器缓存获取数据
       const cacheTsStr = response.headers.get("X-Cache-Timestamp");
       if (cacheTsStr) {
         const cacheTs = parseInt(cacheTsStr);
@@ -311,10 +384,12 @@ const fetchFeeds = async (forceRefresh = false) => {
           serverCacheTime.value.toLocaleString()
         );
       }
+      activeCache.value = "server";
     } else {
+      // 获取了新内容
       console.log("获取了新内容");
-      lastUpdateTime.value = new Date(); // 更新最后获取新数据的时间
-      serverCacheTime.value = null; // 清除服务器缓存时间
+      lastUpdateTime.value = new Date();
+      activeCache.value = "fresh";
     }
 
     if (!response.ok) {
@@ -331,19 +406,18 @@ const fetchFeeds = async (forceRefresh = false) => {
     }
 
     feeds.value = data;
-    countdown.value = RSS_CONFIG.refresh?.interval || 300;
+
+    // 只有在首次加载时恢复倒计时，否则继续使用当前倒计时
+    if (isFirstLoad) {
+      restoreCountdown();
+      isFirstLoad = false;
+    }
   } catch (err) {
     console.error("获取RSS内容失败:", err);
     error.value = `获取内容失败: ${err.message}`;
+    activeCache.value = "none";
   } finally {
     loading.value = false;
-  }
-};
-
-const updateCountdown = () => {
-  countdown.value--;
-  if (countdown.value <= 0) {
-    countdown.value = RSS_CONFIG.refresh?.interval || 300;
   }
 };
 

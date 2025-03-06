@@ -5,16 +5,27 @@
     >
       <template v-if="refreshCountdown > 0">
         <div class="flex items-center gap-4">
-          <div v-if="fromCache" class="from-cache inline-flex items-center">
+          <div class="server-cache inline-flex items-center">
             <div
+              v-if="activeCache === 'server'"
               class="w-2 h-2 bg-purple-500 rounded-full mr-1 animate-pulse"
             ></div>
             <span class="mr-2">服务器缓存: {{ serverCacheTimeFormatted }}</span>
           </div>
           <div class="local-cache inline-flex items-center">
+            <div
+              v-if="activeCache === 'local'"
+              class="w-2 h-2 bg-blue-500 rounded-full mr-1 animate-pulse"
+            ></div>
             <span class="mr-2">本地缓存: {{ localCacheTimeFormatted }}</span>
           </div>
-          <span class="mr-2">最后更新: {{ lastUpdateTime }}</span>
+          <div class="last-update inline-flex items-center">
+            <div
+              v-if="activeCache === 'fresh'"
+              class="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"
+            ></div>
+            <span class="mr-2">最后更新: {{ lastUpdateTime }}</span>
+          </div>
           <span>{{ countdownText }}</span>
         </div>
       </template>
@@ -32,9 +43,9 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
-  fromCache: {
-    type: Boolean,
-    default: false,
+  activeCache: {
+    type: String,
+    default: "none", // 'server', 'local', 'fresh' 或 'none'
   },
   lastUpdateTime: {
     type: String,
@@ -46,7 +57,7 @@ const props = defineProps({
   },
   localCacheTime: {
     type: Date,
-    required: true,
+    default: null,
   },
 });
 
@@ -59,12 +70,12 @@ const countdownText = computed(() => {
 });
 
 const formatTime = (date) => {
-  if (!date) return "";
+  if (!date) return "无";
   return format(date, "HH:mm:ss");
 };
 
 const serverCacheTimeFormatted = computed(() => {
-  return props.serverCacheTime ? formatTime(props.serverCacheTime) : "无";
+  return formatTime(props.serverCacheTime);
 });
 
 const localCacheTimeFormatted = computed(() => {
@@ -77,7 +88,8 @@ const localCacheTimeFormatted = computed(() => {
   padding: 0.5rem 1rem;
   background-color: var(--el-bg-color-page);
 }
-.from-cache {
+
+.server-cache {
   color: #8566c9;
   font-weight: 500;
   display: inline-flex;
@@ -86,25 +98,45 @@ const localCacheTimeFormatted = computed(() => {
 }
 
 .local-cache {
-  color: #6b7280;
+  color: #3b82f6;
   display: inline-flex;
   align-items: center;
+  margin-right: 0.5rem;
 }
 
-/* 亮色模式下从缓存加载的动画球 */
-html body .app-container:not(.dark) .from-cache .animate-pulse {
+.last-update {
+  color: #10b981;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+/* 亮色模式下样式 */
+html body .app-container:not(.dark) .server-cache .animate-pulse {
   background-color: #a18cd1 !important;
   box-shadow: 0 0 5px rgba(161, 140, 209, 0.7);
 }
 
-/* 亮色模式下从缓存加载的文本 */
-html body .app-container:not(.dark) .from-cache {
+html body .app-container:not(.dark) .local-cache .animate-pulse {
+  background-color: #60a5fa !important;
+  box-shadow: 0 0 5px rgba(59, 130, 246, 0.7);
+}
+
+html body .app-container:not(.dark) .last-update .animate-pulse {
+  background-color: #34d399 !important;
+  box-shadow: 0 0 5px rgba(16, 185, 129, 0.7);
+}
+
+html body .app-container:not(.dark) .server-cache {
   color: #8566c9 !important;
 }
 
-/* 亮色模式下本地缓存文本 */
 html body .app-container:not(.dark) .local-cache {
-  color: #7d6ca5 !important;
+  color: #3b82f6 !important;
+}
+
+html body .app-container:not(.dark) .last-update {
+  color: #10b981 !important;
 }
 
 /* 亮色模式下刷新倒计时 */
@@ -112,14 +144,32 @@ html body .app-container:not(.dark) .countdown {
   color: #7d6ca5 !important;
 }
 
-/* 暗色模式下从缓存加载的动画 */
-.dark .from-cache {
+/* 暗色模式下样式 */
+.dark .server-cache {
   color: rgba(220, 200, 255, 0.9);
 }
 
-.dark .from-cache .animate-pulse {
+.dark .local-cache {
+  color: rgba(191, 219, 254, 0.9);
+}
+
+.dark .last-update {
+  color: rgba(167, 243, 208, 0.9);
+}
+
+.dark .server-cache .animate-pulse {
   background-color: rgba(220, 200, 255, 0.9) !important;
   box-shadow: 0 0 8px rgba(220, 200, 255, 0.5);
+}
+
+.dark .local-cache .animate-pulse {
+  background-color: rgba(191, 219, 254, 0.9) !important;
+  box-shadow: 0 0 8px rgba(191, 219, 254, 0.5);
+}
+
+.dark .last-update .animate-pulse {
+  background-color: rgba(167, 243, 208, 0.9) !important;
+  box-shadow: 0 0 8px rgba(167, 243, 208, 0.5);
 }
 
 @keyframes pulse-glow {
@@ -134,7 +184,7 @@ html body .app-container:not(.dark) .countdown {
   }
 }
 
-.from-cache .animate-pulse {
+.animate-pulse {
   animation: pulse-glow 1.5s infinite;
 }
 </style>
