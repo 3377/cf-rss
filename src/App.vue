@@ -33,7 +33,6 @@
             :active-cache="activeCache"
             :last-update-time="formatLastUpdate"
             :server-cache-time="serverCacheTime"
-            :local-cache-time="localCacheTime"
             @refresh="handleRefreshClick"
           />
         </div>
@@ -159,7 +158,6 @@ const appTitle = ref(RSS_CONFIG.display?.appTitle || "CF RSS");
 const selectedFont = ref("");
 const lastUpdateTime = ref(new Date());
 const serverCacheTime = ref(null);
-const localCacheTime = ref(null);
 const activeCache = ref("none");
 let isFirstLoad = true;
 let persistedCountdown = null;
@@ -330,22 +328,18 @@ const fetchFeeds = async (forceRefresh = false) => {
     );
     const timestamp = new Date().getTime();
 
-    // 确定获取数据的策略
-    let shouldForceRefresh = forceRefresh;
+    // 确定是否强制刷新
+    const shouldForceRefresh = forceRefresh;
 
-    // 如果是按F5刷新页面（非首次加载且非强制刷新）
-    if (!isFirstLoad && !forceRefresh) {
-      console.log("检测到浏览器刷新，使用本地缓存");
-
-      // 如果已有本地缓存，直接使用
-      if (localCacheTime.value) {
-        activeCache.value = "local";
-        loading.value = false;
-        console.log("使用本地缓存显示数据");
-        return; // 直接返回，不发起新请求
-      }
+    // 如果按F5刷新页面且服务器有缓存，则使用服务器缓存
+    if (!shouldForceRefresh && !isFirstLoad && serverCacheTime.value) {
+      console.log("检测到浏览器刷新，使用服务器缓存");
+      activeCache.value = "server";
+      loading.value = false;
+      return; // 直接返回，不发起新请求
     }
 
+    // 构建请求URL
     const url = `/api/feeds?t=${timestamp}${
       shouldForceRefresh ? "&forceRefresh=true" : ""
     }`;
@@ -355,7 +349,7 @@ const fetchFeeds = async (forceRefresh = false) => {
     };
 
     if (shouldForceRefresh) {
-      console.log("添加no-cache头");
+      console.log("添加no-cache头，强制获取新数据");
       headers["Cache-Control"] = "no-cache";
       headers["Pragma"] = "no-cache";
     } else {
@@ -363,11 +357,6 @@ const fetchFeeds = async (forceRefresh = false) => {
     }
 
     const response = await fetch(url, { headers });
-
-    // 更新本地缓存时间
-    if (!localCacheTime.value) {
-      localCacheTime.value = new Date();
-    }
 
     // 检查服务器缓存状态
     const cacheStatus = response.headers.get("X-Cache");
@@ -389,6 +378,7 @@ const fetchFeeds = async (forceRefresh = false) => {
       // 获取了新内容
       console.log("获取了新内容");
       lastUpdateTime.value = new Date();
+      serverCacheTime.value = null; // 清除服务器缓存时间，因为现在使用的是新数据
       activeCache.value = "fresh";
     }
 

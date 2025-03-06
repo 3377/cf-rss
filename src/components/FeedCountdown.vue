@@ -14,13 +14,6 @@
           </div>
           <div class="cache-item inline-flex items-center">
             <div
-              v-if="activeCache === 'local'"
-              class="w-2 h-2 bg-blue-500 rounded-full mr-1 animate-pulse"
-            ></div>
-            <span class="mr-2">本地缓存: {{ localCacheTimeFormatted }}</span>
-          </div>
-          <div class="cache-item inline-flex items-center">
-            <div
               v-if="activeCache === 'fresh'"
               class="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"
             ></div>
@@ -45,17 +38,13 @@ const props = defineProps({
   },
   activeCache: {
     type: String,
-    default: "none", // 'server', 'local', 'fresh' 或 'none'
+    default: "none", // 'server', 'fresh' 或 'none'
   },
   lastUpdateTime: {
     type: String,
     default: "",
   },
   serverCacheTime: {
-    type: Date,
-    default: null,
-  },
-  localCacheTime: {
     type: Date,
     default: null,
   },
@@ -76,10 +65,6 @@ const formatTime = (date) => {
 
 const serverCacheTimeFormatted = computed(() => {
   return formatTime(props.serverCacheTime);
-});
-
-const localCacheTimeFormatted = computed(() => {
-  return formatTime(props.localCacheTime);
 });
 </script>
 
@@ -108,11 +93,6 @@ html body .app-container:not(.dark) .animate-pulse[class*="bg-purple"] {
   box-shadow: 0 0 5px rgba(161, 140, 209, 0.7);
 }
 
-html body .app-container:not(.dark) .animate-pulse[class*="bg-blue"] {
-  background-color: #60a5fa !important;
-  box-shadow: 0 0 5px rgba(59, 130, 246, 0.7);
-}
-
 html body .app-container:not(.dark) .animate-pulse[class*="bg-green"] {
   background-color: #34d399 !important;
   box-shadow: 0 0 5px rgba(16, 185, 129, 0.7);
@@ -137,11 +117,6 @@ html body .app-container:not(.dark) .countdown {
 .dark .animate-pulse[class*="bg-purple"] {
   background-color: rgba(220, 200, 255, 0.9) !important;
   box-shadow: 0 0 8px rgba(220, 200, 255, 0.5);
-}
-
-.dark .animate-pulse[class*="bg-blue"] {
-  background-color: rgba(191, 219, 254, 0.9) !important;
-  box-shadow: 0 0 8px rgba(191, 219, 254, 0.5);
 }
 
 .dark .animate-pulse[class*="bg-green"] {
