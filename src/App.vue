@@ -276,24 +276,18 @@ const fetchFeeds = async (forceRefresh = false) => {
     console.log(`开始获取RSS内容，强制刷新: ${forceRefresh}`);
     const timestamp = new Date().getTime();
 
-    // 用户第一次访问页面时允许使用缓存，后续刷新均使用最新内容
-    const isInitialLoad = feeds.value.length === 0 && !forceRefresh;
-    const shouldUseCache = isInitialLoad;
-
-    console.log(
-      `是否是首次加载: ${isInitialLoad}, 是否使用缓存: ${shouldUseCache}`
-    );
-
     // 构建请求URL，添加forceRefresh参数
-    const url = `/api/feeds?t=${timestamp}&forceRefresh=${forceRefresh}`;
+    const url = `/api/feeds?t=${timestamp}${
+      forceRefresh ? "&forceRefresh=true" : ""
+    }`;
 
     // 设置请求头
     const headers = {
       Accept: "application/json",
     };
 
-    // 只有在强制刷新或非首次加载时才添加no-cache头
-    if (forceRefresh || !isInitialLoad) {
+    // 只有在强制刷新时才添加no-cache头
+    if (forceRefresh) {
       console.log("添加no-cache头");
       headers["Cache-Control"] = "no-cache";
       headers["Pragma"] = "no-cache";
@@ -1012,7 +1006,7 @@ body,
 
 .card-header {
   background: var(--card-header-bg, #f8fafc);
-  border-bottom: 1px solid var(--card-border-color, #e2e8f0);
+  border-bottom: 1px solid var(--card-border, #e2e8f0);
   flex-shrink: 0; /* 防止头部被压缩 */
 }
 

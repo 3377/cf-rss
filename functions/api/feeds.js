@@ -2,6 +2,28 @@ import { RSS_CONFIG } from "../../src/config/rss.config.js";
 
 export async function onRequest(context) {
   try {
+    // 获取请求参数
+    const url = new URL(context.request.url);
+    const forceRefresh = url.searchParams.get("forceRefresh") === "true";
+
+    // 如果不是强制刷新，尝试从缓存获取数据
+    if (!forceRefresh) {
+      const cache = caches.default;
+      const cacheKey = new Request(url.toString());
+      const cachedResponse = await cache.match(cacheKey);
+
+      if (cachedResponse) {
+        console.log("返回缓存的数据");
+        // 添加缓存命中标记
+        const headers = new Headers(cachedResponse.headers);
+        headers.set("X-Cache", "HIT");
+        return new Response(cachedResponse.body, {
+          headers: headers,
+        });
+      }
+    }
+
+    // 如果是强制刷新或没有缓存，获取新数据
     const feedResults = await Promise.all(
       RSS_CONFIG.feeds.map(async (source) => {
         try {
@@ -238,22 +260,43 @@ export async function onRequest(context) {
       })
     );
 
-    return new Response(JSON.stringify(feedResults), {
+    // 创建响应
+    const response = new Response(JSON.stringify(feedResults), {
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0",
         "X-Cache": "MISS",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, OPTIONS",
       },
     });
+
+    // 如果不是强制刷新，将结果存入缓存
+    if (!forceRefresh) {
+      const cache = caches.default;
+      const cacheKey = new Request(url.toString());
+
+      // 创建一个新的响应用于缓存，设置缓存控制头
+      const cacheResponse = new Response(JSON.stringify(feedResults), {
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "public, max-age=3600",
+          "X-Cache-Timestamp": Date.now().toString(),
+        },
+      });
+
+      // 存储到缓存
+      await cache.put(cacheKey, cacheResponse);
+    }
+
+    return response;
   } catch (error) {
     console.error("Global error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
     });
   }
 }
