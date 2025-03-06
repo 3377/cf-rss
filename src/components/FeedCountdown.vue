@@ -9,9 +9,12 @@
             <div
               class="w-2 h-2 bg-purple-500 rounded-full mr-1 animate-pulse"
             ></div>
-            <span class="mr-2">缓存时间: {{ cacheTimeFormatted }}</span>
+            <span class="mr-2">服务器缓存: {{ serverCacheTimeFormatted }}</span>
           </div>
-          <span class="mr-2">上次更新: {{ lastUpdateTime }}</span>
+          <div class="local-cache inline-flex items-center">
+            <span class="mr-2">本地缓存: {{ localCacheTimeFormatted }}</span>
+          </div>
+          <span class="mr-2">最后更新: {{ lastUpdateTime }}</span>
           <span>{{ countdownText }}</span>
         </div>
       </template>
@@ -37,9 +40,13 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  cacheTime: {
+  serverCacheTime: {
     type: Date,
     default: null,
+  },
+  localCacheTime: {
+    type: Date,
+    required: true,
   },
 });
 
@@ -56,8 +63,12 @@ const formatTime = (date) => {
   return format(date, "HH:mm:ss");
 };
 
-const cacheTimeFormatted = computed(() => {
-  return props.cacheTime ? formatTime(props.cacheTime) : "";
+const serverCacheTimeFormatted = computed(() => {
+  return props.serverCacheTime ? formatTime(props.serverCacheTime) : "无";
+});
+
+const localCacheTimeFormatted = computed(() => {
+  return formatTime(props.localCacheTime);
 });
 </script>
 
@@ -74,6 +85,12 @@ const cacheTimeFormatted = computed(() => {
   margin-right: 0.5rem;
 }
 
+.local-cache {
+  color: #6b7280;
+  display: inline-flex;
+  align-items: center;
+}
+
 /* 亮色模式下从缓存加载的动画球 */
 html body .app-container:not(.dark) .from-cache .animate-pulse {
   background-color: #a18cd1 !important;
@@ -83,6 +100,11 @@ html body .app-container:not(.dark) .from-cache .animate-pulse {
 /* 亮色模式下从缓存加载的文本 */
 html body .app-container:not(.dark) .from-cache {
   color: #8566c9 !important;
+}
+
+/* 亮色模式下本地缓存文本 */
+html body .app-container:not(.dark) .local-cache {
+  color: #7d6ca5 !important;
 }
 
 /* 亮色模式下刷新倒计时 */

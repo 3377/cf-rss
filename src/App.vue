@@ -32,7 +32,8 @@
             :refresh-countdown="countdown"
             :from-cache="isFromCache"
             :last-update-time="formatLastUpdate"
-            :cache-time="cacheTime"
+            :server-cache-time="serverCacheTime"
+            :local-cache-time="localCacheTime"
             @refresh="handleRefreshClick"
           />
         </div>
@@ -157,7 +158,10 @@ const isDark = ref(
 const appTitle = ref(RSS_CONFIG.display?.appTitle || "CF RSS");
 const selectedFont = ref("");
 const lastUpdateTime = ref(new Date());
+const serverCacheTime = ref(null);
+const localCacheTime = ref(new Date());
 const cacheTime = ref(null);
+const isFromCache = ref(false);
 let refreshTimer = null;
 let countdownTimer = null;
 
@@ -264,9 +268,6 @@ const toggleTheme = () => {
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
 };
 
-// 在script setup部分添加缓存状态变量
-const isFromCache = ref(false);
-
 // 修改fetchFeeds函数，检查并更新缓存状态
 const fetchFeeds = async (forceRefresh = false) => {
   if (loading.value) return;
@@ -277,29 +278,26 @@ const fetchFeeds = async (forceRefresh = false) => {
   try {
     console.log(`开始获取RSS内容，强制刷新: ${forceRefresh}`);
     const timestamp = new Date().getTime();
-
-    // 构建请求URL，添加forceRefresh参数
     const url = `/api/feeds?t=${timestamp}${
       forceRefresh ? "&forceRefresh=true" : ""
     }`;
 
-    // 设置请求头
     const headers = {
       Accept: "application/json",
     };
 
-    // 只有在强制刷新时才添加no-cache头
     if (forceRefresh) {
       console.log("添加no-cache头");
       headers["Cache-Control"] = "no-cache";
       headers["Pragma"] = "no-cache";
     } else {
-      console.log("使用缓存");
+      console.log("尝试使用服务器缓存");
     }
 
     const response = await fetch(url, { headers });
+    localCacheTime.value = new Date(); // 更新本地缓存时间
 
-    // 检查缓存状态
+    // 检查服务器缓存状态
     const cacheStatus = response.headers.get("X-Cache");
     isFromCache.value = cacheStatus === "HIT";
 
@@ -307,17 +305,16 @@ const fetchFeeds = async (forceRefresh = false) => {
       const cacheTsStr = response.headers.get("X-Cache-Timestamp");
       if (cacheTsStr) {
         const cacheTs = parseInt(cacheTsStr);
-        cacheTime.value = new Date(cacheTs);
+        serverCacheTime.value = new Date(cacheTs);
         console.log(
-          "内容来自缓存，缓存时间:",
-          cacheTime.value.toLocaleString()
+          "内容来自服务器缓存，缓存创建时间:",
+          serverCacheTime.value.toLocaleString()
         );
       }
     } else {
       console.log("获取了新内容");
-      // 更新最后刷新时间
-      lastUpdateTime.value = new Date();
-      cacheTime.value = null; // 清除缓存时间
+      lastUpdateTime.value = new Date(); // 更新最后获取新数据的时间
+      serverCacheTime.value = null; // 清除服务器缓存时间
     }
 
     if (!response.ok) {
