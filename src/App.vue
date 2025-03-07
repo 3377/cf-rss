@@ -422,43 +422,6 @@ onMounted(async () => {
   console.log("页面首次加载，尝试使用服务器缓存");
   await fetchFeeds(false);
 
-  // 如果配置了缓存时间，创建一个自动更新缓存的定时器
-  // 这个定时器负责在后台定期更新缓存，但不会更新UI
-  if (RSS_CONFIG.refresh?.cache > 0) {
-    console.log(`设置缓存自动更新，间隔: ${RSS_CONFIG.refresh.cache}秒`);
-    const cacheUpdateTimer = setInterval(async () => {
-      try {
-        console.log("后台自动更新缓存中...");
-        // 使用fetch直接请求API更新缓存
-        const timestamp = new Date().getTime();
-        const response = await fetch(
-          `/api/feeds?t=${timestamp}&forceRefresh=true`,
-          {
-            headers: {
-              "Cache-Control": "no-cache",
-              Pragma: "no-cache",
-            },
-          }
-        );
-
-        if (response.ok) {
-          console.log("缓存更新完成");
-          const status = response.headers.get("X-Cache");
-          console.log(`缓存状态: ${status}`);
-        } else {
-          console.error(`缓存更新失败: ${response.status}`);
-        }
-      } catch (err) {
-        console.error("缓存自动更新失败:", err);
-      }
-    }, RSS_CONFIG.refresh.cache * 1000);
-
-    // 在组件卸载时清除定时器
-    onUnmounted(() => {
-      if (cacheUpdateTimer) clearInterval(cacheUpdateTimer);
-    });
-  }
-
   // 设置倒计时更新
   countdownTimer = setInterval(updateCountdown, 1000);
 });

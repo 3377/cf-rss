@@ -1,30 +1,19 @@
-// 默认配置
-const defaultConfig = {
-  feeds: [
-    {
-      title: "36kr",
-      url: "https://36kr.com/feed",
-    },
-    {
-      title: "NodeSeek",
-      url: "https://rss.nodeseek.com",
-    },
-    {
-      title: "Linux DO",
-      url: "https://api.dbot.pp.ua/v1/rss/linuxdo",
-    },
-    {
-      title: "极客优惠",
-      url: "https://jike.info/recent.rss",
-    },
-  ],
+// 去除自动后台更新相关配置，简化缓存设置
+
+export const RSS_CONFIG = {
   refresh: {
-    interval: 300, // 单位：秒，RSS 刷新间隔（5分钟）
-    cache: 3900, // 单位：秒，缓存刷新间隔（默认65分钟，与服务器端保持一致）
+    // 单位：秒，UI刷新间隔（5分钟）
+    // 这只控制UI倒计时，不再触发后台缓存更新
+    interval: 300,
+
+    // 移除缓存自动更新间隔，改由UptimeRobot和环境变量控制
+    // cache: 3900, // 此行已删除
   },
   display: {
-    appTitle: "RSS 聚合阅读", // 应用标题
-    defaultDarkMode: false, // 默认暗色模式
+    // 应用标题
+    appTitle: "RSS 聚合阅读",
+    // 默认暗色模式
+    defaultDarkMode: false,
     itemsPerFeed: 15, // 每个卡片显示的条目数
     showItemDate: false, // 默认不显示条目日期
     dateFormat: "yyyy-MM-dd HH:mm",
@@ -46,99 +35,28 @@ const defaultConfig = {
       width: "500px",
     },
   },
+  feeds: [
+    {
+      title: "36kr",
+      url: "https://36kr.com/feed",
+    },
+    {
+      title: "NodeSeek",
+      url: "https://rss.nodeseek.com",
+    },
+    {
+      title: "Linux DO",
+      url: "https://api.dbot.pp.ua/v1/rss/linuxdo",
+    },
+    {
+      title: "极客优惠",
+      url: "https://jike.info/recent.rss",
+    },
+  ],
 };
 
-// 导出配置获取函数
+// 导出一个函数，用于获取配置
 export function getRSSConfig(env) {
-  console.log("Getting RSS config with env:", env); // 调试日志
-
-  // 创建新的配置对象，避免修改默认配置
-  const config = JSON.parse(JSON.stringify(defaultConfig));
-
-  try {
-    // 如果没有环境变量，直接返回默认配置
-    if (!env) {
-      console.log("No env provided, using default config");
-      return config;
-    }
-
-    // 处理 RSS feeds
-    if (env.RSS_FEEDS) {
-      try {
-        const feedsStr = env.RSS_FEEDS.trim();
-        console.log("RSS_FEEDS string:", feedsStr);
-
-        const parsedFeeds = JSON.parse(feedsStr);
-        if (Array.isArray(parsedFeeds) && parsedFeeds.length > 0) {
-          config.feeds = parsedFeeds;
-          console.log("Successfully parsed RSS feeds:", parsedFeeds);
-        } else {
-          console.warn("Parsed RSS_FEEDS is not a valid array");
-        }
-      } catch (parseError) {
-        console.error("Error parsing RSS_FEEDS:", parseError);
-      }
-    }
-
-    // 处理刷新配置
-    if (env.REFRESH_INTERVAL) {
-      config.refresh.interval = parseInt(env.REFRESH_INTERVAL);
-    }
-    if (env.CACHE_DURATION) {
-      config.refresh.cache = parseInt(env.CACHE_DURATION);
-    }
-
-    // 处理显示配置
-    if (env.APP_TITLE) {
-      config.display.appTitle = env.APP_TITLE;
-    }
-    if (env.DEFAULT_DARK_MODE !== undefined) {
-      config.display.defaultDarkMode = env.DEFAULT_DARK_MODE === "true";
-    }
-    if (env.SHOW_ITEM_DATE !== undefined) {
-      config.display.showItemDate = env.SHOW_ITEM_DATE === "true";
-    }
-    if (env.DATE_FORMAT) {
-      config.display.dateFormat = env.DATE_FORMAT;
-    }
-    if (env.FONT_SIZE) {
-      config.display.fontSize = parseInt(env.FONT_SIZE);
-    }
-    if (env.ITEMS_PER_FEED) {
-      config.display.itemsPerFeed = parseInt(env.ITEMS_PER_FEED);
-    }
-
-    // 处理布局配置
-    if (env.LAYOUT_SIDE_MARGIN) {
-      config.display.layout.sideMargin = env.LAYOUT_SIDE_MARGIN;
-    }
-    if (env.CARD_GAP) {
-      config.display.layout.cardGap = parseInt(env.CARD_GAP);
-    }
-    if (env.CARD_PADDING) {
-      config.display.layout.cardPadding = parseInt(env.CARD_PADDING);
-    }
-
-    // 处理提示框配置
-    if (env.TOOLTIP_MAX_PREVIEW_LENGTH) {
-      config.display.tooltip.maxPreviewLength = parseInt(
-        env.TOOLTIP_MAX_PREVIEW_LENGTH
-      );
-    }
-    if (env.TOOLTIP_WIDTH) {
-      config.display.tooltip.width = env.TOOLTIP_WIDTH;
-    }
-  } catch (error) {
-    console.error("Error in getRSSConfig:", error);
-  }
-
-  console.log("Final config:", config);
-  return config;
+  // 可以在这里处理环境变量，如果有需要
+  return RSS_CONFIG;
 }
-
-// 通过环境变量读取配置，如果没有则使用默认值
-export const RSS_CONFIG = getRSSConfig(
-  typeof window !== "undefined" && window.__RSS_CONFIG__
-    ? window.__RSS_CONFIG__
-    : null
-);

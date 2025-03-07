@@ -1,23 +1,22 @@
 // 专用于外部服务触发缓存更新的 API 端点
 export async function onRequest(context) {
   try {
-    // 简单的安全检查（可选）- 使用查询参数中的密钥
+    // 检查访问密钥
     const url = new URL(context.request.url);
-    const key = url.searchParams.get("key");
-    const secretKey = context.env.UPDATE_SECRET || "your-secret-key"; // 建议通过环境变量设置
+    const accessKey = url.searchParams.get("key");
+    const secretKey = context.env.UPDATE_KEY || "35794406";
 
-    // 检查密钥（可选）
-    if (key && key !== secretKey) {
+    if (accessKey !== secretKey) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: "Unauthorized access",
+          message: "非法访问",
         }),
         {
-          status: 401,
           headers: {
             "Content-Type": "application/json",
           },
+          status: 403,
         }
       );
     }
@@ -87,6 +86,17 @@ export async function onRequest(context) {
         .replace(/\//g, "-"); // 将斜杠替换为短横线
     };
 
+    // 缓存管理说明
+    const cacheStrategy = {
+      explanation: `
+        缓存管理策略:
+        1. 该API被设计为由UptimeRobot等服务定期访问(推荐60分钟)
+        2. HTTP缓存有效期由CACHE_MAX_AGE环境变量控制(默认65分钟)
+        3. UI显示的刷新倒计时由RSS_CONFIG.refresh.interval控制(默认5分钟)
+        4. UptimeRobot触发和UI倒计时/手动刷新是唯一的数据更新途径
+      `,
+    };
+
     // 返回成功响应
     return new Response(
       JSON.stringify({
@@ -109,6 +119,11 @@ export async function onRequest(context) {
             ? toBeiJingTime(Number(oldCacheTimestamp))
             : "无",
         },
+        strategy: cacheStrategy.explanation
+          .trim()
+          .split("\n")
+          .map((line) => line.trim())
+          .filter((line) => line),
       }),
       {
         headers: {
@@ -118,17 +133,17 @@ export async function onRequest(context) {
       }
     );
   } catch (error) {
-    console.error("缓存更新失败:", error);
+    console.error("更新缓存时出错:", error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message,
+        message: `更新缓存失败: ${error.message}`,
       }),
       {
-        status: 500,
         headers: {
           "Content-Type": "application/json",
         },
+        status: 500,
       }
     );
   }
