@@ -279,7 +279,7 @@ export async function onRequest(context) {
       const cacheResponse = new Response(JSON.stringify(feedResults), {
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=3900", // 65分钟，略大于UptimeRobot的60分钟间隔
+          "Cache-Control": "public, max-age=1900", // 65分钟，略大于UptimeRobot的60分钟间隔
           "X-Cache-Timestamp": Date.now().toString(),
         },
       });
