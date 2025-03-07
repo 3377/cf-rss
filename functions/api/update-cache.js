@@ -47,13 +47,44 @@ export async function onRequest(context) {
     // 获取响应数据
     const data = await response.json();
 
+    // 获取响应头中的缓存信息
+    const cacheTimestamp = response.headers.get("X-Cache-Timestamp");
+    const cacheControl = response.headers.get("Cache-Control");
+    const maxAge = cacheControl
+      ? cacheControl.match(/max-age=(\d+)/)?.[1]
+      : null;
+
+    // 转换为北京时间的函数
+    const toBeiJingTime = (date) => {
+      return new Date(date).toLocaleString("zh-CN", {
+        timeZone: "Asia/Shanghai",
+        hour12: false,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    };
+
     // 返回成功响应
     return new Response(
       JSON.stringify({
         success: true,
         message: "RSS 缓存已成功更新",
-        timestamp: new Date().toISOString(),
+        timestamp: toBeiJingTime(new Date()),
         feedsCount: Array.isArray(data) ? data.length : 0,
+        cache: {
+          status: "已更新",
+          lastUpdate: cacheTimestamp
+            ? toBeiJingTime(Number(cacheTimestamp))
+            : toBeiJingTime(new Date()),
+          maxAge: maxAge ? `${Math.floor(maxAge / 60)} 分钟` : "未设置",
+          nextUpdate: toBeiJingTime(
+            new Date(Date.now() + (maxAge ? Number(maxAge) * 1000 : 0))
+          ),
+        },
       }),
       {
         headers: {

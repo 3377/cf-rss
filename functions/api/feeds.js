@@ -6,10 +6,15 @@ export async function onRequest(context) {
     const url = new URL(context.request.url);
     const forceRefresh = url.searchParams.get("forceRefresh") === "true";
 
+    // 创建用于缓存的键（移除时间戳和forceRefresh参数）
+    const cacheUrl = new URL(url.toString());
+    cacheUrl.searchParams.delete("t");
+    cacheUrl.searchParams.delete("forceRefresh");
+    const cacheKey = new Request(cacheUrl.toString());
+
     // 如果不是强制刷新，尝试从缓存获取数据
     if (!forceRefresh) {
       const cache = caches.default;
-      const cacheKey = new Request(url.toString());
       const cachedResponse = await cache.match(cacheKey);
 
       if (cachedResponse) {
@@ -273,18 +278,19 @@ export async function onRequest(context) {
     // 如果不是强制刷新，将结果存入缓存
     if (!forceRefresh) {
       const cache = caches.default;
-      const cacheKey = new Request(url.toString());
 
       // 创建一个新的响应用于缓存，设置缓存控制头
       const cacheResponse = new Response(JSON.stringify(feedResults), {
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=1900", // 65分钟，略大于UptimeRobot的60分钟间隔
+          "Cache-Control": "public, max-age=3900", // 65分钟，略大于UptimeRobot的60分钟间隔
           "X-Cache-Timestamp": Date.now().toString(),
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
         },
       });
 
-      // 存储到缓存
+      // 使用不带时间戳的URL作为缓存键
       await cache.put(cacheKey, cacheResponse);
     }
 
