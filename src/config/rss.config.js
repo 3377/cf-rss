@@ -20,7 +20,7 @@ const defaultConfig = {
   ],
   refresh: {
     interval: 120, // 默认UI自动刷新间隔为120秒
-    cache: 3600, // 默认后台缓存更新间隔为1小时，仅影响首次访问速度
+    cache: 1800, // 默认后台缓存更新间隔为1小时，仅影响首次访问速度
   },
   display: {
     appTitle: "FY Pages RSS", // 应用标题
