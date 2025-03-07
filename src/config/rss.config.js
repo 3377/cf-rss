@@ -11,7 +11,7 @@ export const RSS_CONFIG = {
   },
   display: {
     // 应用标题
-    appTitle: "FY Pages RSS,
+    appTitle: "FY Pages RSS",
     // 默认暗色模式
     defaultDarkMode: false,
     itemsPerFeed: 15, // 每个卡片显示的条目数
