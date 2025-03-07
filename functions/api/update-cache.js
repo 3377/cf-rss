@@ -30,6 +30,17 @@ export async function onRequest(context) {
 
     console.log(`正在更新 RSS 缓存: ${feedsUrl.toString()}`);
 
+    // 先检查当前缓存状态
+    const cache = caches.default;
+    const cacheUrl = new URL(feedsUrl.toString());
+    cacheUrl.searchParams.delete("t");
+    cacheUrl.searchParams.delete("forceRefresh");
+    const cacheKey = new Request(cacheUrl.toString());
+    const existingCache = await cache.match(cacheKey);
+    const oldCacheTimestamp = existingCache
+      ? existingCache.headers.get("X-Cache-Timestamp")
+      : null;
+
     // 发送内部请求以强制刷新缓存
     const response = await fetch(feedsUrl.toString(), {
       headers: {
@@ -47,25 +58,32 @@ export async function onRequest(context) {
     // 获取响应数据
     const data = await response.json();
 
-    // 获取响应头中的缓存信息
-    const cacheTimestamp = response.headers.get("X-Cache-Timestamp");
-    const cacheControl = response.headers.get("Cache-Control");
+    // 检查更新后的缓存状态
+    const updatedCache = await cache.match(cacheKey);
+    const newCacheTimestamp = updatedCache
+      ? updatedCache.headers.get("X-Cache-Timestamp")
+      : null;
+    const cacheControl = updatedCache
+      ? updatedCache.headers.get("Cache-Control")
+      : null;
     const maxAge = cacheControl
       ? cacheControl.match(/max-age=(\d+)/)?.[1]
-      : null;
+      : "3900"; // 默认65分钟
 
     // 转换为北京时间的函数
     const toBeiJingTime = (date) => {
-      return new Date(date).toLocaleString("zh-CN", {
-        timeZone: "Asia/Shanghai",
-        hour12: false,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
+      return new Date(date)
+        .toLocaleString("zh-CN", {
+          timeZone: "Asia/Shanghai",
+          hour12: false,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })
+        .replace(/\//g, "-"); // 将斜杠替换为短横线
     };
 
     // 返回成功响应
@@ -76,14 +94,19 @@ export async function onRequest(context) {
         timestamp: toBeiJingTime(new Date()),
         feedsCount: Array.isArray(data) ? data.length : 0,
         cache: {
-          status: "已更新",
-          lastUpdate: cacheTimestamp
-            ? toBeiJingTime(Number(cacheTimestamp))
+          status: oldCacheTimestamp === newCacheTimestamp ? "无变化" : "已更新",
+          lastUpdate: newCacheTimestamp
+            ? toBeiJingTime(Number(newCacheTimestamp))
             : toBeiJingTime(new Date()),
-          maxAge: maxAge ? `${Math.floor(maxAge / 60)} 分钟` : "未设置",
+          maxAge: `${Math.floor(Number(maxAge) / 60)} 分钟`,
           nextUpdate: toBeiJingTime(
-            new Date(Date.now() + (maxAge ? Number(maxAge) * 1000 : 0))
+            new Date(
+              Number(newCacheTimestamp || Date.now()) + Number(maxAge) * 1000
+            )
           ),
+          previousUpdate: oldCacheTimestamp
+            ? toBeiJingTime(Number(oldCacheTimestamp))
+            : "无",
         },
       }),
       {

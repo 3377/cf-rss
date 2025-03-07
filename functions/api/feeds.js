@@ -19,9 +19,26 @@ export async function onRequest(context) {
 
       if (cachedResponse) {
         console.log("返回缓存的数据");
-        // 添加缓存命中标记
+        // 添加缓存命中标记和其他必要的头信息
         const headers = new Headers(cachedResponse.headers);
         headers.set("X-Cache", "HIT");
+        headers.set("Access-Control-Allow-Origin", "*");
+        headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+
+        // 保持原有的Cache-Control和X-Cache-Timestamp
+        const originalTimestamp = headers.get("X-Cache-Timestamp");
+        const maxAge = 3900; // 65分钟
+
+        if (originalTimestamp) {
+          const timeLeft = Math.floor(
+            (Number(originalTimestamp) + maxAge * 1000 - Date.now()) / 1000
+          );
+          if (timeLeft > 0) {
+            // 更新Cache-Control以反映剩余时间
+            headers.set("Cache-Control", `public, max-age=${timeLeft}`);
+          }
+        }
+
         return new Response(cachedResponse.body, {
           headers: headers,
         });
@@ -265,11 +282,15 @@ export async function onRequest(context) {
       })
     );
 
+    const timestamp = Date.now().toString();
+
     // 创建响应
     const response = new Response(JSON.stringify(feedResults), {
       headers: {
         "Content-Type": "application/json",
         "X-Cache": "MISS",
+        "X-Cache-Timestamp": timestamp,
+        "Cache-Control": "public, max-age=3900",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, OPTIONS",
       },
@@ -279,12 +300,13 @@ export async function onRequest(context) {
     if (!forceRefresh) {
       const cache = caches.default;
 
-      // 创建一个新的响应用于缓存，设置缓存控制头
+      // 创建一个新的响应用于缓存，使用相同的时间戳
       const cacheResponse = new Response(JSON.stringify(feedResults), {
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=3900", // 65分钟，略大于UptimeRobot的60分钟间隔
-          "X-Cache-Timestamp": Date.now().toString(),
+          "Cache-Control": "public, max-age=3900",
+          "X-Cache-Timestamp": timestamp,
+          "X-Cache": "MISS",
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, OPTIONS",
         },
