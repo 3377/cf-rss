@@ -19,12 +19,12 @@ const defaultConfig = {
     },
   ],
   refresh: {
-    interval: 120, // 默认UI自动刷新间隔为120秒
-    cache: 1800, // 默认后台缓存更新间隔为1小时，仅影响首次访问速度
+    interval: 300, // 单位：秒，RSS 刷新间隔（5分钟）
+    cache: 3900, // 单位：秒，缓存刷新间隔（默认65分钟，与服务器端保持一致）
   },
   display: {
-    appTitle: "FY Pages RSS", // 应用标题
-    defaultDarkMode: true, // 确保默认使用暗色模式
+    appTitle: "RSS 聚合阅读", // 应用标题
+    defaultDarkMode: false, // 默认暗色模式
     itemsPerFeed: 15, // 每个卡片显示的条目数
     showItemDate: false, // 默认不显示条目日期
     dateFormat: "yyyy-MM-dd HH:mm",

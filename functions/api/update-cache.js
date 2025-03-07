@@ -32,10 +32,8 @@ export async function onRequest(context) {
 
     // 先检查当前缓存状态
     const cache = caches.default;
-    const cacheUrl = new URL(feedsUrl.toString());
-    cacheUrl.searchParams.delete("t");
-    cacheUrl.searchParams.delete("forceRefresh");
-    const cacheKey = new Request(cacheUrl.toString());
+    const cachePath = "/api/feeds";
+    const cacheKey = new Request(`https://cache-key${cachePath}`);
     const existingCache = await cache.match(cacheKey);
     const oldCacheTimestamp = existingCache
       ? existingCache.headers.get("X-Cache-Timestamp")
@@ -66,9 +64,12 @@ export async function onRequest(context) {
     const cacheControl = updatedCache
       ? updatedCache.headers.get("Cache-Control")
       : null;
+
+    // 从环境变量获取缓存时间（秒），默认为3900秒（65分钟）
+    const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "3900");
     const maxAge = cacheControl
       ? cacheControl.match(/max-age=(\d+)/)?.[1]
-      : "3900"; // 默认65分钟
+      : String(cacheMaxAge);
 
     // 转换为北京时间的函数
     const toBeiJingTime = (date) => {

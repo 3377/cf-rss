@@ -5,13 +5,19 @@ export async function onRequest(context) {
     // 获取请求参数
     const url = new URL(context.request.url);
     const forceRefresh = url.searchParams.get("forceRefresh") === "true";
-    console.log(`API请求: forceRefresh=${forceRefresh}`);
 
-    // 创建用于缓存的键（移除时间戳和forceRefresh参数）
-    const cacheUrl = new URL(url.toString());
-    cacheUrl.searchParams.delete("t");
-    cacheUrl.searchParams.delete("forceRefresh");
-    const cacheKey = new Request(cacheUrl.toString());
+    // 从环境变量获取缓存时间（秒），默认为3900秒（65分钟）
+    const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "3900");
+    console.log(
+      `API请求: forceRefresh=${forceRefresh}, cacheMaxAge=${cacheMaxAge}秒`
+    );
+
+    // 创建用于缓存的键（不依赖域名，仅使用路径和处理后的参数）
+    // 这样不同域名访问时将共享同一个缓存
+    const cachePath = url.pathname;
+    const cacheKey = new Request(`https://cache-key${cachePath}`);
+
+    console.log(`使用缓存键: cache-key${cachePath}（域名独立）`);
 
     // 如果不是强制刷新，尝试从缓存获取数据
     if (!forceRefresh) {
@@ -31,7 +37,7 @@ export async function onRequest(context) {
         const cacheControlHeader = headers.get("Cache-Control");
         const maxAgeMatch =
           cacheControlHeader && cacheControlHeader.match(/max-age=(\d+)/);
-        const maxAge = maxAgeMatch ? parseInt(maxAgeMatch[1]) : 3900;
+        const maxAge = maxAgeMatch ? parseInt(maxAgeMatch[1]) : cacheMaxAge;
 
         if (originalTimestamp) {
           const timeLeft = Math.floor(
@@ -307,7 +313,7 @@ export async function onRequest(context) {
 
     // 不强制刷新时使用缓存控制头
     if (!forceRefresh) {
-      responseHeaders["Cache-Control"] = "public, max-age=3900";
+      responseHeaders["Cache-Control"] = `public, max-age=${cacheMaxAge}`;
     } else {
       // 强制刷新时使用no-store
       responseHeaders["Cache-Control"] = "no-store, no-cache, must-revalidate";
@@ -327,7 +333,7 @@ export async function onRequest(context) {
       const cacheResponse = new Response(JSON.stringify(feedResults), {
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=3900",
+          "Cache-Control": `public, max-age=${cacheMaxAge}`,
           "X-Cache-Timestamp": timestamp,
           "X-Cache": "MISS",
           "Access-Control-Allow-Origin": "*",
@@ -335,8 +341,8 @@ export async function onRequest(context) {
         },
       });
 
-      // 使用不带时间戳的URL作为缓存键
-      console.log(`将结果存入缓存，键: ${cacheUrl.toString()}`);
+      // 使用域名无关的缓存键存储
+      console.log(`将结果存入缓存，键: cache-key${cachePath}（域名独立）`);
       await cache.put(cacheKey, cacheResponse);
     } else {
       console.log("强制刷新，不存储到缓存");
