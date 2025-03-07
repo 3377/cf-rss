@@ -7,7 +7,7 @@ export async function onRequest(context) {
     const forceRefresh = url.searchParams.get("forceRefresh") === "true";
 
     // 从环境变量获取缓存时间（秒），默认为3900秒（65分钟）
-    const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "3900");
+    const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "1900");
     console.log(
       `API请求: forceRefresh=${forceRefresh}, cacheMaxAge=${cacheMaxAge}秒`
     );
