@@ -5,6 +5,7 @@ export async function onRequest(context) {
     // 获取请求参数
     const url = new URL(context.request.url);
     const forceRefresh = url.searchParams.get("forceRefresh") === "true";
+    console.log(`API请求: forceRefresh=${forceRefresh}`);
 
     // 创建用于缓存的键（移除时间戳和forceRefresh参数）
     const cacheUrl = new URL(url.toString());
@@ -19,30 +20,41 @@ export async function onRequest(context) {
 
       if (cachedResponse) {
         console.log("返回缓存的数据");
-        // 添加缓存命中标记和其他必要的头信息
+        // 复制缓存响应，以便我们可以修改头部
         const headers = new Headers(cachedResponse.headers);
         headers.set("X-Cache", "HIT");
         headers.set("Access-Control-Allow-Origin", "*");
         headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
 
-        // 保持原有的Cache-Control和X-Cache-Timestamp
+        // 保持原有的缓存控制头，但更新剩余时间
         const originalTimestamp = headers.get("X-Cache-Timestamp");
-        const maxAge = 3900; // 65分钟
+        const cacheControlHeader = headers.get("Cache-Control");
+        const maxAgeMatch =
+          cacheControlHeader && cacheControlHeader.match(/max-age=(\d+)/);
+        const maxAge = maxAgeMatch ? parseInt(maxAgeMatch[1]) : 3900;
 
         if (originalTimestamp) {
           const timeLeft = Math.floor(
-            (Number(originalTimestamp) + maxAge * 1000 - Date.now()) / 1000
+            (parseInt(originalTimestamp) + maxAge * 1000 - Date.now()) / 1000
           );
           if (timeLeft > 0) {
             // 更新Cache-Control以反映剩余时间
             headers.set("Cache-Control", `public, max-age=${timeLeft}`);
+            console.log(`更新缓存控制头，剩余时间: ${timeLeft}秒`);
+          } else {
+            console.log("缓存已过期，但仍返回过期的缓存");
           }
         }
 
-        return new Response(cachedResponse.body, {
+        const cachedBody = await cachedResponse.text();
+        return new Response(cachedBody, {
           headers: headers,
         });
+      } else {
+        console.log("缓存中没有数据，将获取新数据");
       }
+    } else {
+      console.log("强制刷新，绕过缓存");
     }
 
     // 如果是强制刷新或没有缓存，获取新数据
@@ -284,16 +296,27 @@ export async function onRequest(context) {
 
     const timestamp = Date.now().toString();
 
-    // 创建响应
+    // 创建响应，始终包含时间戳和缓存状态
+    const responseHeaders = {
+      "Content-Type": "application/json",
+      "X-Cache": "MISS",
+      "X-Cache-Timestamp": timestamp,
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+    };
+
+    // 不强制刷新时使用缓存控制头
+    if (!forceRefresh) {
+      responseHeaders["Cache-Control"] = "public, max-age=3900";
+    } else {
+      // 强制刷新时使用no-store
+      responseHeaders["Cache-Control"] = "no-store, no-cache, must-revalidate";
+      responseHeaders["Pragma"] = "no-cache";
+      responseHeaders["Expires"] = "0";
+    }
+
     const response = new Response(JSON.stringify(feedResults), {
-      headers: {
-        "Content-Type": "application/json",
-        "X-Cache": "MISS",
-        "X-Cache-Timestamp": timestamp,
-        "Cache-Control": "public, max-age=3900",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-      },
+      headers: responseHeaders,
     });
 
     // 如果不是强制刷新，将结果存入缓存
@@ -313,12 +336,15 @@ export async function onRequest(context) {
       });
 
       // 使用不带时间戳的URL作为缓存键
+      console.log(`将结果存入缓存，键: ${cacheUrl.toString()}`);
       await cache.put(cacheKey, cacheResponse);
+    } else {
+      console.log("强制刷新，不存储到缓存");
     }
 
     return response;
   } catch (error) {
-    console.error("Global error:", error);
+    console.error("全局错误:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: {

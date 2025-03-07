@@ -328,26 +328,20 @@ const fetchFeeds = async (forceRefresh = false) => {
     );
     const timestamp = new Date().getTime();
 
-    // 确定是否强制刷新
+    // 确定是否强制刷新 - 只有在明确要求强制刷新或倒计时结束时才强制刷新
     const shouldForceRefresh = forceRefresh;
 
-    // 如果按F5刷新页面且服务器有缓存，则使用服务器缓存
-    if (!shouldForceRefresh && !isFirstLoad && serverCacheTime.value) {
-      console.log("检测到浏览器刷新，使用服务器缓存");
-      activeCache.value = "server";
-      loading.value = false;
-      return; // 直接返回，不发起新请求
-    }
-
-    // 构建请求URL
+    // 构建请求URL - 只有在强制刷新时才添加forceRefresh参数
     const url = `/api/feeds?t=${timestamp}${
       shouldForceRefresh ? "&forceRefresh=true" : ""
     }`;
 
+    // 设置请求头
     const headers = {
       Accept: "application/json",
     };
 
+    // 只有在强制刷新时才添加no-cache头
     if (shouldForceRefresh) {
       console.log("添加no-cache头，强制获取新数据");
       headers["Cache-Control"] = "no-cache";
@@ -356,10 +350,17 @@ const fetchFeeds = async (forceRefresh = false) => {
       console.log("尝试使用服务器缓存");
     }
 
+    // 发送请求
+    console.log(`正在请求: ${url}`);
     const response = await fetch(url, { headers });
+
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
+    }
 
     // 检查服务器缓存状态
     const cacheStatus = response.headers.get("X-Cache");
+    console.log(`服务器返回缓存状态: ${cacheStatus}`);
     const isFromServerCache = cacheStatus === "HIT";
 
     if (isFromServerCache) {
@@ -378,16 +379,12 @@ const fetchFeeds = async (forceRefresh = false) => {
       // 获取了新内容
       console.log("获取了新内容");
       lastUpdateTime.value = new Date();
-      serverCacheTime.value = null; // 清除服务器缓存时间，因为现在使用的是新数据
+      serverCacheTime.value = new Date(); // 更新服务器缓存时间为当前时间
       activeCache.value = "fresh";
     }
 
-    if (!response.ok) {
-      throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
-    }
-
     const data = await response.json();
-    console.log("获取的RSS数据:", data);
+    console.log(`获取的RSS数据长度: ${data.length}`);
 
     // 验证数据是否为数组
     if (!Array.isArray(data)) {
@@ -397,15 +394,16 @@ const fetchFeeds = async (forceRefresh = false) => {
 
     feeds.value = data;
 
-    // 只有在首次加载时恢复倒计时，否则继续使用当前倒计时
-    if (isFirstLoad) {
-      restoreCountdown();
-      isFirstLoad = false;
+    // 只有在首次加载或强制刷新时重置倒计时
+    if (isFirstLoad || forceRefresh) {
+      countdown.value = RSS_CONFIG.refresh?.interval || 300;
+      persistCountdown();
     }
+
+    isFirstLoad = false;
   } catch (err) {
-    console.error("获取RSS内容失败:", err);
-    error.value = `获取内容失败: ${err.message}`;
-    activeCache.value = "none";
+    console.error("获取RSS数据时出错:", err);
+    error.value = `获取数据失败: ${err.message}`;
   } finally {
     loading.value = false;
   }
@@ -417,7 +415,11 @@ onMounted(async () => {
   selectedFont.value = savedFont;
   loadFont(savedFont);
 
-  // 首次加载时，尝试使用缓存
+  // 恢复倒计时状态（如果有）
+  restoreCountdown();
+
+  // 首次加载时，尽量使用缓存（不强制刷新）
+  console.log("页面首次加载，尝试使用服务器缓存");
   await fetchFeeds(false);
 
   // 如果配置了缓存时间，创建一个自动更新缓存的定时器
@@ -429,13 +431,23 @@ onMounted(async () => {
         console.log("后台自动更新缓存中...");
         // 使用fetch直接请求API更新缓存
         const timestamp = new Date().getTime();
-        await fetch(`/api/feeds?t=${timestamp}&forceRefresh=true`, {
-          headers: {
-            "Cache-Control": "no-cache",
-            Pragma: "no-cache",
-          },
-        });
-        console.log("缓存更新完成");
+        const response = await fetch(
+          `/api/feeds?t=${timestamp}&forceRefresh=true`,
+          {
+            headers: {
+              "Cache-Control": "no-cache",
+              Pragma: "no-cache",
+            },
+          }
+        );
+
+        if (response.ok) {
+          console.log("缓存更新完成");
+          const status = response.headers.get("X-Cache");
+          console.log(`缓存状态: ${status}`);
+        } else {
+          console.error(`缓存更新失败: ${response.status}`);
+        }
       } catch (err) {
         console.error("缓存自动更新失败:", err);
       }
@@ -447,12 +459,6 @@ onMounted(async () => {
     });
   }
 
-  // 设置UI显示的定时刷新 - 这个刷新会更新UI
-  refreshTimer = setInterval(
-    () => fetchFeeds(true), // 强制刷新，不使用缓存
-    (RSS_CONFIG.refresh?.interval || 300) * 1000
-  );
-
   // 设置倒计时更新
   countdownTimer = setInterval(updateCountdown, 1000);
 });
@@ -463,9 +469,6 @@ const handleRefreshClick = () => {
 };
 
 onUnmounted(() => {
-  if (refreshTimer) {
-    clearInterval(refreshTimer);
-  }
   if (countdownTimer) {
     clearInterval(countdownTimer);
   }
