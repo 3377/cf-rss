@@ -7,9 +7,9 @@ export async function onRequest(context) {
     const forceRefresh = url.searchParams.get("forceRefresh") === "true";
 
     // 从环境变量获取缓存时间（秒），默认为3900秒（65分钟）
-    const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "1900");
+    const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "3900");
     console.log(
-      `API请求: forceRefresh=${forceRefresh}, cacheMaxAge=${cacheMaxAge}秒`
+      `API请求: forceRefresh=${forceRefresh}, cacheMaxAge=${cacheMaxAge}秒, 路径=${url.pathname}`
     );
 
     // 创建用于缓存的键（不依赖域名，仅使用路径和处理后的参数）
@@ -20,42 +20,52 @@ export async function onRequest(context) {
     console.log(`使用缓存键: cache-key${cachePath}（域名独立）`);
 
     // 如果不是强制刷新，尝试从缓存获取数据
+    let cachedResponse = null;
     if (!forceRefresh) {
       const cache = caches.default;
-      const cachedResponse = await cache.match(cacheKey);
+      cachedResponse = await cache.match(cacheKey);
 
       if (cachedResponse) {
-        console.log("返回缓存的数据");
+        console.log("找到缓存数据，准备返回");
         // 复制缓存响应，以便我们可以修改头部
         const headers = new Headers(cachedResponse.headers);
         headers.set("X-Cache", "HIT");
         headers.set("Access-Control-Allow-Origin", "*");
         headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+        headers.set("Cache-Control", "no-store"); // 确保浏览器不缓存
 
         // 保持原有的缓存控制头，但更新剩余时间
         const originalTimestamp = headers.get("X-Cache-Timestamp");
-        const cacheControlHeader = headers.get("Cache-Control");
-        const maxAgeMatch =
-          cacheControlHeader && cacheControlHeader.match(/max-age=(\d+)/);
-        const maxAge = maxAgeMatch ? parseInt(maxAgeMatch[1]) : cacheMaxAge;
+        const maxAge = cacheMaxAge;
 
         if (originalTimestamp) {
           const timeLeft = Math.floor(
             (parseInt(originalTimestamp) + maxAge * 1000 - Date.now()) / 1000
           );
           if (timeLeft > 0) {
-            // 更新Cache-Control以反映剩余时间
-            headers.set("Cache-Control", `public, max-age=${timeLeft}`);
-            console.log(`更新缓存控制头，剩余时间: ${timeLeft}秒`);
+            console.log(`缓存有效，剩余时间: ${timeLeft}秒`);
           } else {
-            console.log("缓存已过期，但仍返回过期的缓存");
+            console.log(
+              "缓存已过期，但仍返回过期的缓存 (stale-while-revalidate)"
+            );
           }
         }
 
-        const cachedBody = await cachedResponse.text();
-        return new Response(cachedBody, {
-          headers: headers,
-        });
+        try {
+          const cachedBody = await cachedResponse.text();
+          console.log("缓存内容读取成功，长度:", cachedBody.length);
+
+          // 返回带有明确缓存标记的响应
+          const hitResponse = new Response(cachedBody, {
+            headers: headers,
+          });
+
+          console.log("成功返回缓存数据，X-Cache: HIT");
+          return hitResponse;
+        } catch (cacheReadError) {
+          console.error("读取缓存内容失败:", cacheReadError);
+          // 如果读取缓存失败，继续获取新数据
+        }
       } else {
         console.log("缓存中没有数据，将获取新数据");
       }
@@ -309,17 +319,8 @@ export async function onRequest(context) {
       "X-Cache-Timestamp": timestamp,
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Cache-Control": "no-store", // 确保浏览器不缓存
     };
-
-    // 不强制刷新时使用缓存控制头
-    if (!forceRefresh) {
-      responseHeaders["Cache-Control"] = `public, max-age=${cacheMaxAge}`;
-    } else {
-      // 强制刷新时使用no-store
-      responseHeaders["Cache-Control"] = "no-store, no-cache, must-revalidate";
-      responseHeaders["Pragma"] = "no-cache";
-      responseHeaders["Expires"] = "0";
-    }
 
     const response = new Response(JSON.stringify(feedResults), {
       headers: responseHeaders,
@@ -343,11 +344,18 @@ export async function onRequest(context) {
 
       // 使用域名无关的缓存键存储
       console.log(`将结果存入缓存，键: cache-key${cachePath}（域名独立）`);
-      await cache.put(cacheKey, cacheResponse);
+      try {
+        await cache.put(cacheKey, cacheResponse);
+        console.log("成功存入缓存");
+      } catch (cachePutError) {
+        console.error("存入缓存失败:", cachePutError);
+        // 存入缓存失败不影响响应
+      }
     } else {
       console.log("强制刷新，不存储到缓存");
     }
 
+    console.log("返回新获取的数据，X-Cache: MISS");
     return response;
   } catch (error) {
     console.error("全局错误:", error);

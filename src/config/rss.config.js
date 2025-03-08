@@ -4,7 +4,7 @@ export const RSS_CONFIG = {
   refresh: {
     // 单位：秒，UI刷新间隔（5分钟）
     // 这只控制UI倒计时，不再触发后台缓存更新
-    interval: 100,
+    interval: 300,
 
     // 移除缓存自动更新间隔，改由UptimeRobot和环境变量控制
     // cache: 3900, // 此行已删除
@@ -31,8 +31,8 @@ export const RSS_CONFIG = {
     tooltip: {
       // 提示框预览内容的最大字数
       maxPreviewLength: 100,
-      // 提示框宽度（像素或百分比）
-      width: "500px",
+      // 提示框宽度
+      width: "300px",
     },
   },
   feeds: [

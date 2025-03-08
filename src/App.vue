@@ -352,55 +352,77 @@ const fetchFeeds = async (forceRefresh = false) => {
 
     // 发送请求
     console.log(`正在请求: ${url}`);
-    const response = await fetch(url, { headers });
 
-    if (!response.ok) {
-      throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
-    }
+    // 设置超时
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
 
-    // 检查服务器缓存状态
-    const cacheStatus = response.headers.get("X-Cache");
-    console.log(`服务器返回缓存状态: ${cacheStatus}`);
-    const isFromServerCache = cacheStatus === "HIT";
+    try {
+      const response = await fetch(url, {
+        headers,
+        signal: controller.signal,
+      });
 
-    if (isFromServerCache) {
-      // 从服务器缓存获取数据
-      const cacheTsStr = response.headers.get("X-Cache-Timestamp");
-      if (cacheTsStr) {
-        const cacheTs = parseInt(cacheTsStr);
-        serverCacheTime.value = new Date(cacheTs);
-        console.log(
-          "内容来自服务器缓存，缓存创建时间:",
-          serverCacheTime.value.toLocaleString()
+      clearTimeout(timeoutId); // 清除超时
+
+      if (!response.ok) {
+        throw new Error(
+          `API请求失败: ${response.status} ${response.statusText}`
         );
       }
-      activeCache.value = "server";
-    } else {
-      // 获取了新内容
-      console.log("获取了新内容");
-      lastUpdateTime.value = new Date();
-      serverCacheTime.value = new Date(); // 更新服务器缓存时间为当前时间
-      activeCache.value = "fresh";
+
+      // 检查服务器缓存状态
+      const cacheStatus = response.headers.get("X-Cache");
+      console.log(`服务器返回缓存状态: ${cacheStatus}`);
+      const isFromServerCache = cacheStatus === "HIT";
+
+      if (isFromServerCache) {
+        // 从服务器缓存获取数据
+        const cacheTsStr = response.headers.get("X-Cache-Timestamp");
+        if (cacheTsStr) {
+          const cacheTs = parseInt(cacheTsStr);
+          serverCacheTime.value = new Date(cacheTs);
+          console.log(
+            "内容来自服务器缓存，缓存创建时间:",
+            serverCacheTime.value.toLocaleString()
+          );
+        }
+        activeCache.value = "server";
+      } else {
+        // 获取了新内容
+        console.log("获取了新内容");
+        lastUpdateTime.value = new Date();
+        serverCacheTime.value = new Date(); // 更新服务器缓存时间为当前时间
+        activeCache.value = "fresh";
+      }
+
+      const data = await response.json();
+      console.log(`获取的RSS数据长度: ${data.length}`);
+
+      // 验证数据是否为数组
+      if (!Array.isArray(data)) {
+        console.error("API返回的数据不是数组:", data);
+        throw new Error("无效的数据格式");
+      }
+
+      feeds.value = data;
+
+      // 只有在首次加载或强制刷新时重置倒计时
+      if (isFirstLoad || forceRefresh) {
+        countdown.value = RSS_CONFIG.refresh?.interval || 300;
+        persistCountdown();
+      }
+
+      isFirstLoad = false;
+    } catch (fetchError) {
+      if (fetchError.name === "AbortError") {
+        console.error("请求超时，尝试使用过期缓存");
+        // 超时处理 - 可以尝试使用过期的缓存
+        error.value = "获取数据超时，请稍后再试";
+      } else {
+        throw fetchError; // 重新抛出非超时错误
+      }
     }
-
-    const data = await response.json();
-    console.log(`获取的RSS数据长度: ${data.length}`);
-
-    // 验证数据是否为数组
-    if (!Array.isArray(data)) {
-      console.error("API返回的数据不是数组:", data);
-      throw new Error("无效的数据格式");
-    }
-
-    feeds.value = data;
-
-    // 只有在首次加载或强制刷新时重置倒计时
-    if (isFirstLoad || forceRefresh) {
-      countdown.value = RSS_CONFIG.refresh?.interval || 300;
-      persistCountdown();
-    }
-
-    isFirstLoad = false;
   } catch (err) {
     console.error("获取RSS数据时出错:", err);
     error.value = `获取数据失败: ${err.message}`;
