@@ -420,7 +420,9 @@ const fetchFeeds = async (forceRefresh = false) => {
 
     if (!response || !response.ok) {
       throw new Error(
-        `API请求失败: ${response ? `${response.status} ${response.statusText}` : '无响应'}`
+        `API请求失败: ${
+          response ? `${response.status} ${response.statusText}` : "无响应"
+        }`
       );
     }
 
@@ -469,11 +471,13 @@ const fetchFeeds = async (forceRefresh = false) => {
     isFirstLoad = false;
   } catch (err) {
     console.error("获取RSS数据时出错:", err);
-    error.value = `获取数据失败: ${err.message}`;
 
     // 如果是首次加载失败，显示更友好的错误信息
     if (isFirstLoad) {
-      error.value = "获取RSS数据失败，请刷新页面重试，或点击右上角的"立即刷新"按钮。";
+      error.value =
+        '获取RSS数据失败，请刷新页面重试，或点击右上角的"立即刷新"按钮。';
+    } else {
+      error.value = `获取数据失败: ${err.message}`;
     }
 
     // 即使请求失败，也标记为非首次加载，这样用户可以尝试点击刷新按钮
