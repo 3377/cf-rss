@@ -103,9 +103,43 @@
 
     <!-- 内容区域 -->
     <div class="content-area">
-      <div v-if="error" class="text-center text-red-500">
-        {{ error }}
+      <div
+        v-if="error"
+        class="text-center p-6 bg-red-50 dark:bg-red-900 rounded-lg shadow-md mx-auto my-8 max-w-3xl"
+      >
+        <div class="text-red-600 dark:text-red-300 font-medium text-lg mb-2">
+          {{ error }}
+        </div>
+        <div class="text-gray-600 dark:text-gray-300 text-sm mt-2">
+          <p>您可以尝试：</p>
+          <ul class="list-disc pl-6 mt-2 text-left">
+            <li>点击右上角的"立即刷新"按钮</li>
+            <li>等待几分钟后重新刷新页面</li>
+            <li>检查您的网络连接</li>
+          </ul>
+        </div>
+        <button
+          @click="handleRefreshClick"
+          class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+        >
+          <span v-if="loading">重新加载中...</span>
+          <span v-else>立即重试</span>
+        </button>
       </div>
+
+      <div
+        v-else-if="loading && isFirstLoad"
+        class="flex flex-col items-center justify-center h-full py-16"
+      >
+        <div
+          class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"
+        ></div>
+        <p class="text-gray-600 dark:text-gray-300">正在加载数据，请稍候...</p>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">
+          首次加载可能需要较长时间
+        </p>
+      </div>
+
       <FeedGrid v-else :feeds="feeds" :isDark="isDark" class="flex-1" />
     </div>
 
@@ -353,79 +387,97 @@ const fetchFeeds = async (forceRefresh = false) => {
     // 发送请求
     console.log(`正在请求: ${url}`);
 
-    // 设置超时
+    // 设置超时 - 增加到20秒，许多RSS源可能需要较长时间
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20秒超时
 
+    let response;
     try {
-      const response = await fetch(url, {
+      response = await fetch(url, {
         headers,
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId); // 清除超时
-
-      if (!response.ok) {
-        throw new Error(
-          `API请求失败: ${response.status} ${response.statusText}`
-        );
-      }
-
-      // 检查服务器缓存状态
-      const cacheStatus = response.headers.get("X-Cache");
-      console.log(`服务器返回缓存状态: ${cacheStatus}`);
-      const isFromServerCache = cacheStatus === "HIT";
-
-      if (isFromServerCache) {
-        // 从服务器缓存获取数据
-        const cacheTsStr = response.headers.get("X-Cache-Timestamp");
-        if (cacheTsStr) {
-          const cacheTs = parseInt(cacheTsStr);
-          serverCacheTime.value = new Date(cacheTs);
-          console.log(
-            "内容来自服务器缓存，缓存创建时间:",
-            serverCacheTime.value.toLocaleString()
-          );
-        }
-        activeCache.value = "server";
-      } else {
-        // 获取了新内容
-        console.log("获取了新内容");
-        lastUpdateTime.value = new Date();
-        serverCacheTime.value = new Date(); // 更新服务器缓存时间为当前时间
-        activeCache.value = "fresh";
-      }
-
-      const data = await response.json();
-      console.log(`获取的RSS数据长度: ${data.length}`);
-
-      // 验证数据是否为数组
-      if (!Array.isArray(data)) {
-        console.error("API返回的数据不是数组:", data);
-        throw new Error("无效的数据格式");
-      }
-
-      feeds.value = data;
-
-      // 只有在首次加载或强制刷新时重置倒计时
-      if (isFirstLoad || forceRefresh) {
-        countdown.value = RSS_CONFIG.refresh?.interval || 300;
-        persistCountdown();
-      }
-
-      isFirstLoad = false;
     } catch (fetchError) {
+      clearTimeout(timeoutId); // 确保清除超时
+
       if (fetchError.name === "AbortError") {
-        console.error("请求超时，尝试使用过期缓存");
-        // 超时处理 - 可以尝试使用过期的缓存
-        error.value = "获取数据超时，请稍后再试";
+        console.error("请求超时，尝试不带超时重新请求");
+
+        // 尝试不带超时重新请求一次
+        try {
+          response = await fetch(url, { headers });
+          console.log("不带超时的请求成功");
+        } catch (retryError) {
+          console.error("重试请求也失败:", retryError);
+          throw new Error("网络请求失败，请检查您的网络连接");
+        }
       } else {
         throw fetchError; // 重新抛出非超时错误
       }
     }
+
+    if (!response || !response.ok) {
+      throw new Error(
+        `API请求失败: ${response ? `${response.status} ${response.statusText}` : '无响应'}`
+      );
+    }
+
+    // 检查服务器缓存状态
+    const cacheStatus = response.headers.get("X-Cache");
+    console.log(`服务器返回缓存状态: ${cacheStatus}`);
+    const isFromServerCache = cacheStatus === "HIT";
+
+    if (isFromServerCache) {
+      // 从服务器缓存获取数据
+      const cacheTsStr = response.headers.get("X-Cache-Timestamp");
+      if (cacheTsStr) {
+        const cacheTs = parseInt(cacheTsStr);
+        serverCacheTime.value = new Date(cacheTs);
+        console.log(
+          "内容来自服务器缓存，缓存创建时间:",
+          serverCacheTime.value.toLocaleString()
+        );
+      }
+      activeCache.value = "server";
+    } else {
+      // 获取了新内容
+      console.log("获取了新内容");
+      lastUpdateTime.value = new Date();
+      serverCacheTime.value = new Date(); // 更新服务器缓存时间为当前时间
+      activeCache.value = "fresh";
+    }
+
+    const data = await response.json();
+    console.log(`获取的RSS数据长度: ${data.length}`);
+
+    // 验证数据是否为数组
+    if (!Array.isArray(data)) {
+      console.error("API返回的数据不是数组:", data);
+      throw new Error("无效的数据格式");
+    }
+
+    feeds.value = data;
+
+    // 只有在首次加载或强制刷新时重置倒计时
+    if (isFirstLoad || forceRefresh) {
+      countdown.value = RSS_CONFIG.refresh?.interval || 300;
+      persistCountdown();
+    }
+
+    isFirstLoad = false;
   } catch (err) {
     console.error("获取RSS数据时出错:", err);
     error.value = `获取数据失败: ${err.message}`;
+
+    // 如果是首次加载失败，显示更友好的错误信息
+    if (isFirstLoad) {
+      error.value = "获取RSS数据失败，请刷新页面重试，或点击右上角的"立即刷新"按钮。";
+    }
+
+    // 即使请求失败，也标记为非首次加载，这样用户可以尝试点击刷新按钮
+    isFirstLoad = false;
   } finally {
     loading.value = false;
   }
