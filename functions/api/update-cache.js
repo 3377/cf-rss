@@ -90,9 +90,9 @@ export async function onRequest(context) {
     const cacheStrategy = {
       explanation: `
         缓存管理策略:
-        1. 该API被设计为由UptimeRobot等服务定期访问(推荐60分钟)
-        2. HTTP缓存有效期由CACHE_MAX_AGE环境变量控制(默认65分钟)
-        3. UI显示的刷新倒计时由RSS_CONFIG.refresh.interval控制(默认5分钟)
+        1. 该API被设计为由UptimeRobot等服务定期访问(推荐30分钟)
+        2. HTTP缓存有效期由CACHE_MAX_AGE环境变量控制(默认30分钟)
+        3. UI显示的刷新倒计时由RSS_CONFIG.refresh.interval控制(默认2分钟)
         4. UptimeRobot触发和UI倒计时/手动刷新是唯一的数据更新途径
       `,
     };

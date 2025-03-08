@@ -7,8 +7,8 @@ export async function onRequest(context) {
     const url = new URL(context.request.url);
     const forceRefresh = url.searchParams.get("forceRefresh") === "true";
 
-    // 从环境变量获取缓存时间（秒），默认为3900秒（65分钟）
-    const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "3900");
+    // 从环境变量获取缓存时间（秒），默认为1800秒（30分钟）
+    const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "1800");
     console.log(
       `[${startTime}] API请求: forceRefresh=${forceRefresh}, cacheMaxAge=${cacheMaxAge}秒, 路径=${url.pathname}`
     );
@@ -28,7 +28,9 @@ export async function onRequest(context) {
       const cacheStartTime = Date.now();
       cachedResponse = await cache.match(cacheKey);
       console.log(
-        `[${startTime}] 缓存查询耗时: ${Date.now() - cacheStartTime}ms`
+        `[${startTime}] 缓存查询耗时: ${
+          Date.now() - cacheStartTime
+        }ms, 是否找到缓存: ${cachedResponse ? "是" : "否"}`
       );
 
       if (cachedResponse) {
@@ -41,6 +43,10 @@ export async function onRequest(context) {
         headers.set("Cache-Control", "no-store"); // 确保浏览器不缓存
         headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
         headers.set("X-Worker-Debug", `cache-read:success`);
+
+        console.log(
+          `[${startTime}] 设置的响应头: X-Cache=HIT, X-Worker-Debug=cache-read:success`
+        );
 
         // 保持原有的缓存控制头，但更新剩余时间
         const originalTimestamp = headers.get("X-Cache-Timestamp");

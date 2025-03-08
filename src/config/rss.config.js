@@ -2,12 +2,12 @@
 
 export const RSS_CONFIG = {
   refresh: {
-    // 单位：秒，UI刷新间隔（5分钟）
+    // 单位：秒，UI刷新间隔（2分钟）
     // 这只控制UI倒计时，不再触发后台缓存更新
-    interval: 300,
+    interval: 120,
 
     // 移除缓存自动更新间隔，改由UptimeRobot和环境变量控制
-    // cache: 3900, // 此行已删除
+    // cache: 1800, // 此行已删除
   },
   display: {
     // 应用标题

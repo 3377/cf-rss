@@ -363,12 +363,12 @@ const fetchFeeds = async (forceRefresh = false) => {
     const timestamp = new Date().getTime();
 
     // 确定是否强制刷新 - 只有在明确要求强制刷新或倒计时结束时才强制刷新
+    // 首次加载时优先使用缓存，不强制刷新
     const shouldForceRefresh = forceRefresh;
 
     // 构建请求URL - 只有在强制刷新时才添加forceRefresh参数
-    const url = `/api/feeds?t=${timestamp}${
-      shouldForceRefresh ? "&forceRefresh=true" : ""
-    }`;
+    // 移除时间戳参数，这样可以确保每次请求使用相同的缓存键
+    const url = `/api/feeds${shouldForceRefresh ? "?forceRefresh=true" : ""}`;
 
     // 设置请求头
     const headers = {
@@ -443,12 +443,14 @@ const fetchFeeds = async (forceRefresh = false) => {
         );
       }
       activeCache.value = "server";
+      console.log("已设置缓存状态为: server");
     } else {
       // 获取了新内容
       console.log("获取了新内容");
       lastUpdateTime.value = new Date();
       serverCacheTime.value = new Date(); // 更新服务器缓存时间为当前时间
       activeCache.value = "fresh";
+      console.log("已设置缓存状态为: fresh");
     }
 
     const data = await response.json();
