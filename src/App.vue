@@ -357,17 +357,15 @@ const fetchFeeds = async (forceRefresh = false) => {
   error.value = null;
 
   try {
+    // 首次加载时永远不强制刷新，确保使用缓存
+    const shouldForceRefresh = isFirstLoad ? false : forceRefresh;
+
     console.log(
-      `开始获取RSS内容，强制刷新: ${forceRefresh}, 首次加载: ${isFirstLoad}`
+      `开始获取RSS内容，请求参数强制刷新: ${forceRefresh}, 实际强制刷新: ${shouldForceRefresh}, 首次加载: ${isFirstLoad}`
     );
-    const timestamp = new Date().getTime();
 
-    // 确定是否强制刷新 - 只有在明确要求强制刷新或倒计时结束时才强制刷新
-    // 首次加载时优先使用缓存，不强制刷新
-    const shouldForceRefresh = forceRefresh;
-
-    // 构建请求URL - 只有在强制刷新时才添加forceRefresh参数
-    // 移除时间戳参数，这样可以确保每次请求使用相同的缓存键
+    // 构建请求URL - 只在非首次加载且需要强制刷新时添加forceRefresh参数
+    // 使用绝对固定的URL格式确保缓存键一致
     const url = `/api/feeds${shouldForceRefresh ? "?forceRefresh=true" : ""}`;
 
     // 设置请求头
@@ -428,7 +426,10 @@ const fetchFeeds = async (forceRefresh = false) => {
 
     // 检查服务器缓存状态
     const cacheStatus = response.headers.get("X-Cache");
-    console.log(`服务器返回缓存状态: ${cacheStatus}`);
+    console.log(
+      `服务器返回缓存状态: ${cacheStatus}, 所有响应头:`,
+      Object.fromEntries([...response.headers.entries()])
+    );
     const isFromServerCache = cacheStatus === "HIT";
 
     if (isFromServerCache) {
@@ -453,6 +454,16 @@ const fetchFeeds = async (forceRefresh = false) => {
       console.log("已设置缓存状态为: fresh");
     }
 
+    // 尝试解析调试信息
+    try {
+      const debugInfo = response.headers.get("X-Debug-Info");
+      if (debugInfo) {
+        console.log("服务器调试信息:", JSON.parse(debugInfo));
+      }
+    } catch (e) {
+      console.error("解析调试信息失败:", e);
+    }
+
     const data = await response.json();
     console.log(`获取的RSS数据长度: ${data.length}`);
 
@@ -466,7 +477,7 @@ const fetchFeeds = async (forceRefresh = false) => {
 
     // 只有在首次加载或强制刷新时重置倒计时
     if (isFirstLoad || forceRefresh) {
-      countdown.value = RSS_CONFIG.refresh?.interval || 300;
+      countdown.value = RSS_CONFIG.refresh?.interval || 120;
       persistCountdown();
     }
 
