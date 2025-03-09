@@ -9,11 +9,13 @@ export async function onRequest(context) {
     errors: [],
     timing: {},
     cacheKey: "",
+    url: "",
   };
 
   try {
     // 获取请求参数
     const url = new URL(context.request.url);
+    debug.url = url.toString();
     const forceRefresh = url.searchParams.get("forceRefresh") === "true";
 
     // 从环境变量获取缓存时间（秒），默认为1800秒（30分钟）
@@ -29,6 +31,9 @@ export async function onRequest(context) {
     debug.cacheKey = "https://fixed-cache-key/api/feeds";
 
     console.log(`[${startTime}] 使用固定缓存键: ${debug.cacheKey}`);
+
+    // 确保在任何情况下都返回有效结果
+    let feedResults = [];
 
     // 缓存处理 - 只有在非强制刷新时尝试使用缓存
     let cachedResponse = null;
@@ -82,6 +87,7 @@ export async function onRequest(context) {
                 console.log(
                   `[${startTime}] 缓存内容验证成功，包含${parsedData.length}个源`
                 );
+                feedResults = parsedData; // 保存缓存数据，即使后续出错也能返回
               } else {
                 console.error(`[${startTime}] 缓存内容不是有效的数组或为空`);
                 cachedBody = null; // 标记为无效缓存
@@ -112,7 +118,7 @@ export async function onRequest(context) {
         }
 
         // 如果成功读取和验证了缓存内容，直接返回
-        if (cachedBody) {
+        if (cachedBody && debug.cacheUsed) {
           console.log(`[${startTime}] 使用缓存数据，跳过源站获取`);
 
           // 创建新的响应对象，设置所有必要的头
@@ -151,104 +157,133 @@ export async function onRequest(context) {
     }
 
     // 如果无法使用缓存，则获取新数据
-    console.log(`[${startTime}] 开始获取新的RSS数据...`);
-    const fetchStartTime = Date.now();
-    debug.timing.fetchStart = fetchStartTime - startTime;
+    if (!debug.cacheUsed) {
+      console.log(`[${startTime}] 开始获取新的RSS数据...`);
+      const fetchStartTime = Date.now();
+      debug.timing.fetchStart = fetchStartTime - startTime;
 
-    const feedResults = await Promise.all(
-      RSS_CONFIG.feeds.map(async (source) => {
-        console.log(`[${startTime}] 开始获取RSS源 ${source.title}...`);
-        const sourceFetchStart = Date.now();
-        try {
-          const response = await fetch(source.url);
-          const xml = await response.text();
-          console.log(
-            `[${startTime}] 成功获取 ${source.title}，耗时:${
-              Date.now() - sourceFetchStart
-            }ms`
-          );
-
-          // 解析XML
-          const items = [];
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(xml, "text/xml");
-
-          // 尝试识别RSS格式
-          const rssItems = doc.querySelectorAll("item");
-          const atomEntries = doc.querySelectorAll("entry");
-
-          if (rssItems.length > 0) {
-            // 标准RSS格式
-            for (
-              let i = 0;
-              i <
-              Math.min(rssItems.length, RSS_CONFIG.display?.itemsPerFeed || 10);
-              i++
-            ) {
-              const item = rssItems[i];
-              const title = getTagContent(xml, item.querySelector("title"));
-              const link = getTagContent(xml, item.querySelector("link"));
-              const pubDate = getTagContent(xml, item.querySelector("pubDate"));
-
-              if (title && link) {
-                items.push({
-                  title,
-                  link,
-                  pubDate,
-                });
-              }
-            }
-          } else if (atomEntries.length > 0) {
-            // Atom格式
-            for (
-              let i = 0;
-              i <
-              Math.min(
-                atomEntries.length,
-                RSS_CONFIG.display?.itemsPerFeed || 10
+      try {
+        // 获取RSS数据
+        feedResults = await Promise.all(
+          RSS_CONFIG.feeds.map(async (source) => {
+            console.log(`[${startTime}] 开始获取RSS源 ${source.title}...`);
+            const sourceFetchStart = Date.now();
+            try {
+              const response = await fetch(source.url);
+              const xml = await response.text();
+              console.log(
+                `[${startTime}] 成功获取 ${source.title}，耗时:${
+                  Date.now() - sourceFetchStart
+                }ms`
               );
-              i++
-            ) {
-              const entry = atomEntries[i];
-              const title = getTagContent(xml, entry.querySelector("title"));
-              const linkElem = entry.querySelector("link");
-              const link = linkElem ? linkElem.getAttribute("href") : null;
-              const pubDate =
-                getTagContent(xml, entry.querySelector("published")) ||
-                getTagContent(xml, entry.querySelector("updated"));
 
-              if (title && link) {
-                items.push({
-                  title,
-                  link,
-                  pubDate,
-                });
+              // 解析XML
+              const items = [];
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(xml, "text/xml");
+
+              // 尝试识别RSS格式
+              const rssItems = doc.querySelectorAll("item");
+              const atomEntries = doc.querySelectorAll("entry");
+
+              if (rssItems.length > 0) {
+                // 标准RSS格式
+                for (
+                  let i = 0;
+                  i <
+                  Math.min(
+                    rssItems.length,
+                    RSS_CONFIG.display?.itemsPerFeed || 10
+                  );
+                  i++
+                ) {
+                  const item = rssItems[i];
+                  const title = getTagContent(xml, item.querySelector("title"));
+                  const link = getTagContent(xml, item.querySelector("link"));
+                  const pubDate = getTagContent(
+                    xml,
+                    item.querySelector("pubDate")
+                  );
+
+                  if (title && link) {
+                    items.push({
+                      title,
+                      link,
+                      pubDate,
+                    });
+                  }
+                }
+              } else if (atomEntries.length > 0) {
+                // Atom格式
+                for (
+                  let i = 0;
+                  i <
+                  Math.min(
+                    atomEntries.length,
+                    RSS_CONFIG.display?.itemsPerFeed || 10
+                  );
+                  i++
+                ) {
+                  const entry = atomEntries[i];
+                  const title = getTagContent(
+                    xml,
+                    entry.querySelector("title")
+                  );
+                  const linkElem = entry.querySelector("link");
+                  const link = linkElem ? linkElem.getAttribute("href") : null;
+                  const pubDate =
+                    getTagContent(xml, entry.querySelector("published")) ||
+                    getTagContent(xml, entry.querySelector("updated"));
+
+                  if (title && link) {
+                    items.push({
+                      title,
+                      link,
+                      pubDate,
+                    });
+                  }
+                }
               }
-            }
-          }
 
-          return {
-            title: source.title,
-            items: items,
-          };
-        } catch (error) {
-          console.error(
-            `[${startTime}] 获取RSS源 ${source.title} 失败:`,
-            error
-          );
-          return {
+              return {
+                title: source.title,
+                items: items,
+              };
+            } catch (error) {
+              console.error(
+                `[${startTime}] 获取RSS源 ${source.title} 失败:`,
+                error
+              );
+              return {
+                title: source.title,
+                items: [],
+                error: error.message,
+              };
+            }
+          })
+        );
+      } catch (fetchError) {
+        console.error(`[${startTime}] RSS数据获取过程中发生错误:`, fetchError);
+        debug.errors.push({
+          type: "fetch_process",
+          message: fetchError.message,
+        });
+
+        // 即使获取失败，也尝试返回一些基本数据
+        if (feedResults.length === 0) {
+          feedResults = RSS_CONFIG.feeds.map((source) => ({
             title: source.title,
             items: [],
-            error: error.message,
-          };
+            error: "数据获取失败",
+          }));
         }
-      })
-    );
+      }
 
-    debug.timing.fetchComplete = Date.now() - fetchStartTime;
-    console.log(
-      `[${startTime}] 所有RSS源获取完成，总耗时:${debug.timing.fetchComplete}ms`
-    );
+      debug.timing.fetchComplete = Date.now() - fetchStartTime;
+      console.log(
+        `[${startTime}] 所有RSS源获取完成，总耗时:${debug.timing.fetchComplete}ms`
+      );
+    }
 
     // 准备新的响应
     const timestamp = Date.now().toString();
@@ -257,7 +292,7 @@ export async function onRequest(context) {
     // 创建响应，添加详细的调试信息
     const responseHeaders = {
       "Content-Type": "application/json",
-      "X-Cache": "MISS",
+      "X-Cache": debug.cacheUsed ? "HIT" : "MISS",
       "X-Cache-Timestamp": timestamp,
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
@@ -270,8 +305,8 @@ export async function onRequest(context) {
       headers: responseHeaders,
     });
 
-    // 如果不是强制刷新，将结果存入缓存
-    if (!forceRefresh) {
+    // 如果不是强制刷新且成功获取了新数据，将结果存入缓存
+    if (!forceRefresh && !debug.cacheUsed && feedResults.length > 0) {
       try {
         const cache = caches.default;
         const cacheStoreStart = Date.now();
@@ -302,19 +337,23 @@ export async function onRequest(context) {
           message: cachePutError.message,
         });
       }
-    } else {
+    } else if (forceRefresh) {
       console.log(`[${startTime}] 强制刷新，不存储到缓存`);
     }
 
     console.log(
-      `[${startTime}] 返回新获取的数据，X-Cache: MISS，总耗时:${
-        Date.now() - startTime
-      }ms`
+      `[${startTime}] 返回${debug.cacheUsed ? "缓存" : "新"}数据，X-Cache: ${
+        debug.cacheUsed ? "HIT" : "MISS"
+      }，总耗时:${Date.now() - startTime}ms`
     );
     return response;
   } catch (error) {
     console.error(`[${startTime}] 全局错误:`, error);
-    debug.errors.push({ type: "global", message: error.message });
+    debug.errors.push({
+      type: "global",
+      message: error.message,
+      stack: error.stack,
+    });
 
     return new Response(
       JSON.stringify({
