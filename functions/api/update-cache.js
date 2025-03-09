@@ -29,10 +29,9 @@ export async function onRequest(context) {
 
     console.log(`正在更新 RSS 缓存: ${feedsUrl.toString()}`);
 
-    // 先检查当前缓存状态
+    // 先检查当前缓存状态 - 使用固定的缓存键
     const cache = caches.default;
-    const cachePath = "/api/feeds";
-    const cacheKey = new Request(`https://cache-key${cachePath}`);
+    const cacheKey = new Request("https://fixed-cache-key/api/feeds");
     const existingCache = await cache.match(cacheKey);
     const oldCacheTimestamp = existingCache
       ? existingCache.headers.get("X-Cache-Timestamp")
