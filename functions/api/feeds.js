@@ -8,7 +8,8 @@ export async function onRequest(context) {
     cacheUsed: false,
     errors: [],
     timing: {},
-    cacheKey: "",
+    cacheKey: "https://fixed-cache-key/api/feeds",
+    requestUrl: context.request.url,
   };
 
   try {
@@ -21,12 +22,11 @@ export async function onRequest(context) {
     console.log(
       `[${startTime}] API请求: forceRefresh=${forceRefresh}, cacheMaxAge=${cacheMaxAge}秒, 路径=${
         url.pathname
-      }, 完整URL=${url.toString()}`
+      }, 完整URL=${url.toString()}, 域名=${url.hostname}`
     );
 
     // 创建固定的缓存键 - 使用最简单的形式避免任何不一致
-    const cacheKey = new Request("https://fixed-cache-key/api/feeds");
-    debug.cacheKey = "https://fixed-cache-key/api/feeds";
+    const cacheKey = new Request(debug.cacheKey);
 
     console.log(`[${startTime}] 使用固定缓存键: ${debug.cacheKey}`);
 
@@ -49,7 +49,9 @@ export async function onRequest(context) {
           console.log(
             `[${startTime}] 缓存查询完成，耗时: ${
               debug.timing.cacheMatch
-            }ms, 是否找到缓存: ${debug.cacheFound ? "是" : "否"}`
+            }ms, 是否找到缓存: ${debug.cacheFound ? "是" : "否"}, 域名: ${
+              url.hostname
+            }`
           );
         } catch (matchError) {
           console.error(`[${startTime}] 缓存查询出错:`, matchError);
@@ -113,7 +115,9 @@ export async function onRequest(context) {
 
         // 如果成功读取和验证了缓存内容，直接返回
         if (cachedBody) {
-          console.log(`[${startTime}] 使用缓存数据，跳过源站获取`);
+          console.log(
+            `[${startTime}] 使用缓存数据，跳过源站获取，域名: ${url.hostname}`
+          );
 
           // 创建新的响应对象，设置所有必要的头
           const headers = new Headers();
@@ -128,12 +132,20 @@ export async function onRequest(context) {
           headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
           headers.set("Cache-Control", "no-store"); // 确保浏览器不缓存
           headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
-          headers.set("X-Debug-Info", JSON.stringify(debug));
+          headers.set(
+            "X-Debug-Info",
+            JSON.stringify({
+              ...debug,
+              cacheHit: true,
+              hostname: url.hostname,
+              timestamp: Date.now(),
+            })
+          );
 
           console.log(
             `[${startTime}] 成功返回缓存数据，X-Cache: HIT，总耗时:${
               Date.now() - startTime
-            }ms`
+            }ms，域名: ${url.hostname}`
           );
           return new Response(cachedBody, { headers });
         } else {
@@ -147,7 +159,7 @@ export async function onRequest(context) {
         });
       }
     } else {
-      console.log(`[${startTime}] 强制刷新，跳过缓存`);
+      console.log(`[${startTime}] 强制刷新，跳过缓存，域名: ${url.hostname}`);
     }
 
     // 如果无法使用缓存，则获取新数据
@@ -263,63 +275,74 @@ export async function onRequest(context) {
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Cache-Control": "no-store", // 确保浏览器不缓存
       "X-Response-Time": `${Date.now() - startTime}ms`,
-      "X-Debug-Info": JSON.stringify(debug),
+      "X-Debug-Info": JSON.stringify({
+        ...debug,
+        cacheHit: false,
+        hostname: url.hostname,
+        timestamp: Date.now(),
+      }),
     };
 
     const response = new Response(responseBody, {
       headers: responseHeaders,
     });
 
-    // 如果不是强制刷新，将结果存入缓存
-    if (!forceRefresh) {
-      try {
-        const cache = caches.default;
-        const cacheStoreStart = Date.now();
+    // 无论是否强制刷新，总是更新缓存
+    try {
+      const cache = caches.default;
+      const cacheStoreStart = Date.now();
 
-        // 创建一个新的响应用于缓存，使用相同的内容但不同的头
-        const cacheResponse = new Response(responseBody, {
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": `public, max-age=${cacheMaxAge}`,
-            "X-Cache-Timestamp": timestamp,
-            "X-Cache": "MISS",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, OPTIONS",
-          },
-        });
+      // 创建一个新的响应用于缓存
+      const cacheResponse = new Response(responseBody, {
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": `public, max-age=${cacheMaxAge}`,
+          "X-Cache-Timestamp": timestamp,
+          "X-Cache": "MISS",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+        },
+      });
 
-        // 使用固定的缓存键存储
-        console.log(`[${startTime}] 将结果存入缓存，键: ${debug.cacheKey}`);
-        await cache.put(cacheKey, cacheResponse);
-        debug.timing.cacheStore = Date.now() - cacheStoreStart;
-        console.log(
-          `[${startTime}] 成功存入缓存，耗时:${debug.timing.cacheStore}ms`
-        );
-      } catch (cachePutError) {
-        console.error(`[${startTime}] 存入缓存失败:`, cachePutError);
-        debug.errors.push({
-          type: "cache_store",
-          message: cachePutError.message,
-        });
-      }
-    } else {
-      console.log(`[${startTime}] 强制刷新，不存储到缓存`);
+      // 使用固定的缓存键存储
+      console.log(
+        `[${startTime}] 将结果存入缓存，键: ${debug.cacheKey}，域名: ${url.hostname}`
+      );
+      await cache.put(cacheKey, cacheResponse);
+      debug.timing.cacheStore = Date.now() - cacheStoreStart;
+      console.log(
+        `[${startTime}] 成功存入缓存，耗时:${debug.timing.cacheStore}ms`
+      );
+    } catch (cachePutError) {
+      console.error(`[${startTime}] 存入缓存失败:`, cachePutError);
+      debug.errors.push({
+        type: "cache_store",
+        message: cachePutError.message,
+      });
     }
 
     console.log(
       `[${startTime}] 返回新获取的数据，X-Cache: MISS，总耗时:${
         Date.now() - startTime
-      }ms`
+      }ms，域名: ${url.hostname}`
     );
     return response;
   } catch (error) {
     console.error(`[${startTime}] 全局错误:`, error);
-    debug.errors.push({ type: "global", message: error.message });
+    debug.errors.push({
+      type: "global",
+      message: error.message,
+    });
 
     return new Response(
       JSON.stringify({
         error: error.message,
-        debug: debug,
+        debug: {
+          ...debug,
+          errorStack: error.stack,
+          timestamp: Date.now(),
+          hostname: new URL(context.request.url).hostname,
+        },
       }),
       {
         status: 500,

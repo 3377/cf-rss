@@ -364,9 +364,10 @@ const fetchFeeds = async (forceRefresh = false) => {
       `开始获取RSS内容，请求参数强制刷新: ${forceRefresh}, 实际强制刷新: ${shouldForceRefresh}, 首次加载: ${isFirstLoad}`
     );
 
-    // 构建请求URL - 只在非首次加载且需要强制刷新时添加forceRefresh参数
-    // 使用绝对固定的URL格式确保缓存键一致
+    // 构建请求URL - 尽可能简单，只在需要强制刷新时添加参数
+    // 不添加timestamp参数，确保URL一致性
     const url = `/api/feeds${shouldForceRefresh ? "?forceRefresh=true" : ""}`;
+    console.log(`发送请求到: ${url}`);
 
     // 设置请求头
     const headers = {
@@ -383,11 +384,11 @@ const fetchFeeds = async (forceRefresh = false) => {
     }
 
     // 发送请求
-    console.log(`正在请求: ${url}`);
+    console.log(`正在请求: ${url}, 请求头:`, headers);
 
-    // 设置超时 - 增加到20秒，许多RSS源可能需要较长时间
+    // 设置超时 - 增加到30秒，许多RSS源可能需要较长时间
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20秒超时
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
 
     let response;
     try {
@@ -426,10 +427,24 @@ const fetchFeeds = async (forceRefresh = false) => {
 
     // 检查服务器缓存状态
     const cacheStatus = response.headers.get("X-Cache");
+    const responseHeaders = Object.fromEntries([...response.headers.entries()]);
     console.log(
       `服务器返回缓存状态: ${cacheStatus}, 所有响应头:`,
-      Object.fromEntries([...response.headers.entries()])
+      responseHeaders
     );
+
+    // 尝试解析调试信息
+    let debugInfo = null;
+    try {
+      const debugInfoStr = response.headers.get("X-Debug-Info");
+      if (debugInfoStr) {
+        debugInfo = JSON.parse(debugInfoStr);
+        console.log("服务器调试信息:", debugInfo);
+      }
+    } catch (e) {
+      console.error("解析调试信息失败:", e);
+    }
+
     const isFromServerCache = cacheStatus === "HIT";
 
     if (isFromServerCache) {
@@ -454,18 +469,8 @@ const fetchFeeds = async (forceRefresh = false) => {
       console.log("已设置缓存状态为: fresh");
     }
 
-    // 尝试解析调试信息
-    try {
-      const debugInfo = response.headers.get("X-Debug-Info");
-      if (debugInfo) {
-        console.log("服务器调试信息:", JSON.parse(debugInfo));
-      }
-    } catch (e) {
-      console.error("解析调试信息失败:", e);
-    }
-
     const data = await response.json();
-    console.log(`获取的RSS数据长度: ${data.length}`);
+    console.log(`获取的RSS数据: ${Array.isArray(data) ? data.length : 0}个源`);
 
     // 验证数据是否为数组
     if (!Array.isArray(data)) {
@@ -481,7 +486,11 @@ const fetchFeeds = async (forceRefresh = false) => {
       persistCountdown();
     }
 
-    isFirstLoad = false;
+    // 如果是首次加载且成功获取了数据，立即设置为非首次加载状态
+    if (isFirstLoad) {
+      console.log("首次加载成功，设置为非首次加载状态");
+      isFirstLoad = false;
+    }
   } catch (err) {
     console.error("获取RSS数据时出错:", err);
 
