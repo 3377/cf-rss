@@ -1,5 +1,14 @@
 // 专用于外部服务触发缓存更新的 API 端点
 export async function onRequest(context) {
+  const startTime = Date.now();
+  const debug = {
+    startTime,
+    cacheChecked: false,
+    cacheUpdated: false,
+    errors: [],
+    timing: {},
+  };
+
   try {
     // 检查访问密钥
     const url = new URL(context.request.url);
@@ -7,6 +16,7 @@ export async function onRequest(context) {
     const secretKey = context.env.UPDATE_KEY || "35794406";
 
     if (accessKey !== secretKey) {
+      console.error(`[${startTime}] 非法访问，密钥不匹配`);
       return new Response(
         JSON.stringify({
           success: false,
@@ -21,23 +31,26 @@ export async function onRequest(context) {
       );
     }
 
-    console.log(`开始更新RSS缓存，请求域名: ${url.hostname}`);
+    console.log(`[${startTime}] 开始更新RSS缓存，请求域名: ${url.hostname}`);
 
     // 使用绝对固定的缓存键 - 所有域名共享同一个缓存
-    const cacheKey = new Request("https://fixed-cache-key/api/feeds");
-    console.log(`使用固定缓存键: ${cacheKey.url}`);
+    const fixedCacheKey = "https://fixed-cache-key/api/feeds";
+    const cacheKey = new Request(fixedCacheKey);
+    console.log(`[${startTime}] 使用固定缓存键: ${fixedCacheKey}`);
 
     // 先检查当前缓存状态
     const cache = caches.default;
     const existingCache = await cache.match(cacheKey);
+    debug.cacheChecked = true;
+
     const oldCacheTimestamp = existingCache
       ? existingCache.headers.get("X-Cache-Timestamp")
       : null;
 
     console.log(
-      `现有缓存状态: ${existingCache ? "已存在" : "不存在"}, 时间戳: ${
-        oldCacheTimestamp || "无"
-      }`
+      `[${startTime}] 现有缓存状态: ${
+        existingCache ? "已存在" : "不存在"
+      }, 时间戳: ${oldCacheTimestamp || "无"}`
     );
 
     // 构建请求URL - 使用相同的域名构建绝对URL，确保请求源和当前请求相同
@@ -45,7 +58,9 @@ export async function onRequest(context) {
     feedsUrl.searchParams.set("t", Date.now().toString());
     feedsUrl.searchParams.set("forceRefresh", "true");
 
-    console.log(`正在更新RSS缓存，使用URL: ${feedsUrl.toString()}`);
+    console.log(
+      `[${startTime}] 正在更新RSS缓存，使用URL: ${feedsUrl.toString()}`
+    );
 
     // 发送请求以获取最新数据
     const response = await fetch(feedsUrl.toString(), {
@@ -61,11 +76,13 @@ export async function onRequest(context) {
       );
     }
 
-    // 获取响应数据
+    // 获取响应数据并验证
     const data = await response.json();
-    console.log(
-      `成功获取数据，包含 ${Array.isArray(data) ? data.length : 0} 个源`
-    );
+    if (!Array.isArray(data)) {
+      throw new Error(`API返回的数据无效: 不是数组格式`);
+    }
+
+    console.log(`[${startTime}] 成功获取数据，包含 ${data.length} 个源`);
 
     // 检查更新后的缓存状态
     const updatedCache = await cache.match(cacheKey);
@@ -75,10 +92,6 @@ export async function onRequest(context) {
 
     // 从环境变量获取缓存时间（秒），默认为1800秒（30分钟）
     const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "1800");
-    const maxAge =
-      updatedCache && updatedCache.headers.get("Cache-Control")
-        ? updatedCache.headers.get("Cache-Control").match(/max-age=(\d+)/)?.[1]
-        : String(cacheMaxAge);
 
     // 如果获取到了新数据但缓存没有更新，手动更新缓存
     if (
@@ -86,7 +99,7 @@ export async function onRequest(context) {
       Array.isArray(data) &&
       (!updatedCache || oldCacheTimestamp === newCacheTimestamp)
     ) {
-      console.log("检测到缓存未自动更新，手动更新缓存");
+      console.log(`[${startTime}] 检测到缓存未自动更新，手动更新缓存`);
 
       const timestamp = Date.now().toString();
       const cacheResponse = new Response(JSON.stringify(data), {
@@ -100,206 +113,119 @@ export async function onRequest(context) {
         },
       });
 
-      // 使用固定缓存键存储数据
-      await cache.put(cacheKey, cacheResponse);
-      console.log(`已手动更新缓存，时间戳: ${timestamp}`);
-
-      // 更新缓存时间戳为新值
-      const recheck = await cache.match(cacheKey);
-      if (recheck) {
-        const recheckTimestamp = recheck.headers.get("X-Cache-Timestamp");
-        console.log(`重新检查缓存: 时间戳=${recheckTimestamp || "无"}`);
-      }
-
-      // 额外验证步骤 - 验证并确认缓存是否更新成功
-      let verificationFailed = false;
       try {
-        // 尝试读取缓存
-        const verifyCache = await cache.match(cacheKey);
-        if (!verifyCache) {
-          console.log("缓存验证失败：无法找到缓存");
-          verificationFailed = true;
-        } else {
-          const verifyTs = verifyCache.headers.get("X-Cache-Timestamp");
-          if (verifyTs !== timestamp) {
-            console.log(
-              `缓存验证失败：时间戳不匹配 (期望: ${timestamp}, 实际: ${
-                verifyTs || "无"
-              })`
-            );
-            verificationFailed = true;
-          } else {
-            // 验证内容是否正确
-            const verifyCacheText = await verifyCache.text();
-            try {
-              const verifyCacheData = JSON.parse(verifyCacheText);
-              if (
-                !Array.isArray(verifyCacheData) ||
-                verifyCacheData.length !== data.length
-              ) {
-                console.log(
-                  `缓存验证失败：内容不匹配 (期望长度: ${
-                    data.length
-                  }, 实际长度: ${
-                    Array.isArray(verifyCacheData)
-                      ? verifyCacheData.length
-                      : "非数组"
-                  })`
-                );
-                verificationFailed = true;
-              } else {
-                console.log(
-                  `缓存验证成功：找到缓存且内容匹配，包含 ${verifyCacheData.length} 个RSS源`
-                );
-              }
-            } catch (e) {
-              console.log(`缓存验证失败：无法解析缓存内容为JSON: ${e.message}`);
-              verificationFailed = true;
-            }
-          }
-        }
-      } catch (verifyError) {
-        console.log(`缓存验证过程出错: ${verifyError.message}`);
-        verificationFailed = true;
-      }
-
-      // 如果验证失败，进行第二次尝试
-      if (verificationFailed) {
-        console.log("进行第二次缓存更新尝试...");
-
-        // 使用不同的时间戳重试
-        const retryTimestamp = (Date.now() + 1).toString();
-        const retryCacheResponse = new Response(JSON.stringify(data), {
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": `public, max-age=${cacheMaxAge}`,
-            "X-Cache-Timestamp": retryTimestamp,
-            "X-Cache": "MISS",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, OPTIONS",
-          },
+        // 将结果存入缓存 - 使用固定缓存键
+        await cache.put(cacheKey, cacheResponse.clone());
+        debug.cacheUpdated = true;
+        console.log(`[${startTime}] 成功手动更新缓存，时间戳: ${timestamp}`);
+      } catch (e) {
+        console.error(`[${startTime}] 手动更新缓存失败:`, e);
+        debug.errors.push({
+          type: "cache_update",
+          message: e.message,
         });
+        throw new Error(`手动更新缓存失败: ${e.message}`);
+      }
+    } else if (updatedCache && oldCacheTimestamp !== newCacheTimestamp) {
+      console.log(
+        `[${startTime}] 缓存已自动更新，旧时间戳: ${oldCacheTimestamp}，新时间戳: ${newCacheTimestamp}`
+      );
+      debug.cacheUpdated = true;
+    }
 
-        try {
-          await cache.put(cacheKey, retryCacheResponse);
-          console.log(`第二次缓存更新尝试完成，时间戳: ${retryTimestamp}`);
+    // 再次验证缓存是否已更新
+    const finalCache = await cache.match(cacheKey);
+    const finalCacheTimestamp = finalCache
+      ? finalCache.headers.get("X-Cache-Timestamp")
+      : null;
 
-          // 再次验证
-          const retry2Check = await cache.match(cacheKey);
-          if (retry2Check) {
-            const retry2Ts = retry2Check.headers.get("X-Cache-Timestamp");
-            console.log(`第二次缓存更新验证: 时间戳=${retry2Ts || "无"}`);
-            if (retry2Ts === retryTimestamp) {
-              console.log("第二次尝试成功！");
-            } else {
-              console.log("第二次尝试未能更新缓存时间戳");
-            }
-          } else {
-            console.log("第二次尝试后仍无法找到缓存");
-          }
-        } catch (retryError) {
-          console.log(`第二次缓存更新尝试失败: ${retryError.message}`);
-        }
+    // 确认缓存已更新
+    const cacheUpdatedConfirmed =
+      finalCache &&
+      (!oldCacheTimestamp || finalCacheTimestamp !== oldCacheTimestamp);
+
+    // 如果在多次尝试后仍未更新缓存，返回错误
+    if (!cacheUpdatedConfirmed && debug.cacheUpdated) {
+      console.error(`[${startTime}] 缓存更新验证失败，缓存仍未更新`);
+      debug.errors.push({
+        type: "cache_verify",
+        message: "缓存更新后验证失败",
+      });
+    }
+
+    // 读取缓存内容进行验证
+    let cacheContent = null;
+    if (finalCache) {
+      try {
+        const clonedResponse = finalCache.clone();
+        cacheContent = await clonedResponse.text();
+        const parsedContent = JSON.parse(cacheContent);
+        console.log(
+          `[${startTime}] 缓存内容验证成功，包含 ${
+            Array.isArray(parsedContent) ? parsedContent.length : 0
+          } 个源`
+        );
+      } catch (e) {
+        console.error(`[${startTime}] 缓存内容验证失败:`, e);
+        debug.errors.push({
+          type: "cache_content_verify",
+          message: e.message,
+        });
       }
     }
 
-    // 再次检查缓存状态，确保已更新
-    const finalCache = await cache.match(cacheKey);
-    const finalTimestamp = finalCache
-      ? finalCache.headers.get("X-Cache-Timestamp")
-      : null;
-    const cacheControl = finalCache
-      ? finalCache.headers.get("Cache-Control")
-      : null;
-    const finalMaxAge = cacheControl
-      ? cacheControl.match(/max-age=(\d+)/)?.[1]
-      : String(cacheMaxAge);
-
-    // 转换为北京时间的函数
-    const toBeiJingTime = (date) => {
-      return new Date(date)
-        .toLocaleString("zh-CN", {
-          timeZone: "Asia/Shanghai",
-          hour12: false,
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        })
-        .replace(/\//g, "-"); // 将斜杠替换为短横线
-    };
-
-    // 缓存管理说明
-    const cacheStrategy = {
-      explanation: `
-        缓存管理策略:
-        1. 该API被设计为由UptimeRobot等服务定期访问(推荐30分钟)
-        2. HTTP缓存有效期由CACHE_MAX_AGE环境变量控制(默认30分钟)
-        3. UI显示的刷新倒计时由RSS_CONFIG.refresh.interval控制(默认2分钟)
-        4. UptimeRobot触发和UI倒计时/手动刷新是唯一的数据更新途径
-      `,
-    };
-
-    const currentTime = Date.now();
-    const status = oldCacheTimestamp === finalTimestamp ? "无变化" : "已更新";
-
     // 返回成功响应
-    return new Response(
-      JSON.stringify({
-        success: true,
-        message: "RSS 缓存已成功更新",
-        timestamp: toBeiJingTime(new Date()),
-        feedsCount: Array.isArray(data) ? data.length : 0,
-        cache: {
-          status: status,
-          lastUpdate: finalTimestamp
-            ? toBeiJingTime(Number(finalTimestamp))
-            : toBeiJingTime(new Date()),
-          maxAge: `${Math.floor(Number(finalMaxAge) / 60)} 分钟`,
-          nextUpdate: toBeiJingTime(
-            new Date(
-              Number(finalTimestamp || currentTime) + Number(finalMaxAge) * 1000
-            )
-          ),
-          previousUpdate: oldCacheTimestamp
-            ? toBeiJingTime(Number(oldCacheTimestamp))
-            : "无",
-          cacheKey: cacheKey.url,
-          hostname: url.hostname,
-          cacheMiss: status === "已更新",
-        },
-        debug: {
-          requestOrigin: url.origin,
-          feedsUrl: feedsUrl.toString(),
-          finalTimestamp: finalTimestamp,
-          oldTimestamp: oldCacheTimestamp,
-        },
-        strategy: cacheStrategy.explanation
-          .trim()
-          .split("\n")
-          .map((line) => line.trim())
-          .filter((line) => line),
-      }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "no-store", // 确保这个响应不被缓存
-        },
-      }
-    );
+    const responseBody = {
+      success: true,
+      message: `RSS缓存${debug.cacheUpdated ? "已更新" : "无需更新"}`,
+      cache: debug.cacheUpdated ? "已更新" : "无变化",
+      timestamp: Date.now(),
+      debug: {
+        ...debug,
+        oldTimestamp: oldCacheTimestamp ? parseInt(oldCacheTimestamp) : null,
+        newTimestamp: finalCacheTimestamp
+          ? parseInt(finalCacheTimestamp)
+          : null,
+        dataLength: data.length,
+        cacheContentLength: cacheContent ? cacheContent.length : 0,
+        requestUrl: url.toString(),
+        requestDomain: url.hostname,
+        elapsed: Date.now() - startTime,
+      },
+    };
+
+    return new Response(JSON.stringify(responseBody, null, 2), {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      },
+    });
   } catch (error) {
-    console.error("更新缓存时出错:", error);
+    console.error(`[${startTime}] 更新缓存时出错:`, error);
+
     return new Response(
-      JSON.stringify({
-        success: false,
-        message: `更新缓存失败: ${error.message}`,
-        error: error.stack,
-      }),
+      JSON.stringify(
+        {
+          success: false,
+          message: `更新缓存失败: ${error.message}`,
+          timestamp: Date.now(),
+          debug: {
+            ...debug,
+            error: error.message,
+            stack:
+              process.env.NODE_ENV === "development" ? error.stack : undefined,
+            elapsed: Date.now() - startTime,
+          },
+        },
+        null,
+        2
+      ),
       {
         headers: {
           "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-store, no-cache, must-revalidate",
         },
         status: 500,
       }

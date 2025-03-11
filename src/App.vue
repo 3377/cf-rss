@@ -364,8 +364,8 @@ const fetchFeeds = async (forceRefresh = false) => {
       `开始获取RSS内容，请求参数强制刷新: ${forceRefresh}, 实际强制刷新: ${shouldForceRefresh}, 首次加载: ${isFirstLoad}`
     );
 
-    // 构建请求URL - 尽可能简单，只在需要强制刷新时添加参数
-    // 不添加timestamp参数，确保URL一致性
+    // 构建请求URL - 使用完全固定的基础路径，确保与服务器端缓存键匹配
+    // 只在强制刷新时添加forceRefresh参数
     const url = `/api/feeds${shouldForceRefresh ? "?forceRefresh=true" : ""}`;
     console.log(`发送请求到: ${url}`);
 

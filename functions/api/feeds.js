@@ -40,7 +40,7 @@ export async function onRequest(context) {
         const cacheStartTime = Date.now();
         const cache = caches.default;
 
-        // 尝试从缓存中获取数据
+        // 尝试从缓存中获取数据 - 使用固定缓存键
         try {
           cachedResponse = await cache.match(cacheKey);
           debug.timing.cacheMatch = Date.now() - cacheStartTime;
@@ -111,6 +111,8 @@ export async function onRequest(context) {
               message: readError.message,
             });
           }
+        } else {
+          console.log(`[${startTime}] 未找到匹配的缓存数据，需要从源站获取`);
         }
 
         // 如果成功读取和验证了缓存内容，直接返回
@@ -287,68 +289,58 @@ export async function onRequest(context) {
       headers: responseHeaders,
     });
 
-    // 无论是否强制刷新，总是更新缓存
-    try {
-      const cache = caches.default;
-      const cacheStoreStart = Date.now();
+    // 只有在非强制刷新时才缓存结果
+    if (!forceRefresh) {
+      responseHeaders.set("Cache-Control", `public, max-age=${cacheMaxAge}`);
 
-      // 创建一个新的响应用于缓存
-      const cacheResponse = new Response(responseBody, {
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": `public, max-age=${cacheMaxAge}`,
-          "X-Cache-Timestamp": timestamp,
-          "X-Cache": "MISS",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, OPTIONS",
-        },
-      });
+      try {
+        const cache = caches.default;
+        const cacheableResponse = new Response(responseBody, {
+          headers: new Headers(responseHeaders),
+        });
 
-      // 使用固定的缓存键存储
-      console.log(
-        `[${startTime}] 将结果存入缓存，键: ${debug.cacheKey}，域名: ${url.hostname}`
+        // 使用固定缓存键存储
+        await cache.put(cacheKey, cacheableResponse.clone());
+        console.log(
+          `[${startTime}] 成功更新缓存，使用固定缓存键: ${debug.cacheKey}`
+        );
+      } catch (cacheError) {
+        console.error(`[${startTime}] 缓存更新失败:`, cacheError);
+        debug.errors.push({
+          type: "cache_update",
+          message: cacheError.message,
+        });
+      }
+    } else {
+      responseHeaders.set(
+        "Cache-Control",
+        "no-store, no-cache, must-revalidate"
       );
-      await cache.put(cacheKey, cacheResponse);
-      debug.timing.cacheStore = Date.now() - cacheStoreStart;
-      console.log(
-        `[${startTime}] 成功存入缓存，耗时:${debug.timing.cacheStore}ms`
-      );
-    } catch (cachePutError) {
-      console.error(`[${startTime}] 存入缓存失败:`, cachePutError);
-      debug.errors.push({
-        type: "cache_store",
-        message: cachePutError.message,
-      });
+      console.log(`[${startTime}] 强制刷新模式，不更新缓存`);
     }
 
     console.log(
-      `[${startTime}] 返回新获取的数据，X-Cache: MISS，总耗时:${
+      `[${startTime}] 成功返回新数据，X-Cache: MISS，总耗时:${
         Date.now() - startTime
       }ms，域名: ${url.hostname}`
     );
     return response;
   } catch (error) {
-    console.error(`[${startTime}] 全局错误:`, error);
-    debug.errors.push({
-      type: "global",
-      message: error.message,
-    });
+    console.error(`[${startTime}] 处理请求时出错:`, error);
 
     return new Response(
       JSON.stringify({
-        error: error.message,
-        debug: {
-          ...debug,
-          errorStack: error.stack,
-          timestamp: Date.now(),
-          hostname: new URL(context.request.url).hostname,
-        },
+        error: "获取RSS数据时发生错误",
+        message: error.message,
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+        debug,
       }),
       {
         status: 500,
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
+          "Cache-Control": "no-store, no-cache, must-revalidate",
           "X-Response-Time": `${Date.now() - startTime}ms`,
         },
       }
