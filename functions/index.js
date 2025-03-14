@@ -17,10 +17,11 @@ export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
 
-  // 查找匹配的路由
+  // 查找匹配的路由，优先精确匹配
   const route = routes.find((r) => {
-    if (r.pattern === "/*") return true;
-    return path === r.pattern;
+    if (r.pattern === path) return true; // 精确匹配
+    if (r.pattern === "/*") return true; // 通配符匹配
+    return false;
   });
 
   if (!route) {
