@@ -194,27 +194,44 @@ export async function onRequest(context) {
     const responseBody = {
       成功: true,
       消息: "RSS缓存更新成功",
-      更新时间: formatTimestamp(Date.now()),
-      更新方式: "接口触发",
-      更新结果: debug.cacheUpdated ? "已更新" : "无需更新",
+      缓存状态: debug.cacheUpdated ? "已更新" : "无需更新",
+      时间戳: Date.now(),
       调试信息: {
+        ...debug,
         // 时间信息
-        开始时间: formatTimestamp(startTime),
-        结束时间: getBeijingTime(),
-        总耗时: `${(Date.now() - startTime) / 1000}秒`,
+        旧缓存时间: oldCacheTimestamp ? parseInt(oldCacheTimestamp) : null,
+        新缓存时间: finalCacheTimestamp ? parseInt(finalCacheTimestamp) : null,
+        旧缓存时间格式化: formatTimestamp(oldCacheTimestamp),
+        新缓存时间格式化: formatTimestamp(finalCacheTimestamp),
         // 缓存信息
-        旧缓存时间: formatTimestamp(oldCacheTimestamp),
-        新缓存时间: formatTimestamp(finalCacheTimestamp),
-        数据源数量: data.length,
+        数据长度: data.length,
+        缓存内容长度: cacheContent ? cacheContent.length : 0,
         // 请求信息
         请求地址: url.toString(),
         请求域名: url.hostname,
-        // 状态信息
-        缓存状态: {
-          是否存在: finalCache ? "存在" : "不存在",
-          是否更新: debug.cacheUpdated ? "已更新" : "未更新",
-          是否验证: cacheUpdatedConfirmed ? "已验证" : "未验证",
-          内容是否有效: cacheContent ? "有效" : "无效",
+        // 性能信息
+        耗时: Date.now() - startTime,
+        // 缓存状态
+        缓存详情: {
+          是否存在: !!finalCache,
+          是否更新: debug.cacheUpdated,
+          是否验证: cacheUpdatedConfirmed,
+          内容是否有效: !!cacheContent,
+        },
+        // 时间信息
+        时间记录: {
+          开始时间: formatTimestamp(startTime),
+          结束时间: getBeijingTime(),
+          总耗时: `${(Date.now() - startTime) / 1000}秒`,
+        },
+        // 中文状态描述
+        状态描述: {
+          缓存存在: finalCache ? "存在" : "不存在",
+          缓存更新: debug.cacheUpdated ? "已更新" : "未更新",
+          缓存验证: cacheUpdatedConfirmed ? "已验证" : "未验证",
+          内容有效: cacheContent ? "有效" : "无效",
+          更新类型:
+            oldCacheTimestamp === newCacheTimestamp ? "手动更新" : "自动更新",
         },
       },
     };
