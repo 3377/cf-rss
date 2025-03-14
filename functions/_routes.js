@@ -1,6 +1,10 @@
 // 路由配置
 export const routes = [
   {
+    pattern: "/cache",
+    handler: "api/cache",
+  },
+  {
     pattern: "/api/feeds",
     handler: "api/feeds",
   },
@@ -9,8 +13,8 @@ export const routes = [
     handler: "api/update-cache",
   },
   {
-    pattern: "/cache",
-    handler: "api/cache",
+    pattern: "/",
+    handler: "index",
   },
   {
     pattern: "/*",

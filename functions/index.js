@@ -4,12 +4,14 @@ import { routes } from "./_routes";
 import { onRequest as feedsHandler } from "./api/feeds";
 import { onRequest as updateCacheHandler } from "./api/update-cache";
 import { onRequest as cacheHandler } from "./api/cache";
+import { onRequest as indexHandler } from "./index"; // 导入主页处理函数
 
 // 处理函数映射
 const handlers = {
   "api/feeds": feedsHandler,
   "api/update-cache": updateCacheHandler,
   "api/cache": cacheHandler,
+  index: indexHandler, // 添加主页处理函数
 };
 
 // 主处理函数
@@ -19,8 +21,10 @@ export async function onRequest(context) {
 
   // 查找匹配的路由，优先精确匹配
   const route = routes.find((r) => {
-    if (r.pattern === path) return true; // 精确匹配
-    if (r.pattern === "/*") return true; // 通配符匹配
+    // 精确匹配
+    if (r.pattern === path) return true;
+    // 通配符匹配
+    if (r.pattern === "/*" && path !== "/") return true;
     return false;
   });
 
