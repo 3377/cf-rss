@@ -192,48 +192,45 @@ export async function onRequest(context) {
 
     // 返回成功响应
     const responseBody = {
-      success: true,
-      message: "RSS缓存更新成功",
-      cache: debug.cacheUpdated ? "已更新" : "无需更新",
-      timestamp: Date.now(),
-      beijingTime: getBeijingTime(),
-      debug: {
+      成功: true,
+      消息: "RSS缓存更新成功",
+      缓存状态: debug.cacheUpdated ? "已更新" : "无需更新",
+      时间戳: Date.now(),
+      调试信息: {
         ...debug,
         // 时间信息
-        oldTimestamp: oldCacheTimestamp ? parseInt(oldCacheTimestamp) : null,
-        newTimestamp: finalCacheTimestamp
-          ? parseInt(finalCacheTimestamp)
-          : null,
-        oldTimestampBeijing: formatTimestamp(oldCacheTimestamp),
-        newTimestampBeijing: formatTimestamp(finalCacheTimestamp),
+        旧缓存时间: oldCacheTimestamp ? parseInt(oldCacheTimestamp) : null,
+        新缓存时间: finalCacheTimestamp ? parseInt(finalCacheTimestamp) : null,
+        旧缓存时间格式化: formatTimestamp(oldCacheTimestamp),
+        新缓存时间格式化: formatTimestamp(finalCacheTimestamp),
         // 缓存信息
-        dataLength: data.length,
-        cacheContentLength: cacheContent ? cacheContent.length : 0,
+        数据长度: data.length,
+        缓存内容长度: cacheContent ? cacheContent.length : 0,
         // 请求信息
-        requestUrl: url.toString(),
-        requestDomain: url.hostname,
+        请求地址: url.toString(),
+        请求域名: url.hostname,
         // 性能信息
-        elapsed: Date.now() - startTime,
+        耗时: Date.now() - startTime,
         // 缓存状态
-        cacheStatus: {
-          exists: !!finalCache,
-          updated: debug.cacheUpdated,
-          verified: cacheUpdatedConfirmed,
-          contentValid: !!cacheContent,
+        缓存详情: {
+          是否存在: !!finalCache,
+          是否更新: debug.cacheUpdated,
+          是否验证: cacheUpdatedConfirmed,
+          内容是否有效: !!cacheContent,
         },
         // 时间信息
-        timestamps: {
-          start: formatTimestamp(startTime),
-          end: getBeijingTime(),
-          duration: `${(Date.now() - startTime) / 1000}秒`,
+        时间记录: {
+          开始时间: formatTimestamp(startTime),
+          结束时间: getBeijingTime(),
+          总耗时: `${(Date.now() - startTime) / 1000}秒`,
         },
         // 中文状态描述
-        status: {
-          cacheExists: finalCache ? "存在" : "不存在",
-          cacheUpdated: debug.cacheUpdated ? "已更新" : "未更新",
-          cacheVerified: cacheUpdatedConfirmed ? "已验证" : "未验证",
-          contentValid: cacheContent ? "有效" : "无效",
-          updateType:
+        状态描述: {
+          缓存存在: finalCache ? "存在" : "不存在",
+          缓存更新: debug.cacheUpdated ? "已更新" : "未更新",
+          缓存验证: cacheUpdatedConfirmed ? "已验证" : "未验证",
+          内容有效: cacheContent ? "有效" : "无效",
+          更新类型:
             oldCacheTimestamp === newCacheTimestamp ? "手动更新" : "自动更新",
         },
       },
