@@ -132,7 +132,10 @@ export async function onRequest(context) {
           );
           headers.set("Access-Control-Allow-Origin", "*");
           headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-          headers.set("Cache-Control", "no-store"); // 确保浏览器不缓存
+          headers.set(
+            "Cache-Control",
+            `public, max-age=${cacheMaxAge}, s-maxage=${cacheMaxAge}`
+          );
           headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
           headers.set(
             "X-Debug-Info",
@@ -275,7 +278,7 @@ export async function onRequest(context) {
       "X-Cache-Timestamp": timestamp,
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Cache-Control": "no-store", // 确保浏览器不缓存
+      "Cache-Control": `public, max-age=${cacheMaxAge}, s-maxage=${cacheMaxAge}`,
       "X-Response-Time": `${Date.now() - startTime}ms`,
       "X-Debug-Info": JSON.stringify({
         ...debug,
@@ -291,8 +294,6 @@ export async function onRequest(context) {
 
     // 只有在非强制刷新时才缓存结果
     if (!forceRefresh) {
-      responseHeaders.set("Cache-Control", `public, max-age=${cacheMaxAge}`);
-
       try {
         const cache = caches.default;
         const cacheableResponse = new Response(responseBody, {

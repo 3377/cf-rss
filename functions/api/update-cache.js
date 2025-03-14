@@ -105,7 +105,8 @@ export async function onRequest(context) {
       const cacheResponse = new Response(JSON.stringify(data), {
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": `public, max-age=${cacheMaxAge}`,
+          // 修改缓存控制头，允许共享缓存
+          "Cache-Control": `public, max-age=${cacheMaxAge}, s-maxage=${cacheMaxAge}`,
           "X-Cache-Timestamp": timestamp,
           "X-Cache": "MISS",
           "Access-Control-Allow-Origin": "*",
