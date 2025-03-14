@@ -4,14 +4,14 @@ import { routes } from "./_routes";
 import { onRequest as feedsHandler } from "./api/feeds";
 import { onRequest as updateCacheHandler } from "./api/update-cache";
 import { onRequest as cacheHandler } from "./api/cache";
-import { onRequest as indexHandler } from "./index"; // 导入主页处理函数
+import { onRequest as homeHandler } from "./home";
 
 // 处理函数映射
 const handlers = {
   "api/feeds": feedsHandler,
   "api/update-cache": updateCacheHandler,
   "api/cache": cacheHandler,
-  index: indexHandler, // 添加主页处理函数
+  home: homeHandler,
 };
 
 // 主处理函数

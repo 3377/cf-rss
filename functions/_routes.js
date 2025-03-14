@@ -14,10 +14,10 @@ export const routes = [
   },
   {
     pattern: "/",
-    handler: "index",
+    handler: "home",
   },
   {
     pattern: "/*",
-    handler: "index",
+    handler: "home",
   },
 ];
