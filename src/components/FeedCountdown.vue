@@ -17,7 +17,7 @@
               v-if="activeCache === 'fresh'"
               class="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"
             ></div>
-            <span class="mr-2">最后更新: {{ lastUpdateTime }}</span>
+            <span class="mr-2">最后自动刷新: {{ lastUpdateTime }}</span>
           </div>
           <span>{{ countdownText }}</span>
         </div>

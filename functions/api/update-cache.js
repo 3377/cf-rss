@@ -175,23 +175,67 @@ export async function onRequest(context) {
       }
     }
 
+    // 获取北京时间
+    const getBeijingTime = () => {
+      const now = new Date();
+      const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+      return beijingTime.toISOString().replace("T", " ").replace("Z", "");
+    };
+
+    // 格式化时间戳为北京时间
+    const formatTimestamp = (timestamp) => {
+      if (!timestamp) return null;
+      const date = new Date(parseInt(timestamp));
+      const beijingDate = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+      return beijingDate.toISOString().replace("T", " ").replace("Z", "");
+    };
+
     // 返回成功响应
     const responseBody = {
       success: true,
-      message: `RSS缓存${debug.cacheUpdated ? "已更新" : "无需更新"}`,
-      cache: debug.cacheUpdated ? "已更新" : "无变化",
+      message: "RSS缓存更新成功",
+      cache: debug.cacheUpdated ? "已更新" : "无需更新",
       timestamp: Date.now(),
+      beijingTime: getBeijingTime(),
       debug: {
         ...debug,
+        // 时间信息
         oldTimestamp: oldCacheTimestamp ? parseInt(oldCacheTimestamp) : null,
         newTimestamp: finalCacheTimestamp
           ? parseInt(finalCacheTimestamp)
           : null,
+        oldTimestampBeijing: formatTimestamp(oldCacheTimestamp),
+        newTimestampBeijing: formatTimestamp(finalCacheTimestamp),
+        // 缓存信息
         dataLength: data.length,
         cacheContentLength: cacheContent ? cacheContent.length : 0,
+        // 请求信息
         requestUrl: url.toString(),
         requestDomain: url.hostname,
+        // 性能信息
         elapsed: Date.now() - startTime,
+        // 缓存状态
+        cacheStatus: {
+          exists: !!finalCache,
+          updated: debug.cacheUpdated,
+          verified: cacheUpdatedConfirmed,
+          contentValid: !!cacheContent,
+        },
+        // 时间信息
+        timestamps: {
+          start: formatTimestamp(startTime),
+          end: getBeijingTime(),
+          duration: `${(Date.now() - startTime) / 1000}秒`,
+        },
+        // 中文状态描述
+        status: {
+          cacheExists: finalCache ? "存在" : "不存在",
+          cacheUpdated: debug.cacheUpdated ? "已更新" : "未更新",
+          cacheVerified: cacheUpdatedConfirmed ? "已验证" : "未验证",
+          contentValid: cacheContent ? "有效" : "无效",
+          updateType:
+            oldCacheTimestamp === newCacheTimestamp ? "手动更新" : "自动更新",
+        },
       },
     };
 
@@ -205,18 +249,34 @@ export async function onRequest(context) {
   } catch (error) {
     console.error(`[${startTime}] 更新缓存时出错:`, error);
 
+    // 获取北京时间
+    const getBeijingTime = () => {
+      const now = new Date();
+      const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+      return beijingTime.toISOString().replace("T", " ").replace("Z", "");
+    };
+
     return new Response(
       JSON.stringify(
         {
           success: false,
           message: `更新缓存失败: ${error.message}`,
           timestamp: Date.now(),
+          beijingTime: getBeijingTime(),
           debug: {
             ...debug,
             error: error.message,
             stack:
               process.env.NODE_ENV === "development" ? error.stack : undefined,
             elapsed: Date.now() - startTime,
+            timestamps: {
+              start: new Date(startTime + 8 * 60 * 60 * 1000)
+                .toISOString()
+                .replace("T", " ")
+                .replace("Z", ""),
+              end: getBeijingTime(),
+              duration: `${(Date.now() - startTime) / 1000}秒`,
+            },
           },
         },
         null,

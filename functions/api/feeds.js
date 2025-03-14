@@ -271,6 +271,21 @@ export async function onRequest(context) {
     const timestamp = Date.now().toString();
     const responseBody = JSON.stringify(feedResults);
 
+    // 获取北京时间
+    const getBeijingTime = () => {
+      const now = new Date();
+      const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+      return beijingTime.toISOString().replace("T", " ").replace("Z", "");
+    };
+
+    // 格式化时间戳为北京时间
+    const formatTimestamp = (timestamp) => {
+      if (!timestamp) return null;
+      const date = new Date(parseInt(timestamp));
+      const beijingDate = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+      return beijingDate.toISOString().replace("T", " ").replace("Z", "");
+    };
+
     // 创建响应，添加详细的调试信息
     const responseHeaders = {
       "Content-Type": "application/json",
@@ -285,6 +300,29 @@ export async function onRequest(context) {
         cacheHit: false,
         hostname: url.hostname,
         timestamp: Date.now(),
+        // 时间信息
+        timestamps: {
+          start: formatTimestamp(startTime),
+          end: getBeijingTime(),
+          duration: `${(Date.now() - startTime) / 1000}秒`,
+          cacheTimestamp: formatTimestamp(timestamp),
+        },
+        // 性能信息
+        performance: {
+          totalTime: `${(Date.now() - startTime) / 1000}秒`,
+          cacheTime: debug.timing.cacheMatch
+            ? `${debug.timing.cacheMatch / 1000}秒`
+            : null,
+          fetchTime: debug.timing.fetchComplete
+            ? `${debug.timing.fetchComplete / 1000}秒`
+            : null,
+        },
+        // 缓存信息
+        cacheInfo: {
+          found: debug.cacheFound,
+          used: debug.cacheUsed,
+          maxAge: cacheMaxAge,
+        },
       }),
     };
 
