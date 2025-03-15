@@ -349,7 +349,7 @@ const updateCountdown = () => {
   }
 };
 
-// 修改 fetchFeeds 函数的逻辑
+// 获取RSS数据
 const fetchFeeds = async (forceRefresh = false) => {
   if (loading.value) return;
 
@@ -357,16 +357,15 @@ const fetchFeeds = async (forceRefresh = false) => {
   error.value = null;
 
   try {
-    // 首次加载时永远不强制刷新，确保使用缓存
-    const shouldForceRefresh = isFirstLoad ? false : forceRefresh;
-
     console.log(
-      `开始获取RSS内容，请求参数强制刷新: ${forceRefresh}, 实际强制刷新: ${shouldForceRefresh}, 首次加载: ${isFirstLoad}`
+      `开始获取RSS内容，请求参数强制刷新: ${forceRefresh}, 首次加载: ${isFirstLoad}`
     );
 
     // 构建请求URL - 使用完全固定的基础路径，确保与服务器端缓存键匹配
     // 只在强制刷新时添加forceRefresh参数
-    const url = `/api/feeds${shouldForceRefresh ? "?forceRefresh=true" : ""}`;
+    const url = `/api/feeds${forceRefresh ? "?forceRefresh=true" : ""}${
+      isFirstLoad ? (forceRefresh ? "&" : "?") + "isFirstLoad=true" : ""
+    }`;
     console.log(`发送请求到: ${url}`);
 
     // 设置请求头
@@ -375,7 +374,7 @@ const fetchFeeds = async (forceRefresh = false) => {
     };
 
     // 只有在强制刷新时才添加no-cache头
-    if (shouldForceRefresh) {
+    if (forceRefresh) {
       console.log("添加no-cache头，强制获取新数据");
       headers["Cache-Control"] = "no-cache";
       headers["Pragma"] = "no-cache";
@@ -385,108 +384,33 @@ const fetchFeeds = async (forceRefresh = false) => {
 
     // 发送请求
     console.log(`正在请求: ${url}, 请求头:`, headers);
+    const response = await fetch(url, { headers });
 
-    // 设置超时 - 增加到30秒，许多RSS源可能需要较长时间
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
-
-    let response;
-    try {
-      response = await fetch(url, {
-        headers,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId); // 清除超时
-    } catch (fetchError) {
-      clearTimeout(timeoutId); // 确保清除超时
-
-      if (fetchError.name === "AbortError") {
-        console.error("请求超时，尝试不带超时重新请求");
-
-        // 尝试不带超时重新请求一次
-        try {
-          response = await fetch(url, { headers });
-          console.log("不带超时的请求成功");
-        } catch (retryError) {
-          console.error("重试请求也失败:", retryError);
-          throw new Error("网络请求失败，请检查您的网络连接");
-        }
-      } else {
-        throw fetchError; // 重新抛出非超时错误
-      }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    if (!response || !response.ok) {
-      throw new Error(
-        `API请求失败: ${
-          response ? `${response.status} ${response.statusText}` : "无响应"
-        }`
-      );
-    }
-
-    // 检查服务器缓存状态
+    // 检查缓存状态
     const cacheStatus = response.headers.get("X-Cache");
-    const responseHeaders = Object.fromEntries([...response.headers.entries()]);
-    console.log(
-      `服务器返回缓存状态: ${cacheStatus}, 所有响应头:`,
-      responseHeaders
-    );
-
-    // 尝试解析调试信息
-    let debugInfo = null;
-    try {
-      const debugInfoStr = response.headers.get("X-Debug-Info");
-      if (debugInfoStr) {
-        debugInfo = JSON.parse(debugInfoStr);
-        console.log("服务器调试信息:", debugInfo);
-      }
-    } catch (e) {
-      console.error("解析调试信息失败:", e);
-    }
-
     const isFromServerCache = cacheStatus === "HIT";
 
     if (isFromServerCache) {
-      // 从服务器缓存获取数据
       const cacheTsStr = response.headers.get("X-Cache-Timestamp");
       if (cacheTsStr) {
         const cacheTs = parseInt(cacheTsStr);
         serverCacheTime.value = new Date(cacheTs);
-        console.log(
-          "内容来自服务器缓存，缓存创建时间:",
-          serverCacheTime.value.toLocaleString()
-        );
       }
       activeCache.value = "server";
-      console.log("已设置缓存状态为: server");
     } else {
-      // 获取了新内容
-      console.log("获取了新内容");
       lastUpdateTime.value = new Date();
-      serverCacheTime.value = new Date(); // 更新服务器缓存时间为当前时间
+      serverCacheTime.value = new Date();
       activeCache.value = "fresh";
-      console.log("已设置缓存状态为: fresh");
     }
 
     const data = await response.json();
-    console.log(`获取的RSS数据: ${Array.isArray(data) ? data.length : 0}个源`);
-
-    // 验证数据是否为数组
-    if (!Array.isArray(data)) {
-      console.error("API返回的数据不是数组:", data);
-      throw new Error("无效的数据格式");
-    }
-
     feeds.value = data;
 
-    // 只有在首次加载或强制刷新时重置倒计时
-    if (isFirstLoad || forceRefresh) {
-      countdown.value = RSS_CONFIG.refresh?.interval || 120;
-      persistCountdown();
-    }
-
-    // 如果是首次加载且成功获取了数据，立即设置为非首次加载状态
+    // 更新倒计时
     if (isFirstLoad) {
       console.log("首次加载成功，设置为非首次加载状态");
       isFirstLoad = false;

@@ -16,11 +16,12 @@ export async function onRequest(context) {
     // 获取请求参数
     const url = new URL(context.request.url);
     const forceRefresh = url.searchParams.get("forceRefresh") === "true";
+    const isFirstLoad = url.searchParams.get("isFirstLoad") === "true";
 
     // 从环境变量获取缓存时间（秒），默认为1800秒（30分钟）
     const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "1800");
     console.log(
-      `[${startTime}] API请求: forceRefresh=${forceRefresh}, cacheMaxAge=${cacheMaxAge}秒, 路径=${
+      `[${startTime}] API请求: forceRefresh=${forceRefresh}, isFirstLoad=${isFirstLoad}, cacheMaxAge=${cacheMaxAge}秒, 路径=${
         url.pathname
       }, 完整URL=${url.toString()}, 域名=${url.hostname}`
     );
@@ -30,10 +31,11 @@ export async function onRequest(context) {
 
     console.log(`[${startTime}] 使用固定缓存键: ${debug.cacheKey}`);
 
-    // 缓存处理 - 只有在非强制刷新时尝试使用缓存
+    // 缓存处理 - 只有在强制刷新时跳过缓存
     let cachedResponse = null;
     let cachedBody = null;
 
+    // 首次加载或非强制刷新时尝试使用缓存
     if (!forceRefresh) {
       try {
         console.log(`[${startTime}] 开始尝试从缓存获取数据...`);
