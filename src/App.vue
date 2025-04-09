@@ -29,11 +29,11 @@
           class="flex justify-center flex-1 text-base text-gray-600 status-text gap-8"
         >
           <FeedCountdown
-            :refresh-countdown="countdown.value"
+            :refresh-countdown="countdown"
             :active-cache="activeCache"
-            :last-update-time="lastUpdateTime"
+            :last-update-time="formatLastUpdate"
             :server-cache-time="serverCacheTime"
-            @refresh="fetchData"
+            @refresh="handleRefreshClick"
           />
         </div>
         <div class="flex items-center gap-4 flex-1 justify-end">
@@ -90,7 +90,7 @@
           </div>
 
           <button
-            @click="fetchData"
+            @click="handleRefreshClick"
             class="px-3 py-1.5 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-sm"
             :disabled="loading"
           >
@@ -119,7 +119,7 @@
           </ul>
         </div>
         <button
-          @click="fetchData"
+          @click="handleRefreshClick"
           class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
         >
           <span v-if="loading">重新加载中...</span>
@@ -128,7 +128,7 @@
       </div>
 
       <div
-        v-else-if="loading && isFirstLoad.value"
+        v-else-if="loading && isFirstLoad"
         class="flex flex-col items-center justify-center h-full py-16"
       >
         <div
@@ -193,7 +193,7 @@ const selectedFont = ref("");
 const lastUpdateTime = ref(new Date());
 const serverCacheTime = ref(null);
 const activeCache = ref("none");
-const isFirstLoad = ref(true);
+let isFirstLoad = true;
 let persistedCountdown = null;
 let refreshTimer = null;
 let countdownTimer = null;
@@ -345,99 +345,91 @@ const updateCountdown = () => {
   if (countdown.value <= 0) {
     countdown.value = RSS_CONFIG.refresh?.interval || 300;
     // 倒计时结束时刷新数据
-    fetchData(true);
+    fetchFeeds(true);
   }
 };
 
-const fetchData = async (forceRefresh = false) => {
+// 获取RSS数据
+const fetchFeeds = async (forceRefresh = false) => {
+  if (loading.value) return;
+
+  loading.value = true;
+  error.value = null;
+
   try {
-    loading.value = true;
-    error.value = false;
-    
-    // 如果强制刷新，调用更新缓存的API
-    if (forceRefresh) {
-      try {
-        const updateResponse = await fetch('/api/update-cache', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (!updateResponse.ok) {
-          console.error('刷新缓存失败:', updateResponse.status);
-        } else {
-          console.log('缓存已成功刷新');
-        }
-      } catch (err) {
-        console.error('刷新缓存请求失败:', err);
-      }
-    }
-    
-    const response = await fetch('/api/feeds');
-    const cacheStatus = response.headers.get('X-Cache') || 'none';
-    const cacheTimestamp = response.headers.get('X-Cache-Timestamp');
-    const responseData = await response.json();
-    
-    // 检查新的响应格式
-    let feedsData = [];
-    let cacheMetadata = null;
-    
-    if (responseData && typeof responseData === 'object' && Array.isArray(responseData.data)) {
-      // 新的响应格式: { data: [...feeds], cache: {...} }
-      feedsData = responseData.data;
-      cacheMetadata = responseData.cache;
-      console.log('使用新的响应格式，包含缓存元数据:', cacheMetadata);
-    } else if (Array.isArray(responseData)) {
-      // 旧的响应格式: 直接返回数组
-      feedsData = responseData;
-      console.log('使用旧的响应格式，无缓存元数据');
-    } else {
-      console.error('未知的响应格式:', responseData);
-      feedsData = [];
-    }
-    
-    // 确定缓存状态
-    if (cacheMetadata && cacheMetadata.status) {
-      // 使用响应体中的缓存状态
-      activeCache.value = cacheMetadata.status === 'hit' ? 'server' : 'fresh';
-      if (cacheMetadata.timestamp) {
-        serverCacheTime.value = new Date(cacheMetadata.timestamp);
-      }
-    } else if (cacheStatus === 'HIT') {
-      // 使用响应头中的缓存状态
-      activeCache.value = 'server';
-      if (cacheTimestamp) {
-        serverCacheTime.value = new Date(parseInt(cacheTimestamp));
-      }
-    } else {
-      activeCache.value = 'fresh';
-      serverCacheTime.value = null;
-    }
-    
-    // 格式化当前时间，替换之前错误的format函数调用
-    const now = new Date();
-    lastUpdateTime.value = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`;
-    
-    feeds.value = feedsData;
-    loading.value = false;
-    isFirstLoad.value = false;
-    startCountdown();
-    console.log('数据获取成功，缓存状态:', activeCache.value);
-  } catch (err) {
-    console.error('获取数据失败:', err);
-    error.value = true;
-    loading.value = false;
-  }
-};
+    console.log(
+      `开始获取RSS内容，请求参数强制刷新: ${forceRefresh}, 首次加载: ${isFirstLoad}`
+    );
 
-// 添加 startCountdown 函数
-const startCountdown = () => {
-  // 重置倒计时
-  countdown.value = RSS_CONFIG.refresh?.interval || 300;
-  persistCountdown();
-  
-  // 清除旧的计时器(如果存在)
-  if (refreshTimer) {
-    clearInterval(refreshTimer);
+    // 构建请求URL - 使用完全固定的基础路径，确保与服务器端缓存键匹配
+    // 只在强制刷新时添加forceRefresh参数
+    const url = `/api/feeds${forceRefresh ? "?forceRefresh=true" : ""}${
+      isFirstLoad ? (forceRefresh ? "&" : "?") + "isFirstLoad=true" : ""
+    }`;
+    console.log(`发送请求到: ${url}`);
+
+    // 设置请求头
+    const headers = {
+      Accept: "application/json",
+    };
+
+    // 只有在强制刷新时才添加no-cache头
+    if (forceRefresh) {
+      console.log("添加no-cache头，强制获取新数据");
+      headers["Cache-Control"] = "no-cache";
+      headers["Pragma"] = "no-cache";
+    } else {
+      console.log("尝试使用服务器缓存");
+    }
+
+    // 发送请求
+    console.log(`正在请求: ${url}, 请求头:`, headers);
+    const response = await fetch(url, { headers });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // 检查缓存状态
+    const cacheStatus = response.headers.get("X-Cache");
+    const isFromServerCache = cacheStatus === "HIT";
+
+    if (isFromServerCache) {
+      const cacheTsStr = response.headers.get("X-Cache-Timestamp");
+      if (cacheTsStr) {
+        const cacheTs = parseInt(cacheTsStr);
+        serverCacheTime.value = new Date(cacheTs);
+      }
+      activeCache.value = "server";
+    } else {
+      lastUpdateTime.value = new Date();
+      serverCacheTime.value = new Date();
+      activeCache.value = "fresh";
+    }
+
+    const data = await response.json();
+    feeds.value = data;
+
+    // 更新倒计时
+    if (isFirstLoad) {
+      console.log("首次加载成功，设置为非首次加载状态");
+      isFirstLoad = false;
+    }
+  } catch (err) {
+    console.error("获取RSS数据时出错:", err);
+
+    // 如果是首次加载失败，显示更友好的错误信息
+    if (isFirstLoad) {
+      error.value =
+        '获取RSS数据失败，请刷新页面重试，或点击右上角的"立即刷新"按钮。';
+    } else {
+      error.value = `获取数据失败: ${err.message}`;
+    }
+
+    // 即使请求失败，也标记为非首次加载，这样用户可以尝试点击刷新按钮
+    isFirstLoad = false;
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -452,11 +444,16 @@ onMounted(async () => {
 
   // 首次加载时，尽量使用缓存（不强制刷新）
   console.log("页面首次加载，尝试使用服务器缓存");
-  await fetchData(false);
+  await fetchFeeds(false);
 
   // 设置倒计时更新
   countdownTimer = setInterval(updateCountdown, 1000);
 });
+
+// 修改刷新按钮点击函数，使用强制刷新
+const handleRefreshClick = () => {
+  fetchFeeds(true); // 强制刷新，不使用缓存
+};
 
 onUnmounted(() => {
   if (countdownTimer) {

@@ -363,90 +363,52 @@ export async function onRequest(context) {
     
     console.log(`处理 RSS API 请求: forceRefresh=${forceRefresh}, cacheMaxAge=${ttl}秒`);
     
-    // 从缓存获取数据
-    const result = await getFromCache(context.env);
-    
-    // 准备响应头
-    const headers = {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": "public, max-age=120" // 允许客户端缓存120秒
-    };
-    
-    if (result.cacheHit) {
-      // 缓存命中
-      console.log(`命中缓存, 缓存时间戳: ${result.metadata.timestamp || 'unknown'}`);
+    // 如果不是强制刷新，尝试从缓存获取数据
+    if (!forceRefresh) {
+      const cacheResult = await getFromCache(context.env);
       
-      // 添加缓存相关的响应头
-      headers["X-Cache"] = "HIT";
-      headers["X-Cache-Status"] = "hit";
-      headers["X-Cache-Timestamp"] = result.metadata.timestamp || Date.now();
-      
-      // 构建响应体，包含数据和缓存元数据
-      const responseData = {
-        data: result.data,
-        cache: {
-          status: 'hit',
-          timestamp: result.metadata.timestamp || Date.now(),
-          lastUpdate: result.metadata.lastUpdate || new Date().toISOString()
-        }
-      };
-      
-      return new Response(JSON.stringify(responseData), { headers });
-    } else {
-      // 缓存未命中，尝试获取新数据
-      try {
-        console.log("缓存未命中或强制刷新，获取新数据");
+      // 如果缓存命中
+      if (cacheResult.cacheHit) {
+        console.log("缓存命中，使用缓存数据");
         
-        // 添加缓存未命中相关的响应头
-        headers["X-Cache"] = "MISS";
-        headers["X-Cache-Status"] = "miss";
-        headers["X-Cache-Timestamp"] = Date.now();
-        
-        const data = await fetchRSSData();
-        
-        // 保存到缓存
-        const cached = await saveToCache(context.env, data, ttl);
-        
-        if (cached) {
-          console.log(`数据已成功缓存, 过期时间: ${ttl}秒`);
-        } else {
-          console.log("数据缓存失败");
+        // 如果缓存即将过期，触发异步更新
+        if (shouldUpdateCache(cacheResult, ttl)) {
+          console.log("缓存即将过期，触发异步更新");
+          // 使用调度器在后台运行异步更新
+          context.waitUntil(asyncUpdateCache(context.env));
         }
         
-        // 构建响应体，包含数据和缓存元数据
-        const responseData = {
-          data: data,
-          cache: {
-            status: 'miss',
-            timestamp: Date.now(),
-            lastUpdate: new Date().toISOString()
-          }
-        };
+        // 返回缓存数据
+        const headers = new Headers();
+        headers.set("Content-Type", "application/json");
+        headers.set("X-Cache", "HIT");
+        headers.set("Access-Control-Allow-Origin", "*");
+        headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+        headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
         
-        return new Response(JSON.stringify(responseData), { headers });
-      } catch (error) {
-        console.error("获取RSS数据失败:", error);
-        
-        // 构建错误响应
-        headers["X-Cache"] = "ERROR";
-        headers["X-Cache-Status"] = "error";
-        
-        return new Response(
-          JSON.stringify({
-            error: `获取RSS数据失败: ${error.message}`,
-            cache: {
-              status: 'error',
-              timestamp: Date.now()
-            }
-          }),
-          {
-            status: 500,
-            headers
-          }
-        );
+        return new Response(JSON.stringify(cacheResult.data), { headers });
       }
+      
+      console.log("缓存未命中，获取新数据");
+    } else {
+      console.log("强制刷新，跳过缓存检查");
     }
+    
+    // 获取新数据
+    const data = await fetchRSSData();
+    
+    // 返回数据并更新缓存
+    await saveToCache(context.env, data, ttl);
+    
+    // 设置响应头
+    const headers = new Headers();
+    headers.set("Content-Type", "application/json");
+    headers.set("X-Cache", "MISS");
+    headers.set("Access-Control-Allow-Origin", "*");
+    headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+    headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
+    
+    return new Response(JSON.stringify(data), { headers });
   } catch (error) {
     console.error("处理 RSS 请求失败:", error);
 

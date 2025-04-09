@@ -9,30 +9,17 @@
             <div
               v-if="activeCache === 'server'"
               class="w-2 h-2 bg-purple-500 rounded-full mr-1 animate-pulse"
-              title="使用服务器缓存"
             ></div>
-            <div v-else class="w-2 h-2 mr-1"></div>
             <span class="mr-2">服务器缓存: {{ serverCacheTimeFormatted }}</span>
           </div>
           <div class="cache-item inline-flex items-center">
             <div
               v-if="activeCache === 'fresh'"
               class="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"
-              title="最新数据"
             ></div>
-            <div v-else class="w-2 h-2 mr-1"></div>
             <span class="mr-2">最后自动刷新: {{ lastUpdateTime }}</span>
           </div>
           <span>{{ countdownText }}</span>
-          <button 
-            @click="handleRefresh" 
-            class="ml-2 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
-            title="立即刷新"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </button>
         </div>
       </template>
       <span v-else>刷新中...</span>
@@ -79,11 +66,6 @@ const formatTime = (date) => {
 const serverCacheTimeFormatted = computed(() => {
   return formatTime(props.serverCacheTime);
 });
-
-// 处理刷新按钮点击
-const handleRefresh = () => {
-  emit('refresh', true); // 传递true表示强制刷新
-};
 </script>
 
 <style scoped>
