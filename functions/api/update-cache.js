@@ -15,6 +15,8 @@ export async function onRequest(context) {
     const clearCache = url.searchParams.get("clear") === "true";
     // 是否初始化缓存（首次访问时使用）
     const initCache = url.searchParams.get("init") === "true";
+    // 检查是否为系统自动检测的首次访问
+    const isFirstVisit = url.searchParams.get("firstVisit") === "true";
 
     if (accessKey !== secretKey) {
       console.error("非法访问，密钥不匹配");
@@ -32,7 +34,12 @@ export async function onRequest(context) {
       );
     }
 
-    console.log(`开始${clearCache ? '清除并' : ''}${initCache ? '初始化' : '更新'} RSS 缓存...`);
+    // 初始化操作类型描述
+    const operationType = isFirstVisit ? '首次访问初始化' : 
+                         (initCache ? '手动初始化' : 
+                         (clearCache ? '清除并更新' : '更新'));
+
+    console.log(`开始${operationType} RSS 缓存...`);
     
     // 从环境变量获取缓存时间（秒）
     const ttl = parseInt(context.env.CACHE_MAX_AGE || String(DEFAULT_CACHE_TTL));
@@ -92,7 +99,9 @@ export async function onRequest(context) {
     const metadata = {
       timestamp: Date.now(),
       lastUpdate: new Date().toISOString(),
-      updateMethod: initCache ? "initial" : "manual",
+      updateMethod: isFirstVisit ? "first_visit_auto" : 
+                   (initCache ? "manual_init" : 
+                   (clearCache ? "clear_update" : "manual")),
       updateDuration: Date.now() - startTime,
       nodeseekStatus: {
         found: nodeseekFound,
@@ -105,13 +114,13 @@ export async function onRequest(context) {
       metadata: metadata
     });
 
-    console.log(`缓存成功${clearCache ? '清除并' : ''}${initCache ? '初始化' : '更新'}，过期时间: ${ttl}秒`);
+    console.log(`缓存成功${operationType}，过期时间: ${ttl}秒`);
 
     // 返回成功信息
     return new Response(
       JSON.stringify({
         success: true,
-        message: `RSS 缓存已${clearCache ? '清除并' : ''}${initCache ? '初始化' : '更新'}`,
+        message: `RSS 缓存已${operationType}`,
         timestamp: Date.now(),
         feeds: data.length,
         nodeseekStatus: {

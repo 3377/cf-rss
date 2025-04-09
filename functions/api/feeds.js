@@ -363,6 +363,7 @@ export async function onRequest(context) {
     let cacheStatus = "无";
     let data = null;
     let metadata = null;
+    let isFirstVisit = false;
 
     if (!forceRefresh) {
       const cached = await context.env.RSS_KV.getWithMetadata(CACHE_KEY);
@@ -375,18 +376,25 @@ export async function onRequest(context) {
           console.error("缓存数据解析失败:", e);
           cacheStatus = "无效";
         }
+      } else {
+        // 缓存不存在，这是首次访问
+        isFirstVisit = true;
+        console.log("检测到首次访问，需要初始化缓存");
       }
     }
 
-    // 如果缓存无效或强制刷新，获取新数据
-    if (!data || forceRefresh || initCache) {
-      console.log(`${initCache ? '初始化' : '更新'}缓存中...`);
+    // 如果缓存无效、强制刷新或首次访问，获取新数据
+    if (!data || forceRefresh || initCache || isFirstVisit) {
+      console.log(`${isFirstVisit ? '首次访问，初始化' : (initCache ? '手动初始化' : '更新')}缓存中...`);
       
       // 调用更新缓存接口
       const updateUrl = new URL("/api/update-cache", url.origin);
       updateUrl.searchParams.set("key", context.env.UPDATE_KEY || "35794406");
-      if (initCache) {
+      if (initCache || isFirstVisit) {
         updateUrl.searchParams.set("init", "true");
+      }
+      if (isFirstVisit) {
+        updateUrl.searchParams.set("firstVisit", "true");
       }
 
       const updateResponse = await fetch(updateUrl.toString());
@@ -404,7 +412,8 @@ export async function onRequest(context) {
       if (cached.value) {
         data = JSON.parse(cached.value);
         metadata = cached.metadata;
-        cacheStatus = initCache ? "初始化" : "更新";
+        // 关键改动：首次访问后将缓存状态设为"命中"，而非"初始化"
+        cacheStatus = isFirstVisit ? "命中" : (initCache ? "初始化" : "更新");
       } else {
         throw new Error("更新后未能获取到缓存数据");
       }
@@ -419,11 +428,12 @@ export async function onRequest(context) {
         "X-Cache-Last-Update": metadata?.lastUpdate || new Date().toISOString(),
         "X-Cache-Update-Method": metadata?.updateMethod || "unknown",
         "X-Cache-Update-Duration": metadata?.updateDuration ? `${metadata.updateDuration}ms` : "unknown",
+        "X-Cache-First-Visit": isFirstVisit ? "true" : "false",
         "Access-Control-Allow-Origin": "*"
       }
     });
 
-    console.log(`请求处理完成，耗时: ${Date.now() - startTime}ms，缓存状态: ${cacheStatus}`);
+    console.log(`请求处理完成，耗时: ${Date.now() - startTime}ms，缓存状态: ${cacheStatus}${isFirstVisit ? '（首次访问）' : ''}`);
     return response;
 
   } catch (error) {

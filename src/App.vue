@@ -363,21 +363,9 @@ const fetchFeeds = async (forceRefresh = false) => {
 
     // 构建请求URL - 使用完全固定的基础路径，确保与服务器端缓存键匹配
     // 只在强制刷新时添加forceRefresh参数
-    let url = `/api/feeds`;
-    let params = [];
-    
-    if (forceRefresh) {
-      params.push("forceRefresh=true");
-    }
-    
-    if (isFirstLoad) {
-      params.push("init=true");
-    }
-    
-    if (params.length > 0) {
-      url += `?${params.join("&")}`;
-    }
-    
+    const url = `/api/feeds${forceRefresh ? "?forceRefresh=true" : ""}${
+      isFirstLoad ? (forceRefresh ? "&" : "?") + "isFirstLoad=true" : ""
+    }`;
     console.log(`发送请求到: ${url}`);
 
     // 设置请求头
@@ -403,32 +391,20 @@ const fetchFeeds = async (forceRefresh = false) => {
     }
 
     // 检查缓存状态
-    const cacheStatus = response.headers.get("X-Cache-Status");
-    console.log(`缓存状态: ${cacheStatus}`);
-    
-    // 处理缓存状态和显示
-    if (cacheStatus === "命中") {
-      serverCacheTime.value = new Date();
+    const cacheStatus = response.headers.get("X-Cache");
+    const isFromServerCache = cacheStatus === "HIT";
+
+    if (isFromServerCache) {
+      const cacheTsStr = response.headers.get("X-Cache-Timestamp");
+      if (cacheTsStr) {
+        const cacheTs = parseInt(cacheTsStr);
+        serverCacheTime.value = new Date(cacheTs);
+      }
       activeCache.value = "server";
-    } else if (cacheStatus === "初始化") {
-      lastUpdateTime.value = new Date();
-      serverCacheTime.value = null;
-      activeCache.value = "init";
-    } else if (cacheStatus === "更新") {
-      lastUpdateTime.value = new Date();
-      serverCacheTime.value = null;
-      activeCache.value = "fresh";
     } else {
-      // 其他状态("无"或"无效")
       lastUpdateTime.value = new Date();
-      serverCacheTime.value = null;
+      serverCacheTime.value = new Date();
       activeCache.value = "fresh";
-    }
-    
-    // 获取最后更新时间
-    const lastUpdateHeader = response.headers.get("X-Cache-Last-Update");
-    if (lastUpdateHeader) {
-      lastUpdateTime.value = new Date(lastUpdateHeader);
     }
 
     const data = await response.json();
