@@ -1,408 +1,262 @@
 import { RSS_CONFIG } from "../../src/config/rss.config.js";
 
-export async function onRequest(context) {
-  const startTime = Date.now();
-  let debug = {
-    startTime,
-    cacheFound: false,
-    cacheUsed: false,
-    errors: [],
-    timing: {},
-    cacheKey: "https://fixed-cache-key/api/feeds",
-    requestUrl: context.request.url,
-  };
+// KV 缓存键名
+const CACHE_KEY = "RSS_FEEDS_DATA";
 
+// 缓存有效期（秒）- 2小时
+const DEFAULT_CACHE_TTL = 7200;
+
+/**
+ * 从 KV 中获取缓存数据
+ * @param {Object} env Cloudflare Workers 环境
+ * @returns {Promise<Object|null>} 缓存数据或 null
+ */
+async function getFromCache(env) {
   try {
-    // 获取请求参数
-    const url = new URL(context.request.url);
-    const forceRefresh = url.searchParams.get("forceRefresh") === "true";
-    const isFirstLoad = url.searchParams.get("isFirstLoad") === "true";
-
-    // 从环境变量获取缓存时间（秒），默认为1800秒（30分钟）
-    const cacheMaxAge = parseInt(context.env.CACHE_MAX_AGE || "1800");
-    console.log(
-      `[${startTime}] API请求: forceRefresh=${forceRefresh}, isFirstLoad=${isFirstLoad}, cacheMaxAge=${cacheMaxAge}秒, 路径=${
-        url.pathname
-      }, 完整URL=${url.toString()}, 域名=${url.hostname}`
-    );
-
-    // 创建固定的缓存键 - 使用最简单的形式避免任何不一致
-    const cacheKey = new Request(debug.cacheKey);
-
-    console.log(`[${startTime}] 使用固定缓存键: ${debug.cacheKey}`);
-
-    // 缓存处理 - 只有在强制刷新时跳过缓存
-    let cachedResponse = null;
-    let cachedBody = null;
-
-    // 首次加载或非强制刷新时尝试使用缓存
-    if (!forceRefresh) {
-      try {
-        console.log(`[${startTime}] 开始尝试从缓存获取数据...`);
-        const cacheStartTime = Date.now();
-        const cache = caches.default;
-
-        // 尝试从缓存中获取数据 - 使用固定缓存键
-        try {
-          cachedResponse = await cache.match(cacheKey);
-          debug.timing.cacheMatch = Date.now() - cacheStartTime;
-          debug.cacheFound = !!cachedResponse;
-
-          console.log(
-            `[${startTime}] 缓存查询完成，耗时: ${
-              debug.timing.cacheMatch
-            }ms, 是否找到缓存: ${debug.cacheFound ? "是" : "否"}, 域名: ${
-              url.hostname
-            }`
-          );
-        } catch (matchError) {
-          console.error(`[${startTime}] 缓存查询出错:`, matchError);
-          debug.errors.push({
-            type: "cache_match",
-            message: matchError.message,
-          });
-        }
-
-        // 如果找到了缓存响应，尝试读取内容
-        if (cachedResponse) {
-          try {
-            console.log(`[${startTime}] 找到缓存数据，准备读取内容...`);
-            const bodyReadStart = Date.now();
-
-            // 克隆响应以确保可以多次读取
-            const clonedResponse = cachedResponse.clone();
-            cachedBody = await clonedResponse.text();
-
-            debug.timing.cacheRead = Date.now() - bodyReadStart;
-            console.log(
-              `[${startTime}] 缓存内容读取成功，长度:${cachedBody.length}，耗时:${debug.timing.cacheRead}ms`
-            );
-
-            // 验证缓存内容是有效的JSON
-            try {
-              const parsedData = JSON.parse(cachedBody);
-              if (Array.isArray(parsedData) && parsedData.length > 0) {
-                debug.cacheUsed = true;
-                console.log(
-                  `[${startTime}] 缓存内容验证成功，包含${parsedData.length}个源`
-                );
-              } else {
-                console.error(`[${startTime}] 缓存内容不是有效的数组或为空`);
-                cachedBody = null; // 标记为无效缓存
-                debug.errors.push({
-                  type: "cache_invalid",
-                  message: "缓存内容不是有效的数组或为空",
-                });
-              }
-            } catch (parseError) {
-              console.error(
-                `[${startTime}] 缓存内容解析为JSON失败:`,
-                parseError
-              );
-              cachedBody = null; // 标记为无效缓存
-              debug.errors.push({
-                type: "cache_parse",
-                message: parseError.message,
-              });
-            }
-          } catch (readError) {
-            console.error(`[${startTime}] 读取缓存内容失败:`, readError);
-            cachedBody = null;
-            debug.errors.push({
-              type: "cache_read",
-              message: readError.message,
-            });
-          }
-        } else {
-          console.log(`[${startTime}] 未找到匹配的缓存数据，需要从源站获取`);
-        }
-
-        // 如果成功读取和验证了缓存内容，直接返回
-        if (cachedBody) {
-          console.log(
-            `[${startTime}] 使用缓存数据，跳过源站获取，域名: ${url.hostname}`
-          );
-
-          // 创建新的响应对象，设置所有必要的头
-          const headers = new Headers();
-          headers.set("Content-Type", "application/json");
-          headers.set("X-Cache", "HIT");
-          headers.set(
-            "X-Cache-Timestamp",
-            cachedResponse.headers.get("X-Cache-Timestamp") ||
-              Date.now().toString()
-          );
-          headers.set("Access-Control-Allow-Origin", "*");
-          headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-          headers.set(
-            "Cache-Control",
-            `public, max-age=${cacheMaxAge}, s-maxage=${cacheMaxAge}`
-          );
-          headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
-          headers.set(
-            "X-Debug-Info",
-            JSON.stringify({
-              ...debug,
-              cacheHit: true,
-              hostname: url.hostname,
-              timestamp: Date.now(),
-            })
-          );
-
-          console.log(
-            `[${startTime}] 成功返回缓存数据，X-Cache: HIT，总耗时:${
-              Date.now() - startTime
-            }ms，域名: ${url.hostname}`
-          );
-          return new Response(cachedBody, { headers });
-        } else {
-          console.log(`[${startTime}] 无法使用缓存数据，将获取新数据`);
-        }
-      } catch (cacheError) {
-        console.error(`[${startTime}] 缓存处理过程中出错:`, cacheError);
-        debug.errors.push({
-          type: "cache_process",
-          message: cacheError.message,
-        });
-      }
-    } else {
-      console.log(`[${startTime}] 强制刷新，跳过缓存，域名: ${url.hostname}`);
+    // 尝试读取缓存及其元数据
+    const result = await env.RSS_KV.getWithMetadata(CACHE_KEY, { type: "json" });
+    
+    if (result && result.value && Array.isArray(result.value) && result.value.length > 0) {
+      const metadata = result.metadata || {};
+      return {
+        data: result.value,
+        metadata: metadata,
+        cacheHit: true
+      };
     }
+  } catch (error) {
+    console.error("读取 KV 缓存失败:", error);
+  }
+  
+  return { cacheHit: false };
+}
 
-    // 如果无法使用缓存，则获取新数据
-    console.log(`[${startTime}] 开始获取新的RSS数据...`);
-    const fetchStartTime = Date.now();
-    debug.timing.fetchStart = fetchStartTime - startTime;
+/**
+ * 将数据保存到 KV 缓存
+ * @param {Object} env Cloudflare Workers 环境
+ * @param {Array} data 要缓存的数据
+ * @param {number} ttl 缓存过期时间（秒）
+ * @returns {Promise<boolean>} 缓存操作是否成功
+ */
+async function saveToCache(env, data, ttl = DEFAULT_CACHE_TTL) {
+  try {
+    // 创建元数据对象，包含时间戳
+    const metadata = {
+      timestamp: Date.now(),
+      lastUpdate: new Date().toISOString()
+    };
+    
+    // 将数据和元数据保存到 KV
+    await env.RSS_KV.put(CACHE_KEY, JSON.stringify(data), {
+      expirationTtl: ttl,
+      metadata: metadata
+    });
+    
+    console.log(`数据已缓存，过期时间: ${ttl}秒`);
+    return true;
+  } catch (error) {
+    console.error("保存数据到 KV 缓存失败:", error);
+    return false;
+  }
+}
 
+/**
+ * 获取 RSS 源数据
+ * @returns {Promise<Array>} RSS 源数据
+ */
+async function fetchRSSData() {
+  console.log("开始获取新的 RSS 数据...");
+  
+  try {
     const feedResults = await Promise.all(
       RSS_CONFIG.feeds.map(async (source) => {
-        console.log(`[${startTime}] 开始获取RSS源 ${source.title}...`);
-        const sourceFetchStart = Date.now();
         try {
+          console.log(`获取 RSS 源: ${source.title}`);
           const response = await fetch(source.url);
           const xml = await response.text();
-          console.log(
-            `[${startTime}] 成功获取 ${source.title}，耗时:${
-              Date.now() - sourceFetchStart
-            }ms`
-          );
 
-          // 解析XML
+          // 解析 XML
           const items = [];
           const parser = new DOMParser();
           const doc = parser.parseFromString(xml, "text/xml");
 
-          // 尝试识别RSS格式
+          // 尝试识别 RSS 格式
           const rssItems = doc.querySelectorAll("item");
           const atomEntries = doc.querySelectorAll("entry");
 
           if (rssItems.length > 0) {
-            // 标准RSS格式
-            for (
-              let i = 0;
-              i <
-              Math.min(rssItems.length, RSS_CONFIG.display?.itemsPerFeed || 10);
-              i++
-            ) {
-              const item = rssItems[i];
-              const title = getTagContent(xml, item.querySelector("title"));
-              const link = getTagContent(xml, item.querySelector("link"));
-              const pubDate = getTagContent(xml, item.querySelector("pubDate"));
-
-              if (title && link) {
-                items.push({
-                  title,
-                  link,
-                  pubDate,
-                });
-              }
-            }
+            // 标准 RSS 格式解析
+            Array.from(rssItems).forEach((item) => {
+              const title = item.querySelector("title")?.textContent || "";
+              const link = item.querySelector("link")?.textContent || "";
+              const pubDate = item.querySelector("pubDate")?.textContent || "";
+              const description = item.querySelector("description")?.textContent || "";
+              
+              items.push({
+                title: title.trim(),
+                link: link.trim(),
+                pubDate: pubDate.trim(),
+                description: description.trim()
+              });
+            });
           } else if (atomEntries.length > 0) {
-            // Atom格式
-            for (
-              let i = 0;
-              i <
-              Math.min(
-                atomEntries.length,
-                RSS_CONFIG.display?.itemsPerFeed || 10
-              );
-              i++
-            ) {
-              const entry = atomEntries[i];
-              const title = getTagContent(xml, entry.querySelector("title"));
-              const linkElem = entry.querySelector("link");
-              const link = linkElem ? linkElem.getAttribute("href") : null;
-              const pubDate =
-                getTagContent(xml, entry.querySelector("published")) ||
-                getTagContent(xml, entry.querySelector("updated"));
-
-              if (title && link) {
-                items.push({
-                  title,
-                  link,
-                  pubDate,
-                });
+            // Atom 格式解析
+            Array.from(atomEntries).forEach((entry) => {
+              let link = "";
+              const linkElement = entry.querySelector("link");
+              
+              if (linkElement) {
+                link = linkElement.getAttribute("href") || linkElement.textContent || "";
               }
-            }
+              
+              const title = entry.querySelector("title")?.textContent || "";
+              const pubDate = entry.querySelector("published,updated")?.textContent || "";
+              const summary = entry.querySelector("summary,content")?.textContent || "";
+              
+              items.push({
+                title: title.trim(),
+                link: link.trim(),
+                pubDate: pubDate.trim(),
+                description: summary.trim()
+              });
+            });
           }
 
           return {
+            source: source.id,
             title: source.title,
+            link: source.link || "",
             items: items,
+            totalItems: items.length,
+            lastUpdate: new Date().toISOString()
           };
         } catch (error) {
-          console.error(
-            `[${startTime}] 获取RSS源 ${source.title} 失败:`,
-            error
-          );
+          console.error(`获取 RSS 源 ${source.title} 失败:`, error);
           return {
+            source: source.id,
             title: source.title,
+            link: source.link || "",
             items: [],
             error: error.message,
+            lastUpdate: new Date().toISOString()
           };
         }
       })
     );
 
-    debug.timing.fetchComplete = Date.now() - fetchStartTime;
-    console.log(
-      `[${startTime}] 所有RSS源获取完成，总耗时:${debug.timing.fetchComplete}ms`
-    );
-
-    // 准备新的响应
-    const timestamp = Date.now().toString();
-    const responseBody = JSON.stringify(feedResults);
-
-    // 获取北京时间
-    const getBeijingTime = () => {
-      const now = new Date();
-      const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
-      return beijingTime.toISOString().replace("T", " ").replace("Z", "");
-    };
-
-    // 格式化时间戳为北京时间
-    const formatTimestamp = (timestamp) => {
-      if (!timestamp) return null;
-      const date = new Date(parseInt(timestamp));
-      const beijingDate = new Date(date.getTime() + 8 * 60 * 60 * 1000);
-      return beijingDate.toISOString().replace("T", " ").replace("Z", "");
-    };
-
-    // 创建响应，添加详细的调试信息
-    const responseHeaders = {
-      "Content-Type": "application/json",
-      "X-Cache": "MISS",
-      "X-Cache-Timestamp": timestamp,
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Cache-Control": `public, max-age=${cacheMaxAge}, s-maxage=${cacheMaxAge}`,
-      "X-Response-Time": `${Date.now() - startTime}ms`,
-      "X-Debug-Info": JSON.stringify({
-        ...debug,
-        cacheHit: false,
-        hostname: url.hostname,
-        timestamp: Date.now(),
-        // 时间信息
-        timestamps: {
-          start: formatTimestamp(startTime),
-          end: getBeijingTime(),
-          duration: `${(Date.now() - startTime) / 1000}秒`,
-          cacheTimestamp: formatTimestamp(timestamp),
-        },
-        // 性能信息
-        performance: {
-          totalTime: `${(Date.now() - startTime) / 1000}秒`,
-          cacheTime: debug.timing.cacheMatch
-            ? `${debug.timing.cacheMatch / 1000}秒`
-            : null,
-          fetchTime: debug.timing.fetchComplete
-            ? `${debug.timing.fetchComplete / 1000}秒`
-            : null,
-        },
-        // 缓存信息
-        cacheInfo: {
-          found: debug.cacheFound,
-          used: debug.cacheUsed,
-          maxAge: cacheMaxAge,
-        },
-      }),
-    };
-
-    const response = new Response(responseBody, {
-      headers: responseHeaders,
-    });
-
-    // 只有在非强制刷新时才缓存结果
-    if (!forceRefresh) {
-      try {
-        const cache = caches.default;
-        const cacheableResponse = new Response(responseBody, {
-          headers: new Headers(responseHeaders),
-        });
-
-        // 使用固定缓存键存储
-        await cache.put(cacheKey, cacheableResponse.clone());
-        console.log(
-          `[${startTime}] 成功更新缓存，使用固定缓存键: ${debug.cacheKey}`
-        );
-      } catch (cacheError) {
-        console.error(`[${startTime}] 缓存更新失败:`, cacheError);
-        debug.errors.push({
-          type: "cache_update",
-          message: cacheError.message,
-        });
-      }
-    } else {
-      responseHeaders.set(
-        "Cache-Control",
-        "no-store, no-cache, must-revalidate"
-      );
-      console.log(`[${startTime}] 强制刷新模式，不更新缓存`);
-    }
-
-    console.log(
-      `[${startTime}] 成功返回新数据，X-Cache: MISS，总耗时:${
-        Date.now() - startTime
-      }ms，域名: ${url.hostname}`
-    );
-    return response;
+    console.log(`所有 RSS 源获取完成，共 ${feedResults.length} 个源`);
+    return feedResults;
   } catch (error) {
-    console.error(`[${startTime}] 处理请求时出错:`, error);
+    console.error("获取 RSS 数据失败:", error);
+    throw error;
+  }
+}
 
+/**
+ * 检查是否需要异步更新缓存
+ * @param {Object} cacheResult 缓存结果
+ * @param {number} maxTtl 最大缓存时间（秒）
+ * @returns {boolean} 是否需要更新缓存
+ */
+function shouldUpdateCache(cacheResult, maxTtl = DEFAULT_CACHE_TTL) {
+  // 如果没有缓存命中，不需要触发异步更新（会在主流程中直接更新）
+  if (!cacheResult.cacheHit) return false;
+  
+  const metadata = cacheResult.metadata || {};
+  const timestamp = metadata.timestamp || 0;
+  const cacheAge = Date.now() - timestamp;
+  
+  // 如果缓存已经达到其最大年龄的 80%，触发异步更新
+  return cacheAge > maxTtl * 0.8 * 1000;
+}
+
+/**
+ * 异步更新缓存
+ * @param {Object} env Cloudflare Workers 环境
+ */
+async function asyncUpdateCache(env) {
+  try {
+    console.log("开始异步更新缓存...");
+    const newData = await fetchRSSData();
+    await saveToCache(env, newData);
+    console.log("异步缓存更新完成");
+  } catch (error) {
+    console.error("异步更新缓存失败:", error);
+  }
+}
+
+export async function onRequest(context) {
+  const startTime = Date.now();
+  const ttl = parseInt(context.env.CACHE_MAX_AGE || String(DEFAULT_CACHE_TTL));
+  
+  try {
+    // 获取请求参数
+    const url = new URL(context.request.url);
+    const forceRefresh = url.searchParams.get("forceRefresh") === "true";
+    
+    console.log(`处理 RSS API 请求: forceRefresh=${forceRefresh}, cacheMaxAge=${ttl}秒`);
+    
+    // 如果不是强制刷新，尝试从缓存获取数据
+    if (!forceRefresh) {
+      const cacheResult = await getFromCache(context.env);
+      
+      // 如果缓存命中
+      if (cacheResult.cacheHit) {
+        console.log("缓存命中，使用缓存数据");
+        
+        // 如果缓存即将过期，触发异步更新
+        if (shouldUpdateCache(cacheResult, ttl)) {
+          console.log("缓存即将过期，触发异步更新");
+          // 使用调度器在后台运行异步更新
+          context.waitUntil(asyncUpdateCache(context.env));
+        }
+        
+        // 返回缓存数据
+        const headers = new Headers();
+        headers.set("Content-Type", "application/json");
+        headers.set("X-Cache", "HIT");
+        headers.set("Access-Control-Allow-Origin", "*");
+        headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+        headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
+        
+        return new Response(JSON.stringify(cacheResult.data), { headers });
+      }
+      
+      console.log("缓存未命中，获取新数据");
+    } else {
+      console.log("强制刷新，跳过缓存检查");
+    }
+    
+    // 获取新数据
+    const data = await fetchRSSData();
+    
+    // 返回数据并更新缓存
+    await saveToCache(context.env, data, ttl);
+    
+    // 设置响应头
+    const headers = new Headers();
+    headers.set("Content-Type", "application/json");
+    headers.set("X-Cache", "MISS");
+    headers.set("Access-Control-Allow-Origin", "*");
+    headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+    headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
+    
+    return new Response(JSON.stringify(data), { headers });
+  } catch (error) {
+    console.error("处理 RSS 请求失败:", error);
+    
     return new Response(
       JSON.stringify({
-        error: "获取RSS数据时发生错误",
-        message: error.message,
-        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
-        debug,
+        error: `处理 RSS 请求失败: ${error.message}`,
+        timestamp: Date.now()
       }),
       {
         status: 500,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Cache-Control": "no-store, no-cache, must-revalidate",
-          "X-Response-Time": `${Date.now() - startTime}ms`,
-        },
+          "Access-Control-Allow-Origin": "*"
+        }
       }
     );
-  }
-}
-
-// 辅助函数：获取XML标签内容
-function getTagContent(xml, element) {
-  if (!element) return null;
-
-  try {
-    // 如果元素有子元素，返回innerHTML
-    if (element.innerHTML) {
-      return element.innerHTML.trim();
-    }
-
-    // 否则返回textContent
-    return element.textContent ? element.textContent.trim() : null;
-  } catch (error) {
-    console.error("解析XML内容失败:", error);
-    return null;
   }
 }
