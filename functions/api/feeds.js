@@ -1,4 +1,5 @@
 import { RSS_CONFIG } from "../../src/config/rss.config.js";
+import { DOMParser } from "@xmldom/xmldom";
 
 // KV 缓存键名
 const CACHE_KEY = "RSS_FEEDS_DATA";
@@ -77,49 +78,112 @@ async function fetchRSSData() {
 
           // 解析 XML
           const items = [];
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(xml, "text/xml");
-
-          // 尝试识别 RSS 格式
-          const rssItems = doc.querySelectorAll("item");
-          const atomEntries = doc.querySelectorAll("entry");
-
-          if (rssItems.length > 0) {
-            // 标准 RSS 格式解析
-            Array.from(rssItems).forEach((item) => {
-              const title = item.querySelector("title")?.textContent || "";
-              const link = item.querySelector("link")?.textContent || "";
-              const pubDate = item.querySelector("pubDate")?.textContent || "";
-              const description = item.querySelector("description")?.textContent || "";
-              
-              items.push({
-                title: title.trim(),
-                link: link.trim(),
-                pubDate: pubDate.trim(),
-                description: description.trim()
-              });
-            });
-          } else if (atomEntries.length > 0) {
-            // Atom 格式解析
-            Array.from(atomEntries).forEach((entry) => {
-              let link = "";
-              const linkElement = entry.querySelector("link");
-              
-              if (linkElement) {
-                link = linkElement.getAttribute("href") || linkElement.textContent || "";
+          
+          try {
+            const parser = new DOMParser({
+              errorHandler: {
+                warning: () => {},
+                error: () => {},
+                fatalError: (e) => console.error(`XML解析致命错误: ${e}`)
               }
-              
-              const title = entry.querySelector("title")?.textContent || "";
-              const pubDate = entry.querySelector("published,updated")?.textContent || "";
-              const summary = entry.querySelector("summary,content")?.textContent || "";
-              
-              items.push({
-                title: title.trim(),
-                link: link.trim(),
-                pubDate: pubDate.trim(),
-                description: summary.trim()
-              });
             });
+            
+            const doc = parser.parseFromString(xml, "text/xml");
+
+            // 尝试识别 RSS 格式
+            const rssItems = doc.getElementsByTagName("item");
+            const atomEntries = doc.getElementsByTagName("entry");
+
+            // 辅助函数：安全获取元素内容
+            const getElementText = (parent, tagName) => {
+              const element = parent.getElementsByTagName(tagName);
+              if (element && element.length > 0 && element[0].textContent) {
+                return element[0].textContent.trim();
+              }
+              return "";
+            };
+            
+            // 辅助函数：获取链接
+            const getLink = (parent) => {
+              const linkElements = parent.getElementsByTagName("link");
+              if (linkElements && linkElements.length > 0) {
+                const linkElement = linkElements[0];
+                // 检查是否有href属性(Atom格式)
+                if (linkElement.getAttribute && linkElement.getAttribute("href")) {
+                  return linkElement.getAttribute("href").trim();
+                }
+                // 否则使用文本内容(RSS格式)
+                return linkElement.textContent ? linkElement.textContent.trim() : "";
+              }
+              return "";
+            };
+
+            if (rssItems && rssItems.length > 0) {
+              // 标准 RSS 格式解析
+              for (let i = 0; i < rssItems.length; i++) {
+                const item = rssItems[i];
+                const title = getElementText(item, "title");
+                const link = getLink(item) || getElementText(item, "link");
+                const pubDate = getElementText(item, "pubDate");
+                const description = getElementText(item, "description");
+                
+                items.push({
+                  title: title,
+                  link: link,
+                  pubDate: pubDate,
+                  description: description
+                });
+              }
+            } else if (atomEntries && atomEntries.length > 0) {
+              // Atom 格式解析
+              for (let i = 0; i < atomEntries.length; i++) {
+                const entry = atomEntries[i];
+                const title = getElementText(entry, "title");
+                const link = getLink(entry);
+                const pubDate = getElementText(entry, "published") || getElementText(entry, "updated");
+                const summary = getElementText(entry, "summary") || getElementText(entry, "content");
+                
+                items.push({
+                  title: title,
+                  link: link,
+                  pubDate: pubDate,
+                  description: summary
+                });
+              }
+            }
+          } catch (parseError) {
+            console.error(`解析 ${source.title} 的XML内容失败:`, parseError);
+            // 尝试使用正则表达式进行简单解析（备用方案）
+            try {
+              // 提取标题
+              const titleMatches = xml.match(/<title>([^<]+)<\/title>/g);
+              const linkMatches = xml.match(/<link>([^<]+)<\/link>/g) || xml.match(/<link[^>]+href="([^"]+)"[^>]*\/?>/g);
+              
+              if (titleMatches && linkMatches) {
+                for (let i = 0; i < Math.min(titleMatches.length, linkMatches.length); i++) {
+                  // 跳过第一个（通常是频道标题）
+                  if (i === 0) continue;
+                  
+                  const titleMatch = titleMatches[i].match(/<title>([^<]+)<\/title>/);
+                  let linkMatch = linkMatches[i].match(/<link>([^<]+)<\/link>/);
+                  
+                  if (!linkMatch) {
+                    linkMatch = linkMatches[i].match(/href="([^"]+)"/);
+                  }
+                  
+                  if (titleMatch && titleMatch[1] && linkMatch && linkMatch[1]) {
+                    items.push({
+                      title: titleMatch[1].trim(),
+                      link: linkMatch[1].trim(),
+                      pubDate: "",
+                      description: ""
+                    });
+                  }
+                }
+              }
+            } catch (regexError) {
+              console.error(`备用解析方法也失败:`, regexError);
+            }
           }
 
           return {
