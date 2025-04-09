@@ -13,6 +13,9 @@ export async function onRequest(context) {
     
     // 是否清除缓存（彻底删除而非仅更新）
     const clearCache = url.searchParams.get("clear") === "true";
+    
+    // 在查询参数中添加自定义请求头，可能由其他设备发起
+    const clientId = url.searchParams.get("client") || "unknown";
 
     if (accessKey !== secretKey) {
       console.error("非法访问，密钥不匹配");
@@ -51,6 +54,7 @@ export async function onRequest(context) {
     const feedsUrl = new URL("/api/feeds", url.origin);
     feedsUrl.searchParams.set("forceRefresh", "true");
     feedsUrl.searchParams.set("t", Date.now().toString()); // 防止缓存
+    feedsUrl.searchParams.set("updater", clientId); // 标记更新者
 
     console.log(`向 ${feedsUrl.toString()} 请求最新数据`);
 
@@ -66,10 +70,19 @@ export async function onRequest(context) {
     }
 
     // 解析数据
-    const data = await response.json();
-    if (!Array.isArray(data)) {
-      throw new Error("返回的数据格式无效，不是数组");
+    const responseData = await response.json();
+    if (!responseData || !responseData.data || !Array.isArray(responseData.data)) {
+      throw new Error("返回的数据格式无效");
     }
+    
+    const data = responseData.data;
+    const cacheStatus = responseData.cacheStatus || {
+      isCached: true,
+      timestamp: Date.now(),
+      lastUpdate: new Date().toISOString(),
+      freshlyUpdated: true,
+      updatedBy: clientId
+    };
 
     console.log(`成功获取 ${data.length} 个 RSS 源的数据`);
     
@@ -78,46 +91,41 @@ export async function onRequest(context) {
     let nodeseekItems = 0;
     
     for (const feed of data) {
-      if (feed.title.includes("NodeSeek") || (feed.link && feed.link.includes("nodeseek"))) {
+      if (feed.title && feed.title.includes("NodeSeek") || (feed.link && feed.link.includes("nodeseek"))) {
         nodeseekFound = true;
         nodeseekItems = feed.items ? feed.items.length : 0;
         console.log(`NodeSeek源包含 ${nodeseekItems} 个条目`);
         break;
       }
     }
-
-    // 用新数据更新 KV 缓存
-    const metadata = {
-      timestamp: Date.now(),
-      lastUpdate: new Date().toISOString(),
-      updateMethod: "manual",
-      updateDuration: Date.now() - startTime
+    
+    // 添加缓存更新信息
+    cacheStatus.manuallyUpdated = true;
+    cacheStatus.updatedBy = clientId;
+    cacheStatus.nodeseekStatus = {
+      found: nodeseekFound,
+      itemCount: nodeseekItems
     };
 
-    await context.env.RSS_KV.put(CACHE_KEY, JSON.stringify(data), {
-      expirationTtl: ttl,
-      metadata: metadata
-    });
-
-    console.log(`缓存成功${clearCache ? '清除并' : ''}更新，过期时间: ${ttl}秒`);
-
-    // 返回成功信息
+    // 返回详细的成功信息，包含缓存状态
     return new Response(
       JSON.stringify({
         success: true,
         message: `RSS 缓存已${clearCache ? '清除并' : ''}手动更新`,
         timestamp: Date.now(),
         feeds: data.length,
+        cacheStatus: cacheStatus,
         nodeseekStatus: {
           found: nodeseekFound,
           itemCount: nodeseekItems
         },
-        cacheExpiration: Date.now() + (ttl * 1000)
+        clientId: clientId
       }),
       {
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
+          "Access-Control-Allow-Origin": "*",
+          "X-Cache-Updated": "true"
         }
       }
     );
@@ -128,7 +136,12 @@ export async function onRequest(context) {
       JSON.stringify({
         success: false,
         message: `缓存更新失败: ${error.message}`,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        cacheStatus: {
+          isCached: false,
+          error: true,
+          errorMessage: error.message
+        }
       }),
       {
         status: 500,

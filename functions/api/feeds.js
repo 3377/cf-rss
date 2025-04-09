@@ -363,6 +363,15 @@ export async function onRequest(context) {
     
     console.log(`处理 RSS API 请求: forceRefresh=${forceRefresh}, cacheMaxAge=${ttl}秒`);
     
+    // 准备缓存状态信息对象
+    const cacheStatus = {
+      isCached: false,
+      timestamp: null,
+      lastUpdate: null,
+      age: null,
+      ttl: ttl
+    };
+    
     // 如果不是强制刷新，尝试从缓存获取数据
     if (!forceRefresh) {
       const cacheResult = await getFromCache(context.env);
@@ -371,12 +380,25 @@ export async function onRequest(context) {
       if (cacheResult.cacheHit) {
         console.log("缓存命中，使用缓存数据");
         
+        // 更新缓存状态信息
+        cacheStatus.isCached = true;
+        cacheStatus.timestamp = cacheResult.metadata.timestamp || Date.now();
+        cacheStatus.lastUpdate = cacheResult.metadata.lastUpdate || new Date().toISOString();
+        cacheStatus.age = Date.now() - cacheStatus.timestamp;
+        
         // 如果缓存即将过期，触发异步更新
         if (shouldUpdateCache(cacheResult, ttl)) {
           console.log("缓存即将过期，触发异步更新");
           // 使用调度器在后台运行异步更新
           context.waitUntil(asyncUpdateCache(context.env));
+          cacheStatus.updating = true;
         }
+        
+        // 准备数据对象，包含缓存状态
+        const dataWithCacheInfo = {
+          data: cacheResult.data,
+          cacheStatus: cacheStatus
+        };
         
         // 返回缓存数据
         const headers = new Headers();
@@ -386,7 +408,7 @@ export async function onRequest(context) {
         headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
         headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
         
-        return new Response(JSON.stringify(cacheResult.data), { headers });
+        return new Response(JSON.stringify(dataWithCacheInfo), { headers });
       }
       
       console.log("缓存未命中，获取新数据");
@@ -395,10 +417,23 @@ export async function onRequest(context) {
     }
     
     // 获取新数据
-    const data = await fetchRSSData();
+    const feedData = await fetchRSSData();
+    
+    // 更新缓存状态
+    cacheStatus.isCached = true; // 即将被缓存
+    cacheStatus.timestamp = Date.now();
+    cacheStatus.lastUpdate = new Date().toISOString();
+    cacheStatus.age = 0; // 全新缓存
+    cacheStatus.freshlyUpdated = true;
     
     // 返回数据并更新缓存
-    await saveToCache(context.env, data, ttl);
+    await saveToCache(context.env, feedData, ttl);
+    
+    // 准备数据对象，包含缓存状态
+    const dataWithCacheInfo = {
+      data: feedData,
+      cacheStatus: cacheStatus
+    };
     
     // 设置响应头
     const headers = new Headers();
@@ -408,14 +443,18 @@ export async function onRequest(context) {
     headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
     headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
     
-    return new Response(JSON.stringify(data), { headers });
+    return new Response(JSON.stringify(dataWithCacheInfo), { headers });
   } catch (error) {
     console.error("处理 RSS 请求失败:", error);
     
     return new Response(
       JSON.stringify({
         error: `处理 RSS 请求失败: ${error.message}`,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        cacheStatus: {
+          isCached: false,
+          error: true
+        }
       }),
       {
         status: 500,
