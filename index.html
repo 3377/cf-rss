@@ -25,8 +25,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="format-detection" content="telephone=no" />
     <title>FY Pages RSS</title>
-    <!-- 引入缓存状态监控脚本 -->
-    <script src="/cache-status.js"></script>
     <style>
       body {
         margin: 0;
@@ -65,76 +63,15 @@
           transform: rotate(360deg);
         }
       }
-
-      /* 添加缓存状态控制面板样式 */
-      .cache-control-panel {
-        margin: 20px auto;
-        max-width: 800px;
-        padding: 15px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      }
-      .control-buttons {
-        margin-top: 10px;
-        display: flex;
-        gap: 10px;
-      }
-      .control-buttons button {
-        padding: 8px 12px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 500;
-      }
-      .control-buttons button.refresh {
-        background-color: #28a745;
-        color: white;
-      }
-      .control-buttons button.clear-cache {
-        background-color: #dc3545;
-        color: white;
-      }
     </style>
   </head>
   <body>
-    <!-- 缓存控制面板 -->
-    <div class="cache-control-panel">
-      <h3>缓存控制</h3>
-      <div id="server-cache-status">加载中...</div>
-      <div class="control-buttons">
-        <button class="refresh" onclick="refreshFeeds()">刷新订阅</button>
-        <button class="clear-cache" onclick="clearAndRefreshCache()">清除并刷新缓存</button>
-      </div>
-    </div>
-
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
     <script>
       // 添加页面加载完成的类
       window.addEventListener("load", () => {
         document.body.classList.add("loaded");
-      });
-
-      // 缓存控制函数
-      function refreshFeeds() {
-        window.RSSCacheManager.fetchDataAndUpdateStatus('/api/feeds', true);
-      }
-
-      function clearAndRefreshCache() {
-        // 您需要替换为您的实际UPDATE_KEY
-        const updateKey = prompt('请输入缓存更新密钥:');
-        if (updateKey) {
-          window.RSSCacheManager.updateCache('/api/update-cache', updateKey, true);
-        }
-      }
-
-      // 页面加载时自动检查最新缓存状态
-      document.addEventListener('DOMContentLoaded', () => {
-        // 每60秒检查一次缓存状态
-        setInterval(() => {
-          window.RSSCacheManager.fetchDataAndUpdateStatus();
-        }, 60000);
       });
     </script>
   </body>
