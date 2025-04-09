@@ -410,11 +410,19 @@ const fetchFeeds = async (forceRefresh = false) => {
       }
       activeCache.value = "server";
       // 获取并处理缓存详细信息
-      serverCacheCreated.value = response.headers.get("X-Cache-Created");
+      const cacheCreated = response.headers.get("X-Cache-Created");
+      const cacheUpdateMethod = response.headers.get("X-Cache-Update-Method");
+      
+      // 创建包含元数据的对象，而不仅仅是时间戳字符串
+      serverCacheCreated.value = {
+        timestamp: cacheCreated,
+        updateMethod: cacheUpdateMethod || "unknown"
+      };
+      
       serverCacheAge.value = parseInt(response.headers.get("X-Cache-Age") || "0");
       serverCacheExpiry.value = response.headers.get("X-Cache-Expires");
       serverCacheTTL.value = parseInt(response.headers.get("X-Cache-TTL") || "0");
-      serverCacheTime.value = new Date(parseInt(serverCacheCreated.value));
+      serverCacheTime.value = new Date(parseInt(cacheCreated));
     } else {
       lastUpdateTime.value = new Date();
       serverCacheTime.value = null;

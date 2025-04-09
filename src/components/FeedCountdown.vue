@@ -173,11 +173,21 @@ const formatDuration = (seconds) => {
 };
 
 const serverCacheTimeFormatted = computed(() => {
-  return formatTime(props.serverCacheTime || props.serverCacheCreated);
+  // 如果serverCacheCreated是对象，则使用其timestamp属性
+  const timestamp = props.serverCacheCreated && typeof props.serverCacheCreated === 'object'
+    ? props.serverCacheCreated.timestamp
+    : props.serverCacheCreated;
+  
+  return formatTime(props.serverCacheTime || timestamp);
 });
 
 const serverCacheCreatedFormatted = computed(() => {
-  return formatFullDateTime(props.serverCacheCreated);
+  // 如果serverCacheCreated是对象，则使用其timestamp属性
+  const timestamp = props.serverCacheCreated && typeof props.serverCacheCreated === 'object'
+    ? props.serverCacheCreated.timestamp
+    : props.serverCacheCreated;
+    
+  return formatFullDateTime(timestamp);
 });
 
 const serverCacheAgeFormatted = computed(() => {

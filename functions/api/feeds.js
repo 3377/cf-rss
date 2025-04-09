@@ -387,6 +387,7 @@ export async function onRequest(context) {
         const cacheAge = Math.floor((Date.now() - cacheTimestamp) / 1000);
         const cacheExpiry = cacheTimestamp + (ttl * 1000);
         const cacheExpiryDate = new Date(cacheExpiry);
+        const updateMethod = metadata.updateMethod || 'unknown';
         
         // 格式化时间为本地字符串
         const formatDateTime = (date) => {
@@ -413,7 +414,8 @@ export async function onRequest(context) {
             expiresAt: cacheExpiry,
             expiresAtFormatted: formatDateTime(cacheExpiryDate),
             timeToLive: ttl - cacheAge,
-            timeToLiveFormatted: `${Math.floor((ttl - cacheAge) / 60)}分${(ttl - cacheAge) % 60}秒`
+            timeToLiveFormatted: `${Math.floor((ttl - cacheAge) / 60)}分${(ttl - cacheAge) % 60}秒`,
+            updateMethod: updateMethod
           }
         };
         
@@ -427,9 +429,10 @@ export async function onRequest(context) {
         headers.set("X-Cache-TTL", (ttl - cacheAge).toString());
         headers.set("X-Cache-Expires", cacheExpiry.toString());
         headers.set("X-Cache-Expires-Formatted", formatDateTime(cacheExpiryDate));
+        headers.set("X-Cache-Update-Method", updateMethod);
         headers.set("Access-Control-Allow-Origin", "*");
         headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-        headers.set("Access-Control-Expose-Headers", "X-Cache, X-Cache-Created, X-Cache-Created-Formatted, X-Cache-Age, X-Cache-TTL, X-Cache-Expires, X-Cache-Expires-Formatted");
+        headers.set("Access-Control-Expose-Headers", "X-Cache, X-Cache-Created, X-Cache-Created-Formatted, X-Cache-Age, X-Cache-TTL, X-Cache-Expires, X-Cache-Expires-Formatted, X-Cache-Update-Method");
         headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
         
         // 检查是否需要封装响应数据
