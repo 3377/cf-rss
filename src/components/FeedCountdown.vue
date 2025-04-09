@@ -17,7 +17,7 @@
               v-if="activeCache === 'fresh'"
               class="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"
             ></div>
-            <span class="mr-2">最后自动刷新: {{ lastUpdateTime }}</span>
+            <span class="mr-2">最后{{ activeCache === 'init' ? '初始化' : '自动刷新' }}: {{ lastUpdateTime }}</span>
           </div>
           <span>{{ countdownText }}</span>
         </div>
@@ -38,7 +38,7 @@ const props = defineProps({
   },
   activeCache: {
     type: String,
-    default: "none", // 'server', 'fresh' 或 'none'
+    default: "none", // 'server', 'fresh', 'init' 或 'none'
   },
   lastUpdateTime: {
     type: String,
