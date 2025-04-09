@@ -378,15 +378,63 @@ export async function onRequest(context) {
           context.waitUntil(asyncUpdateCache(context.env));
         }
         
+        // 计算缓存信息
+        const metadata = cacheResult.metadata || {};
+        const cacheTimestamp = metadata.timestamp || Date.now();
+        const cacheDate = new Date(cacheTimestamp);
+        const cacheAge = Math.floor((Date.now() - cacheTimestamp) / 1000);
+        const cacheExpiry = cacheTimestamp + (ttl * 1000);
+        const cacheExpiryDate = new Date(cacheExpiry);
+        
+        // 格式化时间为本地字符串
+        const formatDateTime = (date) => {
+          return date.toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+          });
+        };
+        
+        // 添加缓存信息到响应数据
+        const responseData = {
+          data: cacheResult.data,
+          cache: {
+            hit: true,
+            createdAt: cacheTimestamp,
+            createdAtFormatted: formatDateTime(cacheDate),
+            age: cacheAge,
+            ageFormatted: `${Math.floor(cacheAge / 60)}分${cacheAge % 60}秒`,
+            expiresAt: cacheExpiry,
+            expiresAtFormatted: formatDateTime(cacheExpiryDate),
+            timeToLive: ttl - cacheAge,
+            timeToLiveFormatted: `${Math.floor((ttl - cacheAge) / 60)}分${(ttl - cacheAge) % 60}秒`
+          }
+        };
+        
         // 返回缓存数据
         const headers = new Headers();
         headers.set("Content-Type", "application/json");
         headers.set("X-Cache", "HIT");
+        headers.set("X-Cache-Created", cacheTimestamp.toString());
+        headers.set("X-Cache-Created-Formatted", formatDateTime(cacheDate));
+        headers.set("X-Cache-Age", cacheAge.toString());
+        headers.set("X-Cache-TTL", (ttl - cacheAge).toString());
+        headers.set("X-Cache-Expires", cacheExpiry.toString());
+        headers.set("X-Cache-Expires-Formatted", formatDateTime(cacheExpiryDate));
         headers.set("Access-Control-Allow-Origin", "*");
         headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+        headers.set("Access-Control-Expose-Headers", "X-Cache, X-Cache-Created, X-Cache-Created-Formatted, X-Cache-Age, X-Cache-TTL, X-Cache-Expires, X-Cache-Expires-Formatted");
         headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
         
-        return new Response(JSON.stringify(cacheResult.data), { headers });
+        // 检查是否需要封装响应数据
+        const wrapResponse = url.searchParams.get("includeCache") === "true";
+        const responseBody = wrapResponse ? responseData : cacheResult.data;
+        
+        return new Response(JSON.stringify(responseBody), { headers });
       }
       
       console.log("缓存未命中，获取新数据");
@@ -404,14 +452,17 @@ export async function onRequest(context) {
     const headers = new Headers();
     headers.set("Content-Type", "application/json");
     headers.set("X-Cache", "MISS");
+    headers.set("X-Cache-Created", Date.now().toString());
+    headers.set("X-Cache-TTL", ttl.toString());
     headers.set("Access-Control-Allow-Origin", "*");
     headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+    headers.set("Access-Control-Expose-Headers", "X-Cache, X-Cache-Created, X-Cache-TTL");
     headers.set("X-Response-Time", `${Date.now() - startTime}ms`);
     
     return new Response(JSON.stringify(data), { headers });
   } catch (error) {
     console.error("处理 RSS 请求失败:", error);
-
+    
     return new Response(
       JSON.stringify({
         error: `处理 RSS 请求失败: ${error.message}`,

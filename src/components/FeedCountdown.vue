@@ -10,7 +10,33 @@
               v-if="activeCache === 'server'"
               class="w-2 h-2 bg-purple-500 rounded-full mr-1 animate-pulse"
             ></div>
-            <span class="mr-2">服务器缓存: {{ serverCacheTimeFormatted }}</span>
+            <span 
+              class="mr-2 cursor-pointer hover:underline" 
+              @click="toggleCacheDetails"
+            >
+              服务器缓存: {{ serverCacheTimeFormatted }}
+            </span>
+            <div v-if="showCacheDetails" class="cache-details">
+              <div class="cache-details-arrow"></div>
+              <div class="cache-details-content">
+                <div class="cache-detail-item">
+                  <span class="label">缓存创建时间:</span>
+                  <span class="value">{{ serverCacheCreatedFormatted }}</span>
+                </div>
+                <div class="cache-detail-item">
+                  <span class="label">缓存已存活:</span>
+                  <span class="value">{{ serverCacheAgeFormatted }}</span>
+                </div>
+                <div class="cache-detail-item">
+                  <span class="label">缓存过期时间:</span>
+                  <span class="value">{{ serverCacheExpiryFormatted }}</span>
+                </div>
+                <div class="cache-detail-item">
+                  <span class="label">缓存剩余时间:</span>
+                  <span class="value">{{ serverCacheTTLFormatted }}</span>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="cache-item inline-flex items-center">
             <div
@@ -48,7 +74,30 @@ const props = defineProps({
     type: Date,
     default: null,
   },
+  // 新增的缓存详情属性
+  serverCacheCreated: {
+    type: [Date, Number, String],
+    default: null,
+  },
+  serverCacheAge: {
+    type: [Number, String],
+    default: 0,
+  },
+  serverCacheExpiry: {
+    type: [Date, Number, String],
+    default: null,
+  },
+  serverCacheTTL: {
+    type: [Number, String],
+    default: 0,
+  },
 });
+
+const showCacheDetails = ref(false);
+
+const toggleCacheDetails = () => {
+  showCacheDetails.value = !showCacheDetails.value;
+};
 
 const emit = defineEmits(["refresh"]);
 
@@ -60,11 +109,41 @@ const countdownText = computed(() => {
 
 const formatTime = (date) => {
   if (!date) return "无";
-  return format(date, "HH:mm:ss");
+  const dateObj = date instanceof Date ? date : new Date(Number(date) || date);
+  return format(dateObj, "HH:mm:ss");
+};
+
+const formatFullDateTime = (date) => {
+  if (!date) return "无";
+  const dateObj = date instanceof Date ? date : new Date(Number(date) || date);
+  return format(dateObj, "yyyy-MM-dd HH:mm:ss");
+};
+
+const formatDuration = (seconds) => {
+  if (!seconds) return "无";
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}分${secs < 10 ? "0" + secs : secs}秒`;
 };
 
 const serverCacheTimeFormatted = computed(() => {
-  return formatTime(props.serverCacheTime);
+  return formatTime(props.serverCacheTime || props.serverCacheCreated);
+});
+
+const serverCacheCreatedFormatted = computed(() => {
+  return formatFullDateTime(props.serverCacheCreated);
+});
+
+const serverCacheAgeFormatted = computed(() => {
+  return formatDuration(props.serverCacheAge);
+});
+
+const serverCacheExpiryFormatted = computed(() => {
+  return formatFullDateTime(props.serverCacheExpiry);
+});
+
+const serverCacheTTLFormatted = computed(() => {
+  return formatDuration(props.serverCacheTTL);
 });
 </script>
 
@@ -80,6 +159,52 @@ const serverCacheTimeFormatted = computed(() => {
   margin-right: 0.5rem;
   position: relative;
   min-width: 110px; /* 确保空间足够放置小圆点 */
+}
+
+/* 缓存详情弹出框 */
+.cache-details {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 10px;
+  background-color: var(--el-bg-color-overlay);
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  width: 280px;
+  z-index: 1000;
+}
+
+.cache-details-arrow {
+  position: absolute;
+  top: -6px;
+  left: 30px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid var(--el-bg-color-overlay);
+}
+
+.cache-details-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cache-detail-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.cache-detail-item .label {
+  font-weight: 500;
+  color: var(--el-text-color-secondary);
+}
+
+.cache-detail-item .value {
+  color: var(--el-text-color-primary);
 }
 
 /* 亮色模式下小圆点颜色 */
