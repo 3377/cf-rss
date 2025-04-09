@@ -296,9 +296,10 @@ const cacheSourceIconClass = computed(() => {
 
 /* 适配暗色模式 - 修复背景色问题 */
 .dark .cache-modal-container,
-html body .app-container.dark .cache-modal-container {
-  background-color: rgba(31, 41, 55, 0.95);
-  border: 1px solid rgba(75, 85, 101, 0.6);
+html body .app-container.dark .cache-modal-container,
+html body .dark .cache-modal-container {
+  background-color: rgba(31, 41, 55, 0.95) !important;
+  border: 1px solid rgba(75, 85, 101, 0.6) !important;
 }
 
 .cache-modal-header {
@@ -322,13 +323,17 @@ html body .app-container.dark .cache-modal-container {
 }
 
 /* 标题样式 - 暗色模式 */
-.dark .cache-modal-header {
-  background-color: rgba(55, 65, 81, 0.8);
-  border-bottom: 1px solid rgba(75, 85, 101, 0.8);
+.dark .cache-modal-header,
+html body .app-container.dark .cache-modal-header,
+html body .dark .cache-modal-header {
+  background-color: rgba(55, 65, 81, 0.8) !important;
+  border-bottom: 1px solid rgba(75, 85, 101, 0.8) !important;
 }
 
-.dark .cache-modal-header h3 {
-  color: #e5e7eb;
+.dark .cache-modal-header h3,
+html body .app-container.dark .cache-modal-header h3,
+html body .dark .cache-modal-header h3 {
+  color: #e5e7eb !important;
   margin: 0;
   font-size: 18px;
   font-weight: 600;
@@ -354,12 +359,16 @@ html body .app-container.dark .cache-modal-container {
 }
 
 /* 关闭按钮 - 暗色模式 */
-.dark .cache-modal-close {
-  color: #d1d5db;
+.dark .cache-modal-close,
+html body .app-container.dark .cache-modal-close,
+html body .dark .cache-modal-close {
+  color: #d1d5db !important;
 }
 
-.dark .cache-modal-close:hover {
-  background-color: rgba(75, 85, 101, 0.5);
+.dark .cache-modal-close:hover,
+html body .app-container.dark .cache-modal-close:hover,
+html body .dark .cache-modal-close:hover {
+  background-color: rgba(75, 85, 101, 0.5) !important;
 }
 
 .cache-modal-content {
@@ -396,17 +405,23 @@ html body .app-container.dark .cache-modal-container {
 }
 
 /* 详情项 - 暗色模式 */
-.dark .cache-detail-item {
-  border-color: rgba(75, 85, 101, 0.5);
+.dark .cache-detail-item,
+html body .app-container.dark .cache-detail-item,
+html body .dark .cache-detail-item {
+  border-color: rgba(75, 85, 101, 0.5) !important;
 }
 
-.dark .cache-detail-item .label {
-  color: #9ca3af;
+.dark .cache-detail-item .label,
+html body .app-container.dark .cache-detail-item .label,
+html body .dark .cache-detail-item .label {
+  color: #9ca3af !important;
   font-weight: 600;
 }
 
-.dark .cache-detail-item .value {
-  color: #e5e7eb;
+.dark .cache-detail-item .value,
+html body .app-container.dark .cache-detail-item .value,
+html body .dark .cache-detail-item .value {
+  color: #e5e7eb !important;
   font-weight: 500;
 }
 
