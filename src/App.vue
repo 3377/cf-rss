@@ -36,7 +36,6 @@
             :server-cache-created="serverCacheCreated"
             :server-cache-age="serverCacheAge"
             :server-cache-expiry="serverCacheExpiry"
-            :server-cache-ttl="serverCacheTTL"
             @refresh="handleRefreshClick"
           />
         </div>
@@ -199,7 +198,6 @@ const serverCacheTime = ref(null);
 const serverCacheCreated = ref(null);
 const serverCacheAge = ref(0);
 const serverCacheExpiry = ref(null);
-const serverCacheTTL = ref(0);
 const activeCache = ref("none");
 let isFirstLoad = true;
 let persistedCountdown = null;
@@ -420,9 +418,7 @@ const fetchFeeds = async (forceRefresh = false) => {
       };
       
       serverCacheAge.value = parseInt(response.headers.get("X-Cache-Age") || "0");
-      serverCacheExpiry.value = response.headers.get("X-Cache-Expires");
-      serverCacheTTL.value = parseInt(response.headers.get("X-Cache-TTL") || "0");
-      serverCacheTime.value = new Date(parseInt(cacheCreated));
+      serverCacheExpiry.value = response.headers.get("X-Cache-Expires") || null;
     } else {
       lastUpdateTime.value = new Date();
       serverCacheTime.value = null;
@@ -430,7 +426,6 @@ const fetchFeeds = async (forceRefresh = false) => {
       serverCacheCreated.value = null;
       serverCacheAge.value = 0;
       serverCacheExpiry.value = null;
-      serverCacheTTL.value = 0;
     }
 
     const data = await response.json();

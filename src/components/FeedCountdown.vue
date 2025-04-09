@@ -85,10 +85,6 @@
             <span class="label">缓存过期时间:</span>
             <span class="value">{{ serverCacheExpiryFormatted }}</span>
           </div>
-          <div class="cache-detail-item">
-            <span class="label">缓存剩余时间:</span>
-            <span class="value">{{ serverCacheTTLFormatted }}</span>
-          </div>
         </div>
       </div>
     </div>
@@ -128,10 +124,6 @@ const props = defineProps({
   serverCacheExpiry: {
     type: [Date, Number, String],
     default: null,
-  },
-  serverCacheTTL: {
-    type: [Number, String],
-    default: 0,
   },
 });
 
@@ -196,10 +188,6 @@ const serverCacheAgeFormatted = computed(() => {
 
 const serverCacheExpiryFormatted = computed(() => {
   return formatFullDateTime(props.serverCacheExpiry);
-});
-
-const serverCacheTTLFormatted = computed(() => {
-  return formatDuration(props.serverCacheTTL);
 });
 
 const cacheSourceText = computed(() => {
@@ -306,8 +294,9 @@ const cacheSourceIconClass = computed(() => {
   border: 1px solid rgba(161, 140, 209, 0.8);
 }
 
-/* 适配暗色模式 */
-.dark .cache-modal-container {
+/* 适配暗色模式 - 修复背景色问题 */
+.dark .cache-modal-container,
+html body .app-container.dark .cache-modal-container {
   background-color: rgba(31, 41, 55, 0.95);
   border: 1px solid rgba(75, 85, 101, 0.6);
 }
