@@ -22,4 +22,8 @@ format = "service-worker"
 pages_build_output_dir = "dist"
 
 [functions]
-directory = "functions" 
+directory = "functions"
+
+# 定时任务配置 - 每30分钟更新一次缓存
+[triggers]
+crons = ["*/30 * * * *"] 

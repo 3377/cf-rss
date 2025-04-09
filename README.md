@@ -309,3 +309,24 @@ refresh: {
 1. 在`functions/_middleware.js`中实现缓存逻辑
 2. 在`src/App.vue`中添加智能缓存检测，仅首次访问使用缓存
 3. 修改`FeedCountdown.vue`组件显示缓存状态和最后更新时间
+4. **定时自动更新**: 通过Cloudflare的定时任务每30分钟自动更新缓存
+
+### 缓存更新方式
+
+本应用支持三种缓存更新方式：
+
+1. **智能缓存**: 当缓存即将过期（达到80%寿命）时，自动在后台更新
+2. **定时更新**: 通过Cloudflare Cron触发器每30分钟自动检查并更新缓存
+3. **手动更新**: 通过访问API端点手动更新缓存
+   ```
+   https://您的域名/api/update-cache?key=您设置的UPDATE_KEY
+   ```
+
+### 环境变量配置
+
+在Cloudflare Dashboard的环境变量中，可以添加以下设置：
+
+- `KV_NAMESPACE_ID`: KV缓存命名空间ID（必需）
+- `CACHE_MAX_AGE`: 缓存过期时间（秒），默认7200（2小时）
+- `UPDATE_KEY`: 手动更新缓存的密钥
+- `APP_DOMAIN`: 应用域名，用于定时任务中构建API URL

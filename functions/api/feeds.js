@@ -37,14 +37,16 @@ async function getFromCache(env) {
  * @param {Object} env Cloudflare Workers 环境
  * @param {Array} data 要缓存的数据
  * @param {number} ttl 缓存过期时间（秒）
+ * @param {string} updateMethod 更新方法 ('auto', 'scheduled', 'manual')
  * @returns {Promise<boolean>} 缓存操作是否成功
  */
-async function saveToCache(env, data, ttl = DEFAULT_CACHE_TTL) {
+async function saveToCache(env, data, ttl = DEFAULT_CACHE_TTL, updateMethod = 'auto') {
   try {
     // 创建元数据对象，包含时间戳
     const metadata = {
       timestamp: Date.now(),
-      lastUpdate: new Date().toISOString()
+      lastUpdate: new Date().toISOString(),
+      updateMethod: updateMethod
     };
     
     // 将数据和元数据保存到 KV
@@ -53,7 +55,7 @@ async function saveToCache(env, data, ttl = DEFAULT_CACHE_TTL) {
       metadata: metadata
     });
     
-    console.log(`数据已缓存，过期时间: ${ttl}秒`);
+    console.log(`数据已缓存，过期时间: ${ttl}秒，更新方式: ${updateMethod}`);
     return true;
   } catch (error) {
     console.error("保存数据到 KV 缓存失败:", error);
@@ -345,7 +347,7 @@ async function asyncUpdateCache(env) {
   try {
     console.log("开始异步更新缓存...");
     const newData = await fetchRSSData();
-    await saveToCache(env, newData);
+    await saveToCache(env, newData, parseInt(env.CACHE_MAX_AGE || String(DEFAULT_CACHE_TTL)), 'auto');
     console.log("异步缓存更新完成");
   } catch (error) {
     console.error("异步更新缓存失败:", error);
@@ -446,7 +448,7 @@ export async function onRequest(context) {
     const data = await fetchRSSData();
     
     // 返回数据并更新缓存
-    await saveToCache(context.env, data, ttl);
+    await saveToCache(context.env, data, ttl, 'request');
     
     // 设置响应头
     const headers = new Headers();

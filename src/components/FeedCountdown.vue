@@ -67,6 +67,13 @@
         </div>
         <div class="cache-modal-content">
           <div class="cache-detail-item">
+            <span class="label">缓存来源:</span>
+            <span class="value cache-source">
+              <span class="cache-source-icon" :class="cacheSourceIconClass"></span>
+              {{ cacheSourceText }}
+            </span>
+          </div>
+          <div class="cache-detail-item">
             <span class="label">缓存创建时间:</span>
             <span class="value">{{ serverCacheCreatedFormatted }}</span>
           </div>
@@ -183,6 +190,64 @@ const serverCacheExpiryFormatted = computed(() => {
 
 const serverCacheTTLFormatted = computed(() => {
   return formatDuration(props.serverCacheTTL);
+});
+
+const cacheSourceText = computed(() => {
+  // 检查缓存元数据中的updateMethod字段
+  const updateMethod = props.serverCacheCreated && typeof props.serverCacheCreated === 'object' 
+    && props.serverCacheCreated.updateMethod 
+    ? props.serverCacheCreated.updateMethod 
+    : null;
+    
+  switch (props.activeCache) {
+    case 'server':
+      if (updateMethod === 'scheduled') {
+        return '定时器自动更新 (30分钟)';
+      } else if (updateMethod === 'manual') {
+        return '手动触发更新 (API)';
+      } else if (updateMethod === 'auto') {
+        return '智能异步更新 (80%过期)';
+      } else if (updateMethod === 'request') {
+        return '页面刷新更新';
+      } else {
+        return '服务器缓存 (未知来源)';
+      }
+    case 'fresh':
+      return '页面立即刷新';
+    case 'none':
+      return '无缓存';
+    default:
+      return `未知来源(${props.activeCache})`;
+  }
+});
+
+const cacheSourceIconClass = computed(() => {
+  // 检查缓存元数据中的updateMethod字段
+  const updateMethod = props.serverCacheCreated && typeof props.serverCacheCreated === 'object' 
+    && props.serverCacheCreated.updateMethod 
+    ? props.serverCacheCreated.updateMethod 
+    : null;
+    
+  switch (props.activeCache) {
+    case 'server':
+      if (updateMethod === 'scheduled') {
+        return 'scheduled';
+      } else if (updateMethod === 'manual') {
+        return 'manual';
+      } else if (updateMethod === 'auto') {
+        return 'auto';
+      } else if (updateMethod === 'request') {
+        return 'request';
+      } else {
+        return 'server';
+      }
+    case 'fresh':
+      return 'fresh';
+    case 'none':
+      return 'none';
+    default:
+      return 'unknown';
+  }
 });
 </script>
 
@@ -445,5 +510,90 @@ html body .app-container:not(.dark) .countdown {
   .cache-detail-item .value {
     word-break: break-word;
   }
+}
+
+/* 缓存来源图标和样式 */
+.cache-source {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cache-source-icon {
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  position: relative;
+}
+
+.cache-source-icon::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+/* 不同类型缓存来源的图标 - 亮色模式 */
+:root:not(.dark) .cache-source-icon.scheduled::before {
+  background-color: #8b5cf6; /* 紫色 - 定时器 */
+}
+
+:root:not(.dark) .cache-source-icon.manual::before {
+  background-color: #3b82f6; /* 蓝色 - 手动 */
+}
+
+:root:not(.dark) .cache-source-icon.auto::before {
+  background-color: #10b981; /* 绿色 - 智能 */
+}
+
+:root:not(.dark) .cache-source-icon.request::before {
+  background-color: #f59e0b; /* 橙色 - 请求 */
+}
+
+:root:not(.dark) .cache-source-icon.fresh::before {
+  background-color: #ef4444; /* 红色 - 实时 */
+}
+
+:root:not(.dark) .cache-source-icon.server::before,
+:root:not(.dark) .cache-source-icon.none::before,
+:root:not(.dark) .cache-source-icon.unknown::before {
+  background-color: #6b7280; /* 灰色 - 其他 */
+}
+
+/* 不同类型缓存来源的图标 - 暗色模式 */
+.dark .cache-source-icon.scheduled::before {
+  background-color: #a78bfa; /* 紫色 - 定时器 */
+}
+
+.dark .cache-source-icon.manual::before {
+  background-color: #60a5fa; /* 蓝色 - 手动 */
+}
+
+.dark .cache-source-icon.auto::before {
+  background-color: #34d399; /* 绿色 - 智能 */
+}
+
+.dark .cache-source-icon.request::before {
+  background-color: #fbbf24; /* 橙色 - 请求 */
+}
+
+.dark .cache-source-icon.fresh::before {
+  background-color: #f87171; /* 红色 - 实时 */
+}
+
+.dark .cache-source-icon.server::before,
+.dark .cache-source-icon.none::before,
+.dark .cache-source-icon.unknown::before {
+  background-color: #9ca3af; /* 灰色 - 其他 */
+}
+
+/* 缓存来源强调 - 暗亮色模式统一字体 */
+.cache-detail-item:first-child .value {
+  font-weight: 600;
 }
 </style>
