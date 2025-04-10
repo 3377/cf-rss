@@ -406,14 +406,14 @@ const handleResponse = async (response) => {
   const isFromServerCache = cacheStatus === "HIT";
 
   if (isFromServerCache) {
-    const cacheTsStr = response.headers.get("X-Cache-Timestamp");
-    if (cacheTsStr) {
-      const cacheTs = parseInt(cacheTsStr);
+    // 修复：使用X-Cache-Created替代X-Cache-Timestamp
+    const cacheCreated = response.headers.get("X-Cache-Created");
+    if (cacheCreated) {
+      const cacheTs = parseInt(cacheCreated);
       serverCacheTime.value = new Date(cacheTs);
     }
     activeCache.value = "server";
     // 获取并处理缓存详细信息
-    const cacheCreated = response.headers.get("X-Cache-Created");
     const cacheUpdateMethod = response.headers.get("X-Cache-Update-Method");
     
     // 创建包含元数据的对象，简化updateMethod处理
