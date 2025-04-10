@@ -327,8 +327,25 @@ const fetchFeeds = async (skipClientCache = false) => {
   try {
     console.log(`开始获取RSS内容，跳过客户端缓存: ${skipClientCache}, 首次加载: ${isFirstLoad}`);
 
-    // 构建请求URL - 简化请求，移除强制刷新参数
-    const url = `/api/feeds${isFirstLoad ? "?isFirstLoad=true" : ""}`;
+    // 构建请求URL - 添加forceRefresh参数通知服务器跳过缓存
+    const baseUrl = `/api/feeds`;
+    let url = baseUrl;
+    
+    // 如果需要跳过缓存，添加forceRefresh参数
+    const params = new URLSearchParams();
+    if (skipClientCache) {
+      params.append("forceRefresh", "true");
+    }
+    if (isFirstLoad) {
+      params.append("isFirstLoad", "true");
+    }
+    
+    // 构建最终URL
+    const paramsString = params.toString();
+    if (paramsString) {
+      url = `${baseUrl}?${paramsString}`;
+    }
+    
     console.log(`发送请求到: ${url}`);
 
     // 设置请求头
@@ -336,22 +353,15 @@ const fetchFeeds = async (skipClientCache = false) => {
       Accept: "application/json",
     };
 
-    // 只控制客户端缓存，不要求服务器刷新缓存
+    // 只控制客户端缓存，同时通知服务器刷新数据
     if (skipClientCache) {
       console.log("添加客户端缓存控制头，跳过浏览器缓存");
       headers["Cache-Control"] = "no-cache";
       headers["Pragma"] = "no-cache";
-      // 添加时间戳参数，确保URL是唯一的，跳过浏览器缓存
-      const timestamp = new Date().getTime();
-      const urlWithTimestamp = url.includes('?') 
-        ? `${url}&_t=${timestamp}` 
-        : `${url}?_t=${timestamp}`;
       
-      console.log(`添加时间戳参数: ${urlWithTimestamp}`);
-      
-      // 发送请求
-      console.log(`正在请求: ${urlWithTimestamp}, 请求头:`, headers);
-      const response = await fetch(urlWithTimestamp, { headers });
+      // 发送请求，注意不需要额外的时间戳，因为forceRefresh参数已经足够
+      console.log(`正在请求: ${url}, 请求头:`, headers);
+      const response = await fetch(url, { headers });
       
       // 处理响应...
       if (!response.ok) {
