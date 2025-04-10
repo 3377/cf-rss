@@ -207,6 +207,18 @@ const fontLoaded = ref({
   Yozai: false,
 });
 
+// 添加倒计时定时器变量
+const countdownTimer = ref(null);
+
+// 添加倒计时更新函数
+const updateCountdown = () => {
+  countdown.value--;
+  if (countdown.value <= 0) {
+    countdown.value = RSS_CONFIG.refresh?.interval || 300;
+    // 不触发数据刷新，只重置倒计时
+  }
+};
+
 // 完全重写字体加载和切换逻辑
 // 加载字体
 const loadFont = async (fontName) => {
@@ -399,6 +411,9 @@ onMounted(async () => {
   // 首次加载时使用服务器缓存
   console.log("页面首次加载，使用服务器缓存");
   await fetchFeeds();
+  
+  // 添加倒计时更新定时器
+  countdownTimer.value = setInterval(updateCountdown, 1000);
 });
 
 // 修改刷新按钮点击函数，简化刷新逻辑
@@ -408,6 +423,13 @@ const handleRefreshClick = () => {
   // 重置倒计时时间
   countdown.value = RSS_CONFIG.refresh?.interval || 300;
 };
+
+// 添加组件卸载时清理定时器
+onUnmounted(() => {
+  if (countdownTimer.value) {
+    clearInterval(countdownTimer.value);
+  }
+});
 </script>
 
 <style>

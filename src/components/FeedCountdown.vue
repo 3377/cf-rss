@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineEmits, defineProps, watch } from "vue";
+import { ref, computed, defineEmits, defineProps, watch, onUnmounted } from "vue";
 import { format } from "date-fns";
 
 const props = defineProps({
@@ -130,6 +130,14 @@ const props = defineProps({
 
 const showCacheDetails = ref(false);
 const isDarkMode = ref(false);
+// 添加本地计算的缓存年龄
+const localCacheAge = ref(0);
+const cacheAgeTimer = ref(null);
+
+// 初始化本地缓存年龄
+watch(() => props.serverCacheAge, (newValue) => {
+  localCacheAge.value = parseInt(newValue) || 0;
+}, { immediate: true });
 
 // 检测暗色模式
 const checkDarkMode = () => {
@@ -143,19 +151,53 @@ const checkDarkMode = () => {
 watch(showCacheDetails, (newVal) => {
   if (newVal) {
     checkDarkMode();
+    // 打开弹窗时启动缓存年龄计时器
+    startCacheAgeTimer();
+  } else {
+    // 关闭弹窗时停止计时器
+    stopCacheAgeTimer();
   }
 }, { immediate: true });
+
+// 启动缓存年龄计时器
+const startCacheAgeTimer = () => {
+  if (cacheAgeTimer.value) return;
+  
+  // 每秒更新缓存年龄
+  cacheAgeTimer.value = setInterval(() => {
+    if (props.activeCache === 'server') {
+      localCacheAge.value++;
+    }
+  }, 1000);
+};
+
+// 停止缓存年龄计时器
+const stopCacheAgeTimer = () => {
+  if (cacheAgeTimer.value) {
+    clearInterval(cacheAgeTimer.value);
+    cacheAgeTimer.value = null;
+  }
+};
 
 const toggleCacheDetails = () => {
   showCacheDetails.value = !showCacheDetails.value;
   if (showCacheDetails.value) {
     checkDarkMode();
+    startCacheAgeTimer();
+  } else {
+    stopCacheAgeTimer();
   }
 };
 
 const closeModal = () => {
   showCacheDetails.value = false;
+  stopCacheAgeTimer();
 };
+
+// 组件卸载时清理
+onUnmounted(() => {
+  stopCacheAgeTimer();
+});
 
 const emit = defineEmits(["refresh"]);
 
@@ -202,8 +244,9 @@ const serverCacheCreatedFormatted = computed(() => {
   return formatFullDateTime(timestamp);
 });
 
+// 使用本地计算的缓存年龄来格式化显示
 const serverCacheAgeFormatted = computed(() => {
-  return formatDuration(props.serverCacheAge);
+  return formatDuration(localCacheAge.value);
 });
 
 const serverCacheExpiryFormatted = computed(() => {
