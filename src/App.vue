@@ -325,22 +325,25 @@ const fetchFeeds = async (skipClientCache = false) => {
   error.value = null;
 
   try {
-    console.log(`开始获取RSS内容，跳过客户端缓存: ${skipClientCache}, 首次加载: ${isFirstLoad}`);
+    console.log(`开始获取RSS内容，强制刷新: ${skipClientCache}, 首次加载: ${isFirstLoad}`);
 
-    // 构建请求URL
+    // 构建请求URL - 重新添加forceRefresh参数
     const baseUrl = `/api/feeds`;
-    let url = baseUrl;
     
     // 构建查询参数
     const params = new URLSearchParams();
     
-    // 只添加isFirstLoad参数，不添加forceRefresh
-    // API设计上使用Cache-Control控制缓存，而不是URL参数
+    // 关键：添加forceRefresh参数，这是API设计的方式
+    if (skipClientCache) {
+      params.append("forceRefresh", "true");
+    }
+    
     if (isFirstLoad) {
       params.append("isFirstLoad", "true");
     }
     
     // 构建最终URL
+    let url = baseUrl;
     const paramsString = params.toString();
     if (paramsString) {
       url = `${baseUrl}?${paramsString}`;
@@ -348,32 +351,22 @@ const fetchFeeds = async (skipClientCache = false) => {
     
     console.log(`发送请求到: ${url}`);
 
-    // 设置请求头
+    // 设置请求头 - 同时使用URL参数和请求头双保险
     const headers = {
       Accept: "application/json",
     };
 
     // 控制客户端和服务器缓存
     if (skipClientCache) {
-      console.log("添加缓存控制头，跳过浏览器缓存并通知服务器");
+      console.log("强制刷新 - 跳过缓存获取实时数据");
       
-      // 对服务器端的指令：max-age=0表示需要重新验证缓存
-      // no-cache表示可以使用缓存，但必须先验证是否过期
+      // 添加缓存控制头
       headers["Cache-Control"] = "no-cache, max-age=0, must-revalidate";
       headers["Pragma"] = "no-cache";
       
-      // 添加特殊标记，告诉服务器这是强制刷新请求
-      // 某些服务器可能会识别X-开头的自定义头
-      headers["X-Force-Refresh"] = "true";
-      
-      // 添加时间戳以绕过可能的中间缓存
-      const timestamp = Date.now();
-      const urlWithTimestamp = url + (url.includes('?') ? '&' : '?') + '_t=' + timestamp;
-      
-      console.log(`带时间戳的请求URL: ${urlWithTimestamp}`);
+      // 发送请求
       console.log(`请求头:`, headers);
-      
-      const response = await fetch(urlWithTimestamp, { headers });
+      const response = await fetch(url, { headers });
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
