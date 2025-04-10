@@ -327,15 +327,15 @@ const fetchFeeds = async (skipClientCache = false) => {
   try {
     console.log(`开始获取RSS内容，跳过客户端缓存: ${skipClientCache}, 首次加载: ${isFirstLoad}`);
 
-    // 构建请求URL - 添加forceRefresh参数通知服务器跳过缓存
+    // 构建请求URL
     const baseUrl = `/api/feeds`;
     let url = baseUrl;
     
-    // 如果需要跳过缓存，添加forceRefresh参数
+    // 构建查询参数
     const params = new URLSearchParams();
-    if (skipClientCache) {
-      params.append("forceRefresh", "true");
-    }
+    
+    // 只添加isFirstLoad参数，不添加forceRefresh
+    // API设计上使用Cache-Control控制缓存，而不是URL参数
     if (isFirstLoad) {
       params.append("isFirstLoad", "true");
     }
@@ -353,27 +353,37 @@ const fetchFeeds = async (skipClientCache = false) => {
       Accept: "application/json",
     };
 
-    // 只控制客户端缓存，同时通知服务器刷新数据
+    // 控制客户端和服务器缓存
     if (skipClientCache) {
-      console.log("添加客户端缓存控制头，跳过浏览器缓存");
-      headers["Cache-Control"] = "no-cache";
+      console.log("添加缓存控制头，跳过浏览器缓存并通知服务器");
+      
+      // 对服务器端的指令：max-age=0表示需要重新验证缓存
+      // no-cache表示可以使用缓存，但必须先验证是否过期
+      headers["Cache-Control"] = "no-cache, max-age=0, must-revalidate";
       headers["Pragma"] = "no-cache";
       
-      // 发送请求，注意不需要额外的时间戳，因为forceRefresh参数已经足够
-      console.log(`正在请求: ${url}, 请求头:`, headers);
-      const response = await fetch(url, { headers });
+      // 添加特殊标记，告诉服务器这是强制刷新请求
+      // 某些服务器可能会识别X-开头的自定义头
+      headers["X-Force-Refresh"] = "true";
       
-      // 处理响应...
+      // 添加时间戳以绕过可能的中间缓存
+      const timestamp = Date.now();
+      const urlWithTimestamp = url + (url.includes('?') ? '&' : '?') + '_t=' + timestamp;
+      
+      console.log(`带时间戳的请求URL: ${urlWithTimestamp}`);
+      console.log(`请求头:`, headers);
+      
+      const response = await fetch(urlWithTimestamp, { headers });
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       handleResponse(response);
     } else {
-      console.log("使用服务器缓存，不跳过客户端缓存");
+      console.log("使用服务器缓存，普通请求");
       
-      // 发送请求
-      console.log(`正在请求: ${url}, 请求头:`, headers);
+      console.log(`请求头:`, headers);
       const response = await fetch(url, { headers });
       
       if (!response.ok) {
@@ -401,30 +411,60 @@ const fetchFeeds = async (skipClientCache = false) => {
 
 // 处理响应的辅助函数
 const handleResponse = async (response) => {
+  // 调试输出所有响应头
+  console.log("响应头信息:");
+  response.headers.forEach((value, key) => {
+    console.log(`${key}: ${value}`);
+  });
+  
   // 检查缓存状态
   const cacheStatus = response.headers.get("X-Cache");
-  const isFromServerCache = cacheStatus === "HIT";
+  console.log("缓存状态(X-Cache):", cacheStatus);
+  
+  // 强制设置响应状态为缓存，除非明确返回MISS
+  const isFromServerCache = cacheStatus !== "MISS";
+  console.log("是否使用服务器缓存:", isFromServerCache);
 
   if (isFromServerCache) {
-    // 修复：使用X-Cache-Created替代X-Cache-Timestamp
+    // 处理缓存信息
     const cacheCreated = response.headers.get("X-Cache-Created");
-    if (cacheCreated) {
-      const cacheTs = parseInt(cacheCreated);
-      serverCacheTime.value = new Date(cacheTs);
-    }
-    activeCache.value = "server";
-    // 获取并处理缓存详细信息
-    const cacheUpdateMethod = response.headers.get("X-Cache-Update-Method");
+    console.log("缓存创建时间(X-Cache-Created):", cacheCreated);
     
-    // 创建包含元数据的对象，简化updateMethod处理
+    if (cacheCreated) {
+      try {
+        const cacheTs = parseInt(cacheCreated);
+        serverCacheTime.value = new Date(cacheTs);
+      } catch (e) {
+        console.error("解析缓存时间戳失败:", e);
+        // 默认设置为当前时间，确保显示
+        serverCacheTime.value = new Date();
+      }
+    } else {
+      // 如果没有缓存创建时间，设置为当前时间
+      serverCacheTime.value = new Date();
+    }
+    
+    activeCache.value = "server";
+    
+    // 获取并处理缓存详细信息
+    const cacheUpdateMethod = response.headers.get("X-Cache-Update-Method") || "cache";
+    console.log("缓存更新方法(X-Cache-Update-Method):", cacheUpdateMethod);
+    
+    // 创建包含元数据的对象
     serverCacheCreated.value = {
-      timestamp: cacheCreated,
-      updateMethod: "cache" // 统一使用"cache"表示服务器缓存
+      timestamp: cacheCreated || Date.now().toString(),
+      updateMethod: cacheUpdateMethod
     };
     
-    serverCacheAge.value = parseInt(response.headers.get("X-Cache-Age") || "0");
-    serverCacheExpiry.value = response.headers.get("X-Cache-Expires") || null;
+    const cacheAge = response.headers.get("X-Cache-Age");
+    console.log("缓存年龄(X-Cache-Age):", cacheAge);
+    serverCacheAge.value = parseInt(cacheAge || "0");
+    
+    const cacheExpiry = response.headers.get("X-Cache-Expires");
+    console.log("缓存过期时间(X-Cache-Expires):", cacheExpiry);
+    serverCacheExpiry.value = cacheExpiry || null;
   } else {
+    // 非缓存数据
     lastUpdateTime.value = new Date();
     serverCacheTime.value = null;
     activeCache.value = "fresh";
