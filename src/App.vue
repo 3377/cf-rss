@@ -215,7 +215,8 @@ const updateCountdown = () => {
   countdown.value--;
   if (countdown.value <= 0) {
     countdown.value = RSS_CONFIG.refresh?.interval || 300;
-    // 不触发数据刷新，只重置倒计时
+    // 触发刷新，但不强制服务器重新生成缓存
+    fetchFeeds(true);
   }
 };
 
@@ -317,14 +318,14 @@ const toggleTheme = () => {
 };
 
 // 获取RSS数据
-const fetchFeeds = async () => {
+const fetchFeeds = async (skipClientCache = false) => {
   if (loading.value) return;
 
   loading.value = true;
   error.value = null;
 
   try {
-    console.log(`开始获取RSS内容，首次加载: ${isFirstLoad}`);
+    console.log(`开始获取RSS内容，跳过客户端缓存: ${skipClientCache}, 首次加载: ${isFirstLoad}`);
 
     // 构建请求URL - 简化请求，移除强制刷新参数
     const url = `/api/feeds${isFirstLoad ? "?isFirstLoad=true" : ""}`;
@@ -335,55 +336,41 @@ const fetchFeeds = async () => {
       Accept: "application/json",
     };
 
-    console.log("使用服务器缓存");
-
-    // 发送请求
-    console.log(`正在请求: ${url}, 请求头:`, headers);
-    const response = await fetch(url, { headers });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    // 检查缓存状态
-    const cacheStatus = response.headers.get("X-Cache");
-    const isFromServerCache = cacheStatus === "HIT";
-
-    if (isFromServerCache) {
-      const cacheTsStr = response.headers.get("X-Cache-Timestamp");
-      if (cacheTsStr) {
-        const cacheTs = parseInt(cacheTsStr);
-        serverCacheTime.value = new Date(cacheTs);
+    // 只控制客户端缓存，不要求服务器刷新缓存
+    if (skipClientCache) {
+      console.log("添加客户端缓存控制头，跳过浏览器缓存");
+      headers["Cache-Control"] = "no-cache";
+      headers["Pragma"] = "no-cache";
+      // 添加时间戳参数，确保URL是唯一的，跳过浏览器缓存
+      const timestamp = new Date().getTime();
+      const urlWithTimestamp = url.includes('?') 
+        ? `${url}&_t=${timestamp}` 
+        : `${url}?_t=${timestamp}`;
+      
+      console.log(`添加时间戳参数: ${urlWithTimestamp}`);
+      
+      // 发送请求
+      console.log(`正在请求: ${urlWithTimestamp}, 请求头:`, headers);
+      const response = await fetch(urlWithTimestamp, { headers });
+      
+      // 处理响应...
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      activeCache.value = "server";
-      // 获取并处理缓存详细信息
-      const cacheCreated = response.headers.get("X-Cache-Created");
-      const cacheUpdateMethod = response.headers.get("X-Cache-Update-Method");
       
-      // 创建包含元数据的对象，简化updateMethod处理
-      serverCacheCreated.value = {
-        timestamp: cacheCreated,
-        updateMethod: "cache" // 统一使用"cache"表示服务器缓存
-      };
-      
-      serverCacheAge.value = parseInt(response.headers.get("X-Cache-Age") || "0");
-      serverCacheExpiry.value = response.headers.get("X-Cache-Expires") || null;
+      handleResponse(response);
     } else {
-      lastUpdateTime.value = new Date();
-      serverCacheTime.value = null;
-      activeCache.value = "fresh";
-      serverCacheCreated.value = null;
-      serverCacheAge.value = 0;
-      serverCacheExpiry.value = null;
-    }
-
-    const data = await response.json();
-    feeds.value = data;
-
-    // 更新加载状态
-    if (isFirstLoad) {
-      console.log("首次加载成功，设置为非首次加载状态");
-      isFirstLoad = false;
+      console.log("使用服务器缓存，不跳过客户端缓存");
+      
+      // 发送请求
+      console.log(`正在请求: ${url}, 请求头:`, headers);
+      const response = await fetch(url, { headers });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      handleResponse(response);
     }
   } catch (err) {
     console.error("获取RSS数据时出错:", err);
@@ -399,6 +386,50 @@ const fetchFeeds = async () => {
     isFirstLoad = false;
   } finally {
     loading.value = false;
+  }
+};
+
+// 处理响应的辅助函数
+const handleResponse = async (response) => {
+  // 检查缓存状态
+  const cacheStatus = response.headers.get("X-Cache");
+  const isFromServerCache = cacheStatus === "HIT";
+
+  if (isFromServerCache) {
+    const cacheTsStr = response.headers.get("X-Cache-Timestamp");
+    if (cacheTsStr) {
+      const cacheTs = parseInt(cacheTsStr);
+      serverCacheTime.value = new Date(cacheTs);
+    }
+    activeCache.value = "server";
+    // 获取并处理缓存详细信息
+    const cacheCreated = response.headers.get("X-Cache-Created");
+    const cacheUpdateMethod = response.headers.get("X-Cache-Update-Method");
+    
+    // 创建包含元数据的对象，简化updateMethod处理
+    serverCacheCreated.value = {
+      timestamp: cacheCreated,
+      updateMethod: "cache" // 统一使用"cache"表示服务器缓存
+    };
+    
+    serverCacheAge.value = parseInt(response.headers.get("X-Cache-Age") || "0");
+    serverCacheExpiry.value = response.headers.get("X-Cache-Expires") || null;
+  } else {
+    lastUpdateTime.value = new Date();
+    serverCacheTime.value = null;
+    activeCache.value = "fresh";
+    serverCacheCreated.value = null;
+    serverCacheAge.value = 0;
+    serverCacheExpiry.value = null;
+  }
+
+  const data = await response.json();
+  feeds.value = data;
+
+  // 更新加载状态
+  if (isFirstLoad) {
+    console.log("首次加载成功，设置为非首次加载状态");
+    isFirstLoad = false;
   }
 };
 
@@ -418,8 +449,8 @@ onMounted(async () => {
 
 // 修改刷新按钮点击函数，简化刷新逻辑
 const handleRefreshClick = () => {
-  // 用户手动点击刷新按钮时仍然获取数据
-  fetchFeeds();
+  // 用户手动点击刷新按钮时获取数据，跳过客户端缓存
+  fetchFeeds(true);
   // 重置倒计时时间
   countdown.value = RSS_CONFIG.refresh?.interval || 300;
 };
