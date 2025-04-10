@@ -200,9 +200,6 @@ const serverCacheAge = ref(0);
 const serverCacheExpiry = ref(null);
 const activeCache = ref("none");
 let isFirstLoad = true;
-let persistedCountdown = null;
-let refreshTimer = null;
-let countdownTimer = null;
 
 // 添加字体选择相关状态
 const fontLoaded = ref({
@@ -307,71 +304,18 @@ const toggleTheme = () => {
   localStorage.setItem("theme", isDark.value ? "dark" : "light");
 };
 
-// 在 formatLastUpdate 之后添加 persistCountdown 函数
-// 使用 localStorage 持久化倒计时，使其独立于页面刷新
-const persistCountdown = () => {
-  try {
-    localStorage.setItem("rss_countdown", countdown.value.toString());
-    localStorage.setItem("rss_countdown_timestamp", Date.now().toString());
-  } catch (e) {
-    console.error("无法保存倒计时状态:", e);
-  }
-};
-
-// 恢复倒计时状态
-const restoreCountdown = () => {
-  try {
-    const savedCountdown = localStorage.getItem("rss_countdown");
-    const savedTimestamp = localStorage.getItem("rss_countdown_timestamp");
-
-    if (savedCountdown && savedTimestamp) {
-      const elapsedSeconds = Math.floor(
-        (Date.now() - parseInt(savedTimestamp)) / 1000
-      );
-      let newCountdown = parseInt(savedCountdown) - elapsedSeconds;
-
-      // 如果倒计时已经过期或无效，重置为默认值
-      if (newCountdown <= 0 || isNaN(newCountdown)) {
-        newCountdown = RSS_CONFIG.refresh?.interval || 300;
-      }
-
-      countdown.value = newCountdown;
-      console.log(`恢复倒计时: ${countdown.value}秒`);
-    }
-  } catch (e) {
-    console.error("无法恢复倒计时状态:", e);
-  }
-};
-
-// 修改 updateCountdown 函数
-const updateCountdown = () => {
-  countdown.value--;
-  persistCountdown(); // 每次更新时保存倒计时状态
-
-  if (countdown.value <= 0) {
-    countdown.value = RSS_CONFIG.refresh?.interval || 300;
-    // 倒计时结束时刷新数据
-    fetchFeeds(true);
-  }
-};
-
 // 获取RSS数据
-const fetchFeeds = async (forceRefresh = false) => {
+const fetchFeeds = async () => {
   if (loading.value) return;
 
   loading.value = true;
   error.value = null;
 
   try {
-    console.log(
-      `开始获取RSS内容，请求参数强制刷新: ${forceRefresh}, 首次加载: ${isFirstLoad}`
-    );
+    console.log(`开始获取RSS内容，首次加载: ${isFirstLoad}`);
 
-    // 构建请求URL - 使用完全固定的基础路径，确保与服务器端缓存键匹配
-    // 只在强制刷新时添加forceRefresh参数
-    const url = `/api/feeds${forceRefresh ? "?forceRefresh=true" : ""}${
-      isFirstLoad ? (forceRefresh ? "&" : "?") + "isFirstLoad=true" : ""
-    }`;
+    // 构建请求URL - 简化请求，移除强制刷新参数
+    const url = `/api/feeds${isFirstLoad ? "?isFirstLoad=true" : ""}`;
     console.log(`发送请求到: ${url}`);
 
     // 设置请求头
@@ -379,14 +323,7 @@ const fetchFeeds = async (forceRefresh = false) => {
       Accept: "application/json",
     };
 
-    // 只有在强制刷新时才添加no-cache头
-    if (forceRefresh) {
-      console.log("添加no-cache头，强制获取新数据");
-      headers["Cache-Control"] = "no-cache";
-      headers["Pragma"] = "no-cache";
-    } else {
-      console.log("尝试使用服务器缓存");
-    }
+    console.log("使用服务器缓存");
 
     // 发送请求
     console.log(`正在请求: ${url}, 请求头:`, headers);
@@ -411,10 +348,10 @@ const fetchFeeds = async (forceRefresh = false) => {
       const cacheCreated = response.headers.get("X-Cache-Created");
       const cacheUpdateMethod = response.headers.get("X-Cache-Update-Method");
       
-      // 创建包含元数据的对象，而不仅仅是时间戳字符串
+      // 创建包含元数据的对象，简化updateMethod处理
       serverCacheCreated.value = {
         timestamp: cacheCreated,
-        updateMethod: cacheUpdateMethod || "unknown"
+        updateMethod: "cache" // 统一使用"cache"表示服务器缓存
       };
       
       serverCacheAge.value = parseInt(response.headers.get("X-Cache-Age") || "0");
@@ -431,7 +368,7 @@ const fetchFeeds = async (forceRefresh = false) => {
     const data = await response.json();
     feeds.value = data;
 
-    // 更新倒计时
+    // 更新加载状态
     if (isFirstLoad) {
       console.log("首次加载成功，设置为非首次加载状态");
       isFirstLoad = false;
@@ -441,13 +378,12 @@ const fetchFeeds = async (forceRefresh = false) => {
 
     // 如果是首次加载失败，显示更友好的错误信息
     if (isFirstLoad) {
-      error.value =
-        '获取RSS数据失败，请刷新页面重试，或点击右上角的"立即刷新"按钮。';
+      error.value = '获取RSS数据失败，请刷新页面重试。';
     } else {
       error.value = `获取数据失败: ${err.message}`;
     }
 
-    // 即使请求失败，也标记为非首次加载，这样用户可以尝试点击刷新按钮
+    // 即使请求失败，也标记为非首次加载
     isFirstLoad = false;
   } finally {
     loading.value = false;
@@ -460,27 +396,18 @@ onMounted(async () => {
   selectedFont.value = savedFont;
   loadFont(savedFont);
 
-  // 恢复倒计时状态（如果有）
-  restoreCountdown();
-
-  // 首次加载时，尽量使用缓存（不强制刷新）
-  console.log("页面首次加载，尝试使用服务器缓存");
-  await fetchFeeds(false);
-
-  // 设置倒计时更新
-  countdownTimer = setInterval(updateCountdown, 1000);
+  // 首次加载时使用服务器缓存
+  console.log("页面首次加载，使用服务器缓存");
+  await fetchFeeds();
 });
 
-// 修改刷新按钮点击函数，使用强制刷新
+// 修改刷新按钮点击函数，简化刷新逻辑
 const handleRefreshClick = () => {
-  fetchFeeds(true); // 强制刷新，不使用缓存
+  // 用户手动点击刷新按钮时仍然获取数据
+  fetchFeeds();
+  // 重置倒计时时间
+  countdown.value = RSS_CONFIG.refresh?.interval || 300;
 };
-
-onUnmounted(() => {
-  if (countdownTimer) {
-    clearInterval(countdownTimer);
-  }
-});
 </script>
 
 <style>

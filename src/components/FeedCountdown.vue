@@ -36,6 +36,7 @@
     <div 
       v-if="showCacheDetails" 
       class="cache-modal-overlay"
+      :class="{ 'dark-mode-modal': isDarkMode }"
       @click="closeModal"
     >
       <div 
@@ -92,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineEmits, defineProps } from "vue";
+import { ref, computed, defineEmits, defineProps, watch } from "vue";
 import { format } from "date-fns";
 
 const props = defineProps({
@@ -128,9 +129,28 @@ const props = defineProps({
 });
 
 const showCacheDetails = ref(false);
+const isDarkMode = ref(false);
+
+// 检测暗色模式
+const checkDarkMode = () => {
+  isDarkMode.value = document.documentElement.classList.contains('dark') || 
+                     document.body.classList.contains('dark') ||
+                     document.querySelector('.app-container')?.classList.contains('dark') || 
+                     localStorage.getItem('theme') === 'dark';
+};
+
+// 监听主题变化
+watch(showCacheDetails, (newVal) => {
+  if (newVal) {
+    checkDarkMode();
+  }
+}, { immediate: true });
 
 const toggleCacheDetails = () => {
   showCacheDetails.value = !showCacheDetails.value;
+  if (showCacheDetails.value) {
+    checkDarkMode();
+  }
 };
 
 const closeModal = () => {
@@ -191,27 +211,11 @@ const serverCacheExpiryFormatted = computed(() => {
 });
 
 const cacheSourceText = computed(() => {
-  // 检查缓存元数据中的updateMethod字段
-  const updateMethod = props.serverCacheCreated && typeof props.serverCacheCreated === 'object' 
-    && props.serverCacheCreated.updateMethod 
-    ? props.serverCacheCreated.updateMethod 
-    : null;
-    
   switch (props.activeCache) {
     case 'server':
-      if (updateMethod === 'scheduled') {
-        return '定时器自动更新 (30分钟)';
-      } else if (updateMethod === 'manual') {
-        return '手动触发更新 (API)';
-      } else if (updateMethod === 'auto') {
-        return '智能异步更新 (80%过期)';
-      } else if (updateMethod === 'request') {
-        return '页面刷新更新';
-      } else {
-        return '服务器缓存 (未知来源)';
-      }
+      return '服务器缓存';
     case 'fresh':
-      return '页面立即刷新';
+      return '页面刷新';
     case 'none':
       return '无缓存';
     default:
@@ -220,25 +224,9 @@ const cacheSourceText = computed(() => {
 });
 
 const cacheSourceIconClass = computed(() => {
-  // 检查缓存元数据中的updateMethod字段
-  const updateMethod = props.serverCacheCreated && typeof props.serverCacheCreated === 'object' 
-    && props.serverCacheCreated.updateMethod 
-    ? props.serverCacheCreated.updateMethod 
-    : null;
-    
   switch (props.activeCache) {
     case 'server':
-      if (updateMethod === 'scheduled') {
-        return 'scheduled';
-      } else if (updateMethod === 'manual') {
-        return 'manual';
-      } else if (updateMethod === 'auto') {
-        return 'auto';
-      } else if (updateMethod === 'request') {
-        return 'request';
-      } else {
-        return 'server';
-      }
+      return 'server';
     case 'fresh':
       return 'fresh';
     case 'none':
@@ -248,6 +236,43 @@ const cacheSourceIconClass = computed(() => {
   }
 });
 </script>
+
+<style>
+/* 全局样式，确保在Teleport后仍然生效 */
+.dark-mode-modal .cache-modal-container {
+  background-color: rgba(31, 41, 55, 0.95) !important;
+  border: 1px solid rgba(75, 85, 101, 0.6) !important;
+}
+
+.dark-mode-modal .cache-modal-header {
+  background-color: rgba(55, 65, 81, 0.8) !important;
+  border-bottom: 1px solid rgba(75, 85, 101, 0.8) !important;
+}
+
+.dark-mode-modal .cache-modal-header h3 {
+  color: #e5e7eb !important;
+}
+
+.dark-mode-modal .cache-modal-close {
+  color: #d1d5db !important;
+}
+
+.dark-mode-modal .cache-modal-close:hover {
+  background-color: rgba(75, 85, 101, 0.5) !important;
+}
+
+.dark-mode-modal .cache-detail-item {
+  border-color: rgba(75, 85, 101, 0.5) !important;
+}
+
+.dark-mode-modal .cache-detail-item .label {
+  color: #9ca3af !important;
+}
+
+.dark-mode-modal .cache-detail-item .value {
+  color: #e5e7eb !important;
+}
+</style>
 
 <style scoped>
 .countdown-container {
